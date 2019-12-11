@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestStream(t *testing.T) {
+func TestServerStarts(t *testing.T) {
 	port := getAvailablePort(t)
 	_, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	require.NoError(t, err)

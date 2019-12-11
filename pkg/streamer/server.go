@@ -8,5 +8,10 @@ type Server struct {
 }
 
 func (s *Server) Tail(req *blergproto.StreamRequest, stream blergproto.SpanStream_TailServer) error {
+
+	stream.Send(&blergproto.SpanResponse{
+		Dropped: 32,
+	})
+
 	return nil
 }
