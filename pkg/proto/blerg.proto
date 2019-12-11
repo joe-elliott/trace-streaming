@@ -1,0 +1,21 @@
+// protoc -I pkg/proto/ pkg/proto/blerg.proto --gogoslick_out=plugins=grpc:pkg/proto
+
+syntax="proto3";
+
+package blergproto;
+
+import "trace.proto";
+
+service SpanStream {
+  rpc Tail(StreamRequest) returns (stream SpanResponse) {};
+}
+
+message StreamRequest {
+    int32 requestedBatchSize = 1;
+    int32 requestedRate = 2;
+}
+
+message SpanResponse {  
+    int32 dropped = 1;
+    repeated opentelemetry.proto.trace.v1.Span spans = 2;
+}
