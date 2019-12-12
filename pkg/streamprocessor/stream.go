@@ -20,6 +20,7 @@ import (
 type streamProcessor struct {
 	nextConsumer consumer.TraceConsumer
 	config       Config
+	spans        *spanTailer
 }
 
 // NewTraceProcessor returns the span processor.
@@ -31,6 +32,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 	sp := &streamProcessor{
 		nextConsumer: nextConsumer,
 		config:       config,
+		spans:        newSpanTailer(),
 	}
 
 	port := util.DefaultPort
@@ -41,7 +43,8 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 	}
 
 	server := grpc.NewServer()
-	blergpb.RegisterSpanStreamServer(server, &tailer{})
+
+	blergpb.RegisterSpanStreamServer(server, sp.spans)
 
 	go func() {
 		go server.Serve(lis)
@@ -51,6 +54,9 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 }
 
 func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata.TraceData) error {
+
+	sp.spans.processBatch(td.Spans)
+
 	return sp.nextConsumer.ConsumeTraceData(ctx, td)
 }
 

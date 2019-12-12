@@ -20,6 +20,6 @@ message SpanResponse {
 
 message Span {
   string operationName = 1;
-  int32 startTime = 2;
-  int32 duration = 3;
+  int64 startTime = 2;
+  int64 duration = 3;
 }
