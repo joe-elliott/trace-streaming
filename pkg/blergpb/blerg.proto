@@ -1,10 +1,8 @@
-// protoc -I pkg/proto/ pkg/proto/blerg.proto --go_out=plugins=grpc:pkg/proto
+// protoc -I pkg/blergpb/ pkg/blergpb/blerg.proto --go_out=plugins=grpc:pkg/blergpb
 
 syntax="proto3";
 
-package blergproto;
-
-import "trace.proto";
+package blergpb;
 
 service SpanStream {
   rpc Tail(StreamRequest) returns (stream SpanResponse) {};
@@ -17,5 +15,11 @@ message StreamRequest {
 
 message SpanResponse {  
     int32 dropped = 1;
-    repeated opentelemetry.proto.trace.v1.Span spans = 2;
+    repeated Span spans = 2;
+}
+
+message Span {
+  string operationName = 1;
+  int32 startTime = 2;
+  int32 duration = 3;
 }

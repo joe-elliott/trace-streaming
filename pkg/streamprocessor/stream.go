@@ -13,7 +13,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/oterr"
 	"github.com/open-telemetry/opentelemetry-collector/processor"
 
-	blergproto "github.com/joe-elliott/blerg/pkg/proto"
+	"github.com/joe-elliott/blerg/pkg/blergpb"
 	"github.com/joe-elliott/blerg/pkg/util"
 )
 
@@ -41,7 +41,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 	}
 
 	server := grpc.NewServer()
-	blergproto.RegisterSpanStreamServer(server, &tailer{})
+	blergpb.RegisterSpanStreamServer(server, &tailer{})
 
 	go func() {
 		go server.Serve(lis)

@@ -1,15 +1,15 @@
 package streamprocessor
 
 import (
-	blergproto "github.com/joe-elliott/blerg/pkg/proto"
+	"github.com/joe-elliott/blerg/pkg/blergpb"
 )
 
 type tailer struct {
 }
 
-func (s *tailer) Tail(req *blergproto.StreamRequest, stream blergproto.SpanStream_TailServer) error {
+func (s *tailer) Tail(req *blergpb.StreamRequest, stream blergpb.SpanStream_TailServer) error {
 
-	stream.Send(&blergproto.SpanResponse{
+	stream.Send(&blergpb.SpanResponse{
 		Dropped: 32,
 	})
 

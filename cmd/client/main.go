@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	blergproto "github.com/joe-elliott/blerg/pkg/proto"
+	"github.com/joe-elliott/blerg/pkg/blergpb"
 	"github.com/joe-elliott/blerg/pkg/util"
 )
 
@@ -19,9 +19,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	streamRequest := &blergproto.StreamRequest{}
+	streamRequest := &blergpb.StreamRequest{}
 
-	client := blergproto.NewSpanStreamClient(conn)
+	client := blergpb.NewSpanStreamClient(conn)
 	stream, err := client.Tail(context.Background(), streamRequest)
 
 	for {
