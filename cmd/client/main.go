@@ -19,10 +19,12 @@ func main() {
 	}
 	defer conn.Close()
 
-	streamRequest := &blergpb.StreamRequest{}
+	traceReq := &blergpb.TraceRequest{
+		CrossesProcessBoundaries: false,
+	}
 
 	client := blergpb.NewSpanStreamClient(conn)
-	stream, err := client.QueryTraces(context.Background(), streamRequest)
+	stream, err := client.QueryTraces(context.Background(), traceReq)
 
 	for {
 		resp, err := stream.Recv()

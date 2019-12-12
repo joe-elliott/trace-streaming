@@ -5,12 +5,12 @@ import (
 )
 
 type Spans struct {
-	req    *blergpb.StreamRequest
+	req    *blergpb.SpanRequest
 	stream blergpb.SpanStream_QuerySpansServer
 	spans  chan []*blergpb.Span
 }
 
-func NewSpans(req *blergpb.StreamRequest, stream blergpb.SpanStream_QuerySpansServer) *Spans {
+func NewSpans(req *blergpb.SpanRequest, stream blergpb.SpanStream_QuerySpansServer) *Spans {
 	return &Spans{
 		req:    req,
 		stream: stream,

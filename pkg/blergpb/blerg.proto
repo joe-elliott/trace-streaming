@@ -5,13 +5,22 @@ syntax="proto3";
 package blergpb;
 
 service SpanStream {
-  rpc QuerySpans(StreamRequest) returns (stream SpanResponse) {};
-  rpc QueryTraces(StreamRequest) returns (stream SpanResponse) {};
+  rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {};
+  rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {};
 }
 
 message StreamRequest {
     int32 requestedBatchSize = 1;
     int32 requestedRate = 2;
+}
+
+message TraceRequest {
+  StreamRequest params = 1;
+  bool crossesProcessBoundaries = 2;
+}
+
+message SpanRequest {
+  StreamRequest params = 1;
 }
 
 message SpanResponse {  

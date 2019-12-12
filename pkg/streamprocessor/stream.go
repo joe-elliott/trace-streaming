@@ -26,7 +26,7 @@ type streamProcessor struct {
 	config       Config
 
 	spanStreamers  []*streamer.Spans
-	traceStreamers []*streamer.Spans
+	traceStreamers []*streamer.Traces
 
 	traceBatcher *batcher
 }
@@ -84,15 +84,15 @@ func (sp *streamProcessor) GetCapabilities() processor.Capabilities {
 	return processor.Capabilities{MutatesConsumedData: false}
 }
 
-func (sp *streamProcessor) QuerySpans(req *blergpb.StreamRequest, stream blergpb.SpanStream_QuerySpansServer) error {
+func (sp *streamProcessor) QuerySpans(req *blergpb.SpanRequest, stream blergpb.SpanStream_QuerySpansServer) error {
 	tailer := streamer.NewSpans(req, stream)
 	sp.spanStreamers = append(sp.spanStreamers, tailer)
 
 	return tailer.Do()
 }
 
-func (sp *streamProcessor) QueryTraces(req *blergpb.StreamRequest, stream blergpb.SpanStream_QueryTracesServer) error {
-	tailer := streamer.NewSpans(req, stream)
+func (sp *streamProcessor) QueryTraces(req *blergpb.TraceRequest, stream blergpb.SpanStream_QueryTracesServer) error {
+	tailer := streamer.NewTraces(req, stream)
 	sp.traceStreamers = append(sp.traceStreamers, tailer)
 
 	return tailer.Do()
