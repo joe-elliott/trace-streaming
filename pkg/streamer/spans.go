@@ -1,47 +1,39 @@
 package streamer
 
 import (
-	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 	"github.com/joe-elliott/blerg/pkg/blergpb"
 )
 
 type Spans struct {
 	req    *blergpb.StreamRequest
-	stream blergpb.SpanStream_TailServer
-	spans  chan []*tracepb.Span
+	stream blergpb.SpanStream_QuerySpansServer
+	spans  chan []*blergpb.Span
 }
 
-func NewSpans(req *blergpb.StreamRequest, stream blergpb.SpanStream_TailServer) *Spans {
+func NewSpans(req *blergpb.StreamRequest, stream blergpb.SpanStream_QuerySpansServer) *Spans {
 	return &Spans{
 		req:    req,
 		stream: stream,
-		spans:  make(chan []*tracepb.Span),
+		spans:  make(chan []*blergpb.Span),
 	}
 }
 
 func (s *Spans) Do() error {
 
 	for spans := range s.spans {
-		blergSpans := make([]*blergpb.Span, len(spans))
-
-		for i, span := range spans {
-			blergSpan := spanToSpan(span)
-			blergSpans[i] = blergSpan
-		}
-
 		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
-			Spans:   blergSpans,
+			Spans:   spans,
 		})
 	}
 
 	return nil
 }
 
-func (s *Spans) ProcessBatch(spans []*tracepb.Span) {
+func (s *Spans) ProcessBatch(spans []*blergpb.Span) {
 	s.spans <- spans
 }
 
-func (s *Spans) Shutdown(spans []*tracepb.Span) {
+func (s *Spans) Shutdown(spans []*blergpb.Span) {
 	close(s.spans)
 }

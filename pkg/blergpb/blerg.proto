@@ -5,7 +5,8 @@ syntax="proto3";
 package blergpb;
 
 service SpanStream {
-  rpc Tail(StreamRequest) returns (stream SpanResponse) {};
+  rpc QuerySpans(StreamRequest) returns (stream SpanResponse) {};
+  rpc QueryTraces(StreamRequest) returns (stream SpanResponse) {};
 }
 
 message StreamRequest {
@@ -19,7 +20,8 @@ message SpanResponse {
 }
 
 message Span {
-  string operationName = 1;
-  int64 startTime = 2;
-  int64 duration = 3;
+  bytes traceID = 1;
+  string operationName = 2;
+  int64 startTime = 3;
+  int64 duration = 4;
 }

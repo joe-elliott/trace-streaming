@@ -8,3 +8,6 @@ todo:
   - traceheader
 - web interface
 - some kind of filtering?
+- metrics
+- streamers never removed from the slice in stream processor :)
+- gracefully shutdown batch polling

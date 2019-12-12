@@ -22,7 +22,7 @@ func main() {
 	streamRequest := &blergpb.StreamRequest{}
 
 	client := blergpb.NewSpanStreamClient(conn)
-	stream, err := client.Tail(context.Background(), streamRequest)
+	stream, err := client.QueryTraces(context.Background(), streamRequest)
 
 	for {
 		resp, err := stream.Recv()
