@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  blerg:
+    image: blerg:latest
+    command: ["--config","/etc/config/config.yaml"]
+    ports:
+      - "31234:31234"
+    volumes:
+    - ./:/etc/config
+  hotrod:
+    image: jaegertracing/example-hotrod:latest
+    ports: 
+      - "8080:8080"
+    command: ["all"]
+    environment:
+      - JAEGER_ENDPOINT=http://blerg:14268/api/traces
+    depends_on:
+      - blerg
