@@ -2,11 +2,19 @@ package streamprocessor
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"net"
+
+	"google.golang.org/grpc"
 
 	"github.com/open-telemetry/opentelemetry-collector/consumer"
 	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
 	"github.com/open-telemetry/opentelemetry-collector/oterr"
 	"github.com/open-telemetry/opentelemetry-collector/processor"
+
+	blergproto "github.com/joe-elliott/blerg/pkg/proto"
+	"github.com/joe-elliott/blerg/pkg/util"
 )
 
 type streamProcessor struct {
@@ -24,6 +32,20 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		nextConsumer: nextConsumer,
 		config:       config,
 	}
+
+	port := util.DefaultPort
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+
+	if err != nil {
+		log.Fatal("Failed to listen", err)
+	}
+
+	server := grpc.NewServer()
+	blergproto.RegisterSpanStreamServer(server, &tailer{})
+
+	go func() {
+		go server.Serve(lis)
+	}()
 
 	return sp, nil
 }

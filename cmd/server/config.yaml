@@ -1,0 +1,23 @@
+# go run ./cmd/server --config=./cmd/server/config.yaml
+receivers:
+  jaeger:
+    protocols:
+      thrift-http:
+        endpoint: "0.0.0.0:14268"
+      grpc:
+        endpoint: "0.0.0.0:14250"
+exporters:
+  logging: {}
+processors:
+  stream: {}
+extensions:
+  health_check: {}
+  pprof: {}
+  zpages: {}
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [jaeger]
+      exporters: [logging]
+      processors: [stream]
