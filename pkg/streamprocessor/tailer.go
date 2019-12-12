@@ -38,6 +38,10 @@ func (s *spanTailer) processBatch(spans []*tracepb.Span) {
 	s.spans <- spans
 }
 
+func (s *spanTailer) shutdown(spans []*tracepb.Span) {
+	close(s.spans)
+}
+
 func spanToSpan(in *tracepb.Span) *blergpb.Span {
 
 	return &blergpb.Span{
