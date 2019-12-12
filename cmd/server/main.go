@@ -1,27 +1,32 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
 
-	"google.golang.org/grpc"
+	"github.com/open-telemetry/opentelemetry-collector/defaults"
+	"github.com/open-telemetry/opentelemetry-collector/processor"
+	"github.com/open-telemetry/opentelemetry-collector/service"
 
-	blergproto "github.com/joe-elliott/blerg/pkg/proto"
-	"github.com/joe-elliott/blerg/pkg/streamer"
-	"github.com/joe-elliott/blerg/pkg/util"
+	"github.com/joe-elliott/blerg/pkg/streamprocessor"
 )
 
 func main() {
-	port := util.DefaultPort
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-
-	if err != nil {
-		log.Fatal("Failed to listen", err)
+	handleErr := func(err error) {
+		if err != nil {
+			log.Fatalf("Failed to run the service: %v", err)
+		}
 	}
 
-	server := grpc.NewServer()
-	blergproto.RegisterSpanStreamServer(server, &streamer.Server{})
+	factories, err := defaults.Components()
+	handleErr(err)
 
-	server.Serve(lis)
+	// only need one processor for now.  can add more later
+	factories.Processors, err = processor.Build(
+		&streamprocessor.Factory{},
+	)
+	handleErr(err)
+
+	svc := service.New(factories)
+	err = svc.Start()
+	handleErr(err)
 }
