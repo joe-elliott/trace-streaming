@@ -11,3 +11,4 @@ todo:
 - metrics
 - streamers never removed from the slice in stream processor :)
 - gracefully shutdown batch polling
+- add opentelemetry tracing

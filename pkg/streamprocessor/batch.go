@@ -74,6 +74,7 @@ func (b *batcher) completeBatches() [][]*blergpb.Span {
 	return completed
 }
 
+// let's hope there's no collisions in the first 8 bytes!
 func traceID(b []byte) uint64 {
 	return binary.BigEndian.Uint64(b)
 }

@@ -34,6 +34,7 @@ func main() {
 		if err != nil {
 			log.Fatal("stream fail", err)
 		}
+		log.Println("----received thing----")
 		log.Println(resp)
 	}
 

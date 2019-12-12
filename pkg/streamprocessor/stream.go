@@ -1,6 +1,7 @@
 package streamprocessor
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/oterr"
 	"github.com/open-telemetry/opentelemetry-collector/processor"
 
+	commonpb "github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1"
 	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 
 	"github.com/joe-elliott/blerg/pkg/blergpb"
@@ -67,7 +69,7 @@ func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata
 	blergSpans := make([]*blergpb.Span, len(td.Spans))
 
 	for i, span := range td.Spans {
-		blergSpan := spanToSpan(span)
+		blergSpan := spanToSpan(span, td.Node)
 		blergSpans[i] = blergSpan
 	}
 
@@ -105,6 +107,8 @@ func (sp *streamProcessor) pollBatches(pollTime time.Duration) {
 		completed := sp.traceBatcher.completeBatches()
 
 		for _, batch := range completed {
+			buildSpanTree(batch)
+
 			for _, t := range sp.traceStreamers {
 				t.ProcessBatch(batch)
 			}
@@ -114,11 +118,40 @@ func (sp *streamProcessor) pollBatches(pollTime time.Duration) {
 	}
 }
 
-func spanToSpan(in *tracepb.Span) *blergpb.Span {
+func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 	return &blergpb.Span{
 		TraceID:       in.TraceId,
+		SpanID:        in.SpanId,
+		ParentSpanID:  in.ParentSpanId,
+		ProcessName:   node.ServiceInfo.Name,
 		OperationName: in.Name.Value,
 		StartTime:     in.StartTime.Seconds,
 		Duration:      in.EndTime.Seconds - in.StartTime.Seconds,
+	}
+}
+
+func buildSpanTree(trace []*blergpb.Span) {
+
+	// O(n^2)! yay!
+	for _, child := range trace {
+
+		found := false
+		for _, parent := range trace {
+
+			if bytes.Equal(child.ParentSpanID, parent.SpanID) {
+				found = true
+
+				child.Parent = &blergpb.ParentSpan{
+					OperationName: parent.OperationName,
+					ProcessName:   parent.ProcessName,
+					StartTime:     parent.StartTime,
+					Duration:      parent.Duration,
+				}
+			}
+		}
+
+		if !found {
+			log.Printf("Unable to find parent id %v", child.ParentSpanID)
+		}
 	}
 }
