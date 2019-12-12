@@ -6,16 +6,20 @@ import (
 )
 
 type spanTailer struct {
-	spans chan []*tracepb.Span
+	req    *blergpb.StreamRequest
+	stream blergpb.SpanStream_TailServer
+	spans  chan []*tracepb.Span
 }
 
-func newSpanTailer() *spanTailer {
+func newSpanTailer(req *blergpb.StreamRequest, stream blergpb.SpanStream_TailServer) *spanTailer {
 	return &spanTailer{
-		spans: make(chan []*tracepb.Span),
+		req:    req,
+		stream: stream,
+		spans:  make(chan []*tracepb.Span),
 	}
 }
 
-func (s *spanTailer) Tail(req *blergpb.StreamRequest, stream blergpb.SpanStream_TailServer) error {
+func (s *spanTailer) do() error {
 
 	for spans := range s.spans {
 		blergSpans := make([]*blergpb.Span, len(spans))
@@ -25,7 +29,7 @@ func (s *spanTailer) Tail(req *blergpb.StreamRequest, stream blergpb.SpanStream_
 			blergSpans[i] = blergSpan
 		}
 
-		stream.Send(&blergpb.SpanResponse{
+		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
 			Spans:   blergSpans,
 		})
