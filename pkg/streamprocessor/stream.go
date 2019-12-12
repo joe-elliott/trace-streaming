@@ -14,13 +14,14 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/processor"
 
 	"github.com/joe-elliott/blerg/pkg/blergpb"
+	"github.com/joe-elliott/blerg/pkg/streamer"
 	"github.com/joe-elliott/blerg/pkg/util"
 )
 
 type streamProcessor struct {
-	nextConsumer consumer.TraceConsumer
-	config       Config
-	spans        []*spanTailer
+	nextConsumer  consumer.TraceConsumer
+	config        Config
+	spanStreamers []*streamer.Spans
 }
 
 // NewTraceProcessor returns the span processor.
@@ -54,8 +55,8 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 
 func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata.TraceData) error {
 
-	for _, tailer := range sp.spans {
-		tailer.processBatch(td.Spans)
+	for _, s := range sp.spanStreamers {
+		s.ProcessBatch(td.Spans)
 	}
 
 	return sp.nextConsumer.ConsumeTraceData(ctx, td)
@@ -66,8 +67,8 @@ func (sp *streamProcessor) GetCapabilities() processor.Capabilities {
 }
 
 func (sp *streamProcessor) Tail(req *blergpb.StreamRequest, stream blergpb.SpanStream_TailServer) error {
-	tailer := newSpanTailer(req, stream)
-	sp.spans = append(sp.spans, tailer)
+	tailer := streamer.NewSpans(req, stream)
+	sp.spanStreamers = append(sp.spanStreamers, tailer)
 
-	return tailer.do()
+	return tailer.Do()
 }
