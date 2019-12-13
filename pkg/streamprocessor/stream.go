@@ -24,6 +24,7 @@ import (
 	"github.com/joe-elliott/blerg/pkg/util"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/tmc/grpc-websocket-proxy/wsproxy"
 )
 
 type streamProcessor struct {
@@ -68,7 +69,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		log.Fatal("Failed to start HTTP Proxy", err)
 	}
 	go func() {
-		go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), mux)
+		go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), wsproxy.WebsocketProxy(mux))
 	}()
 
 	go sp.pollBatches(5 * time.Second)
