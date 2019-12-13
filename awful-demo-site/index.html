@@ -10,6 +10,9 @@
     <h2>Let's goooo!</h2>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
+       const maxTraces = 50
+       let traces = []
+
         let socket = new WebSocket("ws://127.0.0.1:31235/socket");
         console.log("Attempting Connection...");
 
@@ -29,18 +32,37 @@
 
         socket.onmessage = msg => {
             console.log("Message: ", msg)
-            if (msg.data != "{}") makeTree(JSON.parse(msg.data))
+
+            if (msg.data != "{}") {
+              traces.push(JSON.parse(msg.data).spans)
+              if (traces.length > maxTraces) traces.pop()
+              
+              makeTree(traces)
+            }
         }
     </script>
     <script>
-      function makeTree(trace) {
+      function makeTree(traces) {
+        allSpans = traces.flat()
+
+        rootSpan = {
+          spanID : "root",
+          processName : "root",
+          operationName : "root",
+          parentSpanID : "",
+          duration: 0,
+        }
+        allSpans.push(rootSpan)
+        
         var data = d3.stratify()
                       .id(function(d) { return d.spanID })
-                      .parentId(function(d) { return d.parentSpanID })
-                      (trace.spans)
+                      .parentId(function(d) { return "parentSpanID" in d ? d.parentSpanID : "root" })
+                      (allSpans)
 
         width = 932
         var root = d3.hierarchy(data)
+                    .sum(d => 1)
+                    .sort((a, b) => 0)
         
         root.dx = 10
         root.dy = width / (root.height + 1)
@@ -54,6 +76,7 @@
           if (d.x < x0) x0 = d.x;
         });
 
+        d3.select("body svg").remove();
         var svg = d3.select("body").append("svg").attr("viewBox", [0, 0, width, x1 - x0 + root.dx * 2]);       
 
         const g = svg.append("g")
@@ -93,7 +116,6 @@
           .clone(true).lower()
             .attr("stroke", "white");
       }
-
     </script>
   </body>
 </html>
