@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"time"
 
 	"google.golang.org/grpc"
@@ -21,6 +22,8 @@ import (
 	"github.com/joe-elliott/blerg/pkg/blergpb"
 	"github.com/joe-elliott/blerg/pkg/streamer"
 	"github.com/joe-elliott/blerg/pkg/util"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 )
 
 type streamProcessor struct {
@@ -45,19 +48,27 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		traceBatcher: newBatcher(),
 	}
 
-	port := util.DefaultPort
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-
+	// GRPC
+	grpcEndpoint := fmt.Sprintf(":%d", util.DefaultGRPCPort)
+	lis, err := net.Listen("tcp", grpcEndpoint)
 	if err != nil {
 		log.Fatal("Failed to listen", err)
 	}
-
 	server := grpc.NewServer()
-
 	blergpb.RegisterSpanStreamServer(server, sp)
-
 	go func() {
 		go server.Serve(lis)
+	}()
+
+	// HTTP
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	mux := runtime.NewServeMux()
+	err = blergpb.RegisterSpanStreamHandlerFromEndpoint(context.Background(), mux, grpcEndpoint, opts)
+	if err != nil {
+		log.Fatal("Failed to start HTTP Proxy", err)
+	}
+	go func() {
+		go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), mux)
 	}()
 
 	go sp.pollBatches(5 * time.Second)

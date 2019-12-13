@@ -1,5 +1,6 @@
 package util
 
 const (
-	DefaultPort = 31234
+	DefaultGRPCPort = 31234
+	DefaultHTTPPort = 31235
 )

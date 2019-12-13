@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial(fmt.Sprintf(":%d", util.DefaultPort), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf(":%d", util.DefaultGRPCPort), grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Failed to listen", err)
 	}

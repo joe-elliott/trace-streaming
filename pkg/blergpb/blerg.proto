@@ -1,12 +1,26 @@
 // protoc -I pkg/blergpb/ pkg/blergpb/blerg.proto --go_out=plugins=grpc:pkg/blergpb
+// protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. pkg/blergpb/blerg.proto
+// protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true:. pkg/blergpb/your_service.proto
 
 syntax="proto3";
 
 package blergpb;
 
+import "google/api/annotations.proto";
+
 service SpanStream {
-  rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {};
-  rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {};
+  rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {
+    option (google.api.http) = {
+      post: "/v1/stream/spans"
+      body: "*"
+    };
+  };
+  rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {
+    option (google.api.http) = {
+      post: "/v1/stream/traces"
+      body: "*"
+    };
+  };
 }
 
 message StreamRequest {
@@ -36,7 +50,7 @@ message Span {
   string operationName = 5;
   int64 startTime = 6;
   int64 duration = 7;
-  
+
   ParentSpan parent = 8;
 }
 
