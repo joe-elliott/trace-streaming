@@ -23,8 +23,7 @@ import (
 	"github.com/joe-elliott/blerg/pkg/streamer"
 	"github.com/joe-elliott/blerg/pkg/util"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/tmc/grpc-websocket-proxy/wsproxy"
+	"github.com/gorilla/websocket"
 )
 
 type streamProcessor struct {
@@ -58,21 +57,15 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 	server := grpc.NewServer()
 	blergpb.RegisterSpanStreamServer(server, sp)
 	go func() {
-		go server.Serve(lis)
-	}()
-
-	// HTTP
-	opts := []grpc.DialOption{grpc.WithInsecure()}
-	mux := runtime.NewServeMux()
-	err = blergpb.RegisterSpanStreamHandlerFromEndpoint(context.Background(), mux, grpcEndpoint, opts)
-	if err != nil {
-		log.Fatal("Failed to start HTTP Proxy", err)
-	}
-	go func() {
-		go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), wsproxy.WebsocketProxy(mux))
+		err := server.Serve(lis)
+		if err != nil {
+			log.Fatal("Failed to start GRPC Server", err)
+		}
 	}()
 
 	go sp.pollBatches(5 * time.Second)
+
+	sp.startWebsocket()
 
 	return sp, nil
 }
@@ -129,6 +122,47 @@ func (sp *streamProcessor) pollBatches(pollTime time.Duration) {
 		<-ticker.C
 	}
 }
+
+// websocket crap
+type socketSender struct {
+	ws *websocket.Conn
+}
+
+func (sp *streamProcessor) startWebsocket() {
+	http.HandleFunc("/socket", sp.ws)
+	go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), nil)
+}
+
+func (sp *streamProcessor) ws(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// helpful log statement to show connections
+	log.Println("Client Connected")
+
+	s := &socketSender{
+		ws: ws,
+	}
+
+	tailer := streamer.NewTraces(&blergpb.TraceRequest{}, s)
+	sp.traceStreamers = append(sp.traceStreamers, tailer)
+
+	tailer.Do()
+}
+
+func (s *socketSender) Send(span *blergpb.SpanResponse) error {
+	return s.ws.WriteJSON(span)
+}
+
+// utility
 
 func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 	return &blergpb.Span{

@@ -5,6 +5,7 @@ services:
     command: ["--config","/etc/config/config.yaml"]
     ports:
       - "31234:31234"
+      - "31235:31235"
     volumes:
     - ./:/etc/config
   hotrod:

@@ -6,11 +6,11 @@ import (
 
 type Spans struct {
 	req    *blergpb.SpanRequest
-	stream blergpb.SpanStream_QuerySpansServer
+	stream ClientStream
 	spans  chan []*blergpb.Span
 }
 
-func NewSpans(req *blergpb.SpanRequest, stream blergpb.SpanStream_QuerySpansServer) *Spans {
+func NewSpans(req *blergpb.SpanRequest, stream ClientStream) *Spans {
 	return &Spans{
 		req:    req,
 		stream: stream,

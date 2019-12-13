@@ -6,11 +6,11 @@ import (
 
 type Traces struct {
 	req    *blergpb.TraceRequest
-	stream blergpb.SpanStream_QueryTracesServer
+	stream ClientStream
 	traces chan []*blergpb.Span
 }
 
-func NewTraces(req *blergpb.TraceRequest, stream blergpb.SpanStream_QueryTracesServer) *Traces {
+func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
 	return &Traces{
 		req:    req,
 		stream: stream,

@@ -6,6 +6,7 @@ require (
 	github.com/census-instrumentation/opencensus-proto v0.2.1
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.2
+	github.com/gorilla/websocket v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
 	github.com/open-telemetry/opentelemetry-collector v0.2.0
 	github.com/open-telemetry/opentelemetry-proto v0.0.0-20191210162502-28a7413d3a0a
