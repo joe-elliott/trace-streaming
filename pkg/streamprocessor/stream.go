@@ -152,7 +152,9 @@ func (sp *streamProcessor) ws(w http.ResponseWriter, r *http.Request) {
 		ws: ws,
 	}
 
-	tailer := streamer.NewTraces(&blergpb.TraceRequest{}, s)
+	tailer := streamer.NewTraces(&blergpb.TraceRequest{
+		CrossesProcessBoundaries: true,
+	}, s)
 	sp.traceStreamers = append(sp.traceStreamers, tailer)
 
 	tailer.Do()

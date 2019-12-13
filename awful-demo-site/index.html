@@ -29,39 +29,20 @@
 
         socket.onmessage = msg => {
             console.log("Message: ", msg)
+            if (msg.data != "{}") makeTree(JSON.parse(msg.data))
         }
     </script>
     <script>
-        var data = {
-          "name": "A1",
-          "children": [
-            {
-              "name": "B1",
-              "children": [
-                {
-                  "name": "C1",
-                  "value": 100
-                },
-                {
-                  "name": "C2",
-                  "value": 300
-                },
-                {
-                  "name": "C3",
-                  "value": 200
-                }
-              ]
-            },
-            {
-              "name": "B2",
-              "value": 200
-            }
-          ]
-        };
+      function makeTree(trace) {
+        console.log(trace)
+        var data = d3.stratify()
+                      .id(function(d) { return d.processName + "-" + d.operationName})
+                      .parentId(function(d) { return d.parent.processName + "-" + d.parent.operationName })
+                      (trace)
 
         width = 932
         var root = d3.hierarchy(data)
-
+        
         root.dx = 10
         root.dy = width / (root.height + 1)
 
@@ -112,7 +93,7 @@
             .text(d => d.data.name)
           .clone(true).lower()
             .attr("stroke", "white");
-
+      }
 
     </script>
   </body>
