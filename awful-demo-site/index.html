@@ -34,11 +34,10 @@
     </script>
     <script>
       function makeTree(trace) {
-        console.log(trace)
         var data = d3.stratify()
-                      .id(function(d) { return d.processName + "-" + d.operationName})
-                      .parentId(function(d) { return d.parent.processName + "-" + d.parent.operationName })
-                      (trace)
+                      .id(function(d) { return d.spanID })
+                      .parentId(function(d) { return d.parentSpanID })
+                      (trace.spans)
 
         width = 932
         var root = d3.hierarchy(data)
@@ -90,7 +89,7 @@
             .attr("dy", "0.31em")
             .attr("x", d => d.children ? -6 : 6)
             .attr("text-anchor", d => d.children ? "end" : "start")
-            .text(d => d.data.name)
+            .text(d => d.data.data.processName + "-" + d.data.data.operationName )
           .clone(true).lower()
             .attr("stroke", "white");
       }
