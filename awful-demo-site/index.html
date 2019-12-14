@@ -9,6 +9,7 @@
   <body>
     <h2>Let's goooo!</h2>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="lodash.js"></script>
     <script>
        const maxTraces = 50
        let traces = []
@@ -59,9 +60,11 @@
                       .parentId(function(d) { return "parentSpanID" in d ? d.parentSpanID : "root" })
                       (allSpans)
 
+        collapse(data)
+
         var root = d3.hierarchy(data)
             .sum(d => 1)
-            .sort((a, b) => { console.log(a); return 0; }) // jpe?
+            // .sort((a, b) => { return 0; }) jpe?
 
         width = 932
         height = 1200
@@ -110,6 +113,41 @@
 
         cell.append("title")
             .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.value)}`);
+      }
+
+      function collapse(node) {
+        if(!("children" in node)) {
+          return
+        }
+
+        agg = new Map()
+
+        node.children.forEach( c => {
+            name = c.data.processName + "-" + c.data.operationName
+
+            if (agg.has(name)) {
+              merge(agg.get(name), c)
+            } else {
+              agg.set(name, c)
+            }
+        })
+
+        node.children = Array.from(agg.values())
+
+        node.children.forEach(c => collapse(c))
+      }
+
+      function merge(n1, n2) {
+        all = []
+        if (n1.children) n1.children.forEach(c => {all.push(c)})
+        if (n2.children) n2.children.forEach(c => {all.push(c)})
+        all.forEach(c => c.parent = n1)
+        n1.children = all
+
+        value = 0
+        value += n1.value ? n1.value : 1
+        value += n2.value ? n2.value : 1
+        n1.value = value        
       }
     </script>
   </body>
