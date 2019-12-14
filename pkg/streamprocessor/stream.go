@@ -131,7 +131,7 @@ type socketSender struct {
 
 func (sp *streamProcessor) startWebsocket() {
 	http.HandleFunc("/v1/stream/traces", sp.streamTraces)
-	http.HandleFunc("/v1/stream/spans", sp.streamTraces)
+	http.HandleFunc("/v1/stream/spans", sp.streamSpans)
 	go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), nil)
 }
 
