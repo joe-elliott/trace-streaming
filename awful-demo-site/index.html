@@ -62,7 +62,7 @@
         collapse(data)
 
         var root = d3.hierarchy(data)
-             .sum(d => 'children' in d ? d.value : 0)
+             .sum(d => d.value)
 
         width = 932
         height = 1200
@@ -121,17 +121,18 @@
         agg = new Map()
 
         node.children.forEach( c => {
-            c.value = 1
             name = c.data.processName + "-" + c.data.operationName
 
             if (agg.has(name)) {
               merge(agg.get(name), c)
             } else {
+              c.value = 1
               agg.set(name, c)
             }
         })
 
         node.children = Array.from(agg.values())
+        node.value -= node.children.length
 
         node.children.forEach(c => collapse(c))
       }
@@ -143,10 +144,7 @@
         all.forEach(c => c.parent = n1)
         n1.children = all
 
-        value = 0
-        value += n1.value ? n1.value : 1
-        value += n2.value ? n2.value : 1
-        n1.value = value        
+        n1.value++
       }
     </script>
   </body>
