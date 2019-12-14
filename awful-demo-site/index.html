@@ -4,11 +4,60 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Go WebSocket Tutorial</title>
+    <title>Trace Stream Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@2.0.3/dist/d3-flamegraph.css">
+    <style>
+        /* Space out content a bit */
+        body {
+          padding-top: 20px;
+          padding-bottom: 20px;
+        }
+        /* Custom page header */
+        .header {
+          padding-bottom: 20px;
+          padding-right: 15px;
+          padding-left: 15px;
+          border-bottom: 1px solid #e5e5e5;
+        }
+        /* Make the masthead heading the same height as the navigation */
+        .header h3 {
+          margin-top: 0;
+          margin-bottom: 0;
+          line-height: 40px;
+        }
+        /* Customize container */
+        .container {
+          max-width: 990px;
+        }
+    </style>
   </head>
   <body>
-    <h2>Let's goooo!</h2>
+      <div class="container">
+          <div class="header clearfix">
+            <nav>
+              <div class="pull-right">
+                <form class="form-inline" id="form">
+                  <a class="btn" href="javascript: resetZoom();">Reset zoom</a>
+                  <a class="btn" href="javascript: clear();">Clear</a>
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="term">
+                  </div>
+                  <a class="btn btn-primary" href="javascript: search();">Search</a>
+                </form>
+              </div>
+            </nav>
+            <h3 class="text-muted">trace streaming</h3>
+          </div>
+          <div id="chart">
+          </div>
+          <hr>
+          <div id="details">
+          </div>
+        </div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@2.0.3/dist/d3-flamegraph.min.js"></script>
     <script>
        const maxTraces = 50
        let traces = []
@@ -42,6 +91,8 @@
         }
     </script>
     <script>
+      var flamegraph
+
       function makeTree(traces) {
         allSpans = traces.flat()
 
@@ -63,54 +114,44 @@
 
         var root = d3.hierarchy(data)
              .sum(d => d.value)
+        root.each(d => d.name = d.data.data.processName + "-" + d.data.data.operationName)
 
-        width = 932
-        height = 1200
+        var color = d3.scaleOrdinal(d3.schemePaired)
+        flamegraph = d3.flamegraph()
+                           .width(960)
+                           .cellHeight(18)
+                           .transitionDuration(750)
+                           .minFrameSize(5)
+                           .sort(true)
+                           .title("")
+                           .onClick(onClick)
+                           .differential(false)
+                           .selfValue(false)
 
-        color = d3.scaleOrdinal(d3.schemePaired)
-        format = d3.format(",d")
+        flamegraph.setColorMapper(function(d, originalColor) {
+          console.log(d);
+            return color(d.data.data.data.processName); 
+        });
 
-        root.each(d => d.data.name = d.data.data.processName + "-" + d.data.data.operationName)
+        flamegraph.label(d => d.data.name);
 
-        root = d3.partition()
-            .size([height, width])
-            .padding(1)
-            (root)        
-        
-        d3.select("body svg").remove();
-        const svg = d3.select("body").append("svg")
-                    .style("width", "100%")
-                    .style("height", height)
-                    .style("font", "10px sans-serif");
+        var tip = d3.tip()
+        .direction("s")
+        .offset([8, 0])
+        .attr('class', 'd3-flame-graph-tip')
+        .html(function(d) { return d.data.data.name });
 
-        const cell = svg
-          .selectAll("g")
-          .data(root.descendants())
-          .join("g")
-            .attr("transform", d => `translate(${d.y0},${d.x0})`);
+        var details = document.getElementById("details");
+          flamegraph.setDetailsElement(details);
 
-        cell.append("rect")
-            .attr("width", d => d.y1 - d.y0)
-            .attr("height", d => d.x1 - d.x0)
-            .attr("fill-opacity", 0.6)
-            .attr("fill", d => {
-              if (!d.depth) return "#ccc";
-              return color(d.data.data.processName);
-            });
+        d3.select("#chart")
+            .datum(root)
+            .call(flamegraph);
 
-        const text = cell.filter(d => (d.x1 - d.x0) > 16).append("text")
-            .attr("x", 4)
-            .attr("y", 13);
-
-        text.append("tspan")
-            .text(d => d.data.name);
-
-        text.append("tspan")
-            .attr("fill-opacity", 0.7)
-            .text(d => ` ${format(d.value)}`);
-
-        cell.append("title")
-            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.value)}`);
+        document.getElementById("form").addEventListener("submit", function(event){
+          event.preventDefault();
+          search();
+        });
       }
 
       function collapse(node) {
@@ -146,6 +187,22 @@
 
         n1.value++
       }
+
+      function onClick(d) {
+        console.info("Clicked on " + d.data.name);
+      }
+
+      function search() {
+          var term = document.getElementById("term").value;
+          flamegraph.search(term);
+        }
+        function clear() {
+          document.getElementById('term').value = '';
+          flamegraph.clear();
+        }
+        function resetZoom() {
+          flamegraph.resetZoom();
+        }
     </script>
   </body>
 </html>
