@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"google.golang.org/grpc"
@@ -129,11 +130,50 @@ type socketSender struct {
 }
 
 func (sp *streamProcessor) startWebsocket() {
-	http.HandleFunc("/socket", sp.ws)
+	http.HandleFunc("/v1/stream/traces", sp.streamTraces)
+	http.HandleFunc("/v1/stream/spans", sp.streamTraces)
 	go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), nil)
 }
 
-func (sp *streamProcessor) ws(w http.ResponseWriter, r *http.Request) {
+func (sp *streamProcessor) streamTraces(w http.ResponseWriter, r *http.Request) {
+	s := setupWebsocket(w, r)
+
+	tailer := streamer.NewTraces(&blergpb.TraceRequest{}, s)
+	sp.traceStreamers = append(sp.traceStreamers, tailer)
+
+	tailer.Do()
+}
+
+func (sp *streamProcessor) streamSpans(w http.ResponseWriter, r *http.Request) {
+	s := setupWebsocket(w, r)
+
+	query := r.URL.Query()
+
+	tailer := streamer.NewSpans(&blergpb.SpanRequest{
+		ProcessName:   getQueryParam(query, "processName"),
+		OperationName: getQueryParam(query, "operationName"),
+	}, s)
+	sp.spanStreamers = append(sp.spanStreamers, tailer)
+
+	tailer.Do()
+}
+
+func (s *socketSender) Send(span *blergpb.SpanResponse) error {
+	return s.ws.WriteJSON(span)
+}
+
+// utility
+func getQueryParam(v url.Values, name string) string {
+	value, ok := v[name]
+
+	if ok && len(value) > 0 {
+		return value[0]
+	}
+
+	return ""
+}
+
+func setupWebsocket(w http.ResponseWriter, r *http.Request) *socketSender {
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -148,23 +188,10 @@ func (sp *streamProcessor) ws(w http.ResponseWriter, r *http.Request) {
 	// helpful log statement to show connections
 	log.Println("Client Connected")
 
-	s := &socketSender{
+	return &socketSender{
 		ws: ws,
 	}
-
-	tailer := streamer.NewTraces(&blergpb.TraceRequest{
-		CrossesProcessBoundaries: true,
-	}, s)
-	sp.traceStreamers = append(sp.traceStreamers, tailer)
-
-	tailer.Do()
 }
-
-func (s *socketSender) Send(span *blergpb.SpanResponse) error {
-	return s.ws.WriteJSON(span)
-}
-
-// utility
 
 func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 	return &blergpb.Span{

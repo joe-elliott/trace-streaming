@@ -21,11 +21,13 @@ func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
 func (s *Traces) Do() error {
 
 	for trace := range s.traces {
-		filtered := s.filterTraces(trace)
+		if !s.sendTrace(trace) {
+			continue
+		}
 
 		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
-			Spans:   filtered,
+			Spans:   trace,
 		})
 	}
 
@@ -40,19 +42,17 @@ func (s *Traces) Shutdown() {
 	close(s.traces)
 }
 
-func (s *Traces) filterTraces(trace []*blergpb.Span) []*blergpb.Span {
-	if !s.req.CrossesProcessBoundaries {
-		var filtered []*blergpb.Span
-
+func (s *Traces) sendTrace(trace []*blergpb.Span) bool {
+	if len(s.req.ProcessName) > 0 {
 		for _, span := range trace {
-			if span.Parent != nil && span.Parent.ProcessName != span.ProcessName {
-				filtered = append(filtered, span)
+			if span.ProcessName == s.req.ProcessName {
+				return true
 			}
 		}
 
-		return filtered
+		return false
 	}
 
 	// unfiltered
-	return trace
+	return true
 }

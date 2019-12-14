@@ -19,9 +19,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	traceReq := &blergpb.TraceRequest{
-		CrossesProcessBoundaries: false,
-	}
+	traceReq := &blergpb.TraceRequest{}
 
 	client := blergpb.NewSpanStreamClient(conn)
 	stream, err := client.QueryTraces(context.Background(), traceReq)

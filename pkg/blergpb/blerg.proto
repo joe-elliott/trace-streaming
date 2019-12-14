@@ -4,8 +4,6 @@ syntax="proto3";
 
 package blergpb;
 
-import "google/api/annotations.proto";
-
 service SpanStream {
   rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {};
   rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {};
@@ -18,11 +16,13 @@ message StreamRequest {
 
 message TraceRequest {
   StreamRequest params = 1;
-  bool crossesProcessBoundaries = 2;
+  string ProcessName = 2;
 }
 
 message SpanRequest {
   StreamRequest params = 1;
+  string OperationName = 2;
+  string ProcessName = 3;
 }
 
 message SpanResponse {  

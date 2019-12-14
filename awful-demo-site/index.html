@@ -83,7 +83,7 @@
        const maxTraces = 50
        let traces = []
 
-        let socket = new WebSocket("ws://127.0.0.1:31235/socket");
+        let socket = new WebSocket("ws://127.0.0.1:31235/v1/stream/traces");
         console.log("Attempting Connection...");
 
         socket.onopen = () => {

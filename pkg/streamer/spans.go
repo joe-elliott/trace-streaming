@@ -21,9 +21,11 @@ func NewSpans(req *blergpb.SpanRequest, stream ClientStream) *Spans {
 func (s *Spans) Do() error {
 
 	for spans := range s.spans {
+		filtered := s.filterSpan(spans)
+
 		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
-			Spans:   spans,
+			Spans:   filtered,
 		})
 	}
 
@@ -36,4 +38,27 @@ func (s *Spans) ProcessBatch(spans []*blergpb.Span) {
 
 func (s *Spans) Shutdown(spans []*blergpb.Span) {
 	close(s.spans)
+}
+
+func (s *Spans) filterSpan(spans []*blergpb.Span) []*blergpb.Span {
+
+	if len(s.req.ProcessName) > 0 || len(s.req.OperationName) > 0 {
+		filtered := make([]*blergpb.Span, 0)
+
+		for _, span := range spans {
+			if len(s.req.ProcessName) > 0 && span.ProcessName == s.req.ProcessName {
+				filtered = append(filtered, span)
+				continue
+			}
+
+			if len(s.req.OperationName) > 0 && span.OperationName == s.req.OperationName {
+				filtered = append(filtered, span)
+				continue
+			}
+		}
+
+		return filtered
+	}
+
+	return spans
 }
