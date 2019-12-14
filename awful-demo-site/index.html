@@ -116,10 +116,10 @@
              .sum(d => d.value)
         root.each(d => d.name = d.data.data.processName + "-" + d.data.data.operationName)
 
-        /*if (flamegraph) {
+        if (flamegraph) {
           flamegraph.update(root)
           return
-        }*/
+        }
 
         var color = d3.scaleOrdinal(d3.schemePaired)
         flamegraph = d3.flamegraph()
