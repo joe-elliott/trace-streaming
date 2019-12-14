@@ -129,8 +129,7 @@
                            .selfValue(false)
 
         flamegraph.setColorMapper(function(d, originalColor) {
-          console.log(d);
-            return color(d.data.data.data.processName); 
+          return d.highlight ? "#E600E6" : color(d.data.data.data.processName);
         });
 
         flamegraph.label(d => d.data.name);
