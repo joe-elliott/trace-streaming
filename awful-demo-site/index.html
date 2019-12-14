@@ -62,7 +62,7 @@
         collapse(data)
 
         var root = d3.hierarchy(data)
-            .sum(d => 1)
+            .sum(d => d.value )
             // .sort((a, b) => { return 0; }) jpe?
 
         width = 932
@@ -122,6 +122,7 @@
         agg = new Map()
 
         node.children.forEach( c => {
+            c.value = 1
             name = c.data.processName + "-" + c.data.operationName
 
             if (agg.has(name)) {
