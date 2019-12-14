@@ -75,9 +75,7 @@
     <script>
        const maxTraces = 50
        let traces = []
-       const maxSpans = 20
-       let spans = []
-
+       
         let socket = new WebSocket("ws://127.0.0.1:31235/v1/stream/traces");
         console.log("Attempting Connection...");
 
@@ -104,28 +102,39 @@
             }
         }
 
-        let spanSocket = new WebSocket("ws://127.0.0.1:31235/v1/stream/spans?processName=route");
-        spanSocket.onopen = () => {
-            console.log("Successfully Connected Spans");
-        };
-        
-        spanSocket.onclose = event => {
-            console.log("Socket Closed Span Connection: ", event);
-        };
+        const maxSpans = 20
+        let spans = []
+        let spanSocket
 
-        spanSocket.onerror = error => {
-            console.log("Span Socket Error: ", error);
-        };
+        function doSpanSocket(processName, operationName) {
+          if (spanSocket) spanSocket.close()
 
-        spanSocket.onmessage = msg => {
-            console.log("Message: ", msg)
+          spans = []         
+          displaySpans(spans)
 
-            if (msg.data.trim() != "{}") {
-              spans.push(...JSON.parse(msg.data).spans)
-              while (spans.length > maxSpans) spans.shift()
-              
-              displaySpans(spans)
-            }
+          spanSocket = new WebSocket("ws://127.0.0.1:31235/v1/stream/spans?processName=" + encodeURI(processName) + "&operationName=" + encodeURI(operationName));
+          spanSocket.onopen = () => {
+              console.log("Successfully Connected Spans");
+          };
+          
+          spanSocket.onclose = event => {
+              console.log("Socket Closed Span Connection: ", event);
+          };
+
+          spanSocket.onerror = error => {
+              console.log("Span Socket Error: ", error);
+          };
+
+          spanSocket.onmessage = msg => {
+              console.log("Message: ", msg)
+
+              if (msg.data.trim() != "{}") {
+                spans.push(...JSON.parse(msg.data).spans)
+                while (spans.length > maxSpans) spans.shift()
+                
+                displaySpans(spans)
+              }
+          }
         }
     </script>
     <script>
@@ -229,7 +238,7 @@
       }
 
       function onClick(d) {
-        console.info("Clicked on " + d.data.name);
+        doSpanSocket(d.data.data.data.processName, d.data.data.data.operationName)
       }
 
       function search() {
