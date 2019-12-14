@@ -62,8 +62,7 @@
         collapse(data)
 
         var root = d3.hierarchy(data)
-            .sum(d => d.value )
-            // .sort((a, b) => { return 0; }) jpe?
+             .sum(d => 'children' in d ? d.value : 0)
 
         width = 932
         height = 1200
