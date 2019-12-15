@@ -7,6 +7,7 @@
     <title>Trace Stream Example</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="flamegraph.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         /* Space out content a bit */
         body {
@@ -44,6 +45,8 @@
                     <input type="text" class="form-control" id="term">
                   </div>
                   <a class="btn btn-primary" href="javascript: search();">Search</a>
+                  <a class="btn btn-danger" href="javascript: stop();" id="stopSocket" style="display: none"><i class="fa fa-pause"></i></a>
+                  <a class="btn btn-success" href="javascript: start();" id="startSocket"><i class="fa fa-play"></i></a>
                 </form>
               </div>
             </nav>
@@ -51,8 +54,23 @@
           </div>
           <div id="chart">
           </div>
-          <hr>
-          <div id="table">
+          <hr/>
+          <div class="header clearfix">
+            <div class="pull-right">
+              <form class="form-inline" id="form2">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="processName" placeholder="Process">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="operationName" placeholder="Operation">
+                  </div>
+                <a class="btn btn-danger" id="stopSpanSocket" href="javascript: stopSpanSocket();" style="display: none"><i class="fa fa-pause"></i></a>
+                <a class="btn btn-success" id="startSpanSocket" href="javascript: startSpanSocket();"><i class="fa fa-play"></i></a>
+              </form>
+            </div>
+          </div>
+          <hr/>
+          <div id="table" class="clearfix">
               <table class="table">
                   <thead>
                     <tr>
@@ -75,8 +93,21 @@
     <script>
        const maxTraces = 50
        let traces = []
-       
-        let socket = new WebSocket("ws://127.0.0.1:31235/v1/stream/traces");
+       let socket
+
+      function stop() {
+        d3.select("#stopSocket").style("display", "none");
+        d3.select("#startSocket").style("display", "inline");
+        if (socket) socket.close()
+      }
+
+       function start() {
+         stop()
+        d3.select("#stopSocket").style("display", "inline");
+        d3.select("#startSocket").style("display", "none");         
+
+         traces = []
+         socket = new WebSocket("ws://127.0.0.1:31235/v1/stream/traces");
         console.log("Attempting Connection...");
 
         socket.onopen = () => {
@@ -101,18 +132,37 @@
               makeTree(traces)
             }
         }
+       }
+       
 
         const maxSpans = 20
         let spans = []
         let spanSocket
 
-        function doSpanSocket(processName, operationName) {
-          if (spanSocket) spanSocket.close()
+       function stopSpanSocket() {
+        d3.select("#stopSpanSocket").style("display", "none");
+        d3.select("#startSpanSocket").style("display", "inline");
+        if (spanSocket) spanSocket.close()
+       }
+
+        function startSpanSocket() {
+          stopSpanSocket()
+          d3.select("#stopSpanSocket").style("display", "inline");
+          d3.select("#startSpanSocket").style("display", "none");
+
+          var processName = document.getElementById("processName").value;
+          var operationName = document.getElementById("operationName").value;
 
           spans = []         
           displaySpans(spans)
 
-          spanSocket = new WebSocket("ws://127.0.0.1:31235/v1/stream/spans?processName=" + encodeURI(processName) + "&operationName=" + encodeURI(operationName));
+          uri = "ws://127.0.0.1:31235/v1/stream/spans?"
+
+          if (processName) uri += "processName=" + encodeURI(processName)
+          if (processName && operationName) uri += "&"
+          if (operationName) uri += "operationName=" + encodeURI(operationName)
+
+          spanSocket = new WebSocket(uri);
           spanSocket.onopen = () => {
               console.log("Successfully Connected Spans");
           };
@@ -238,20 +288,20 @@
       }
 
       function onClick(d) {
-        doSpanSocket(d.data.data.data.processName, d.data.data.data.operationName)
+        
       }
 
       function search() {
-          var term = document.getElementById("term").value;
-          flamegraph.search(term);
-        }
-        function clear() {
-          document.getElementById('term').value = '';
-          flamegraph.clear();
-        }
-        function resetZoom() {
-          flamegraph.resetZoom();
-        }
+        var term = document.getElementById("term").value;
+        flamegraph.search(term);
+      }
+      function clear() {
+        document.getElementById('term').value = '';
+        flamegraph.clear();
+      }
+      function resetZoom() {
+        flamegraph.resetZoom();
+      }
     </script>
     <script>
       function displaySpans(spans) {
