@@ -38,7 +38,7 @@ message Span {
   string processName = 4;
   string operationName = 5;
   int64 startTime = 6;
-  int64 duration = 7;
+  int32 duration = 7;
 
   ParentSpan parent = 8;
 }
@@ -47,5 +47,5 @@ message ParentSpan {
   string processName = 1;
   string operationName = 2;
   int64 startTime = 3;
-  int64 duration = 4;
+  int32 duration = 4;
 }
