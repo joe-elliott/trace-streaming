@@ -159,6 +159,7 @@ func (sp *streamProcessor) streamSpans(w http.ResponseWriter, r *http.Request) {
 		Params:        getStreamRequest(query),
 		ProcessName:   getQueryParam(query, "processName"),
 		OperationName: getQueryParam(query, "operationName"),
+		MinDuration:   int32(getQueryParamInt(query, "minDuration")),
 	}, s)
 	sp.spanStreamers = append(sp.spanStreamers, tailer)
 
@@ -180,8 +181,20 @@ func getQueryParam(v url.Values, name string) string {
 	return ""
 }
 
+func getQueryParamInt(v url.Values, name string) int {
+	value, ok := v[name]
+
+	ret := 0
+
+	if ok && len(value) > 0 {
+		ret, _ = strconv.Atoi(value[0])
+	}
+
+	return ret
+}
+
 func getStreamRequest(v url.Values) *blergpb.StreamRequest {
-	rate, _ := strconv.Atoi(getQueryParam(v, "rate"))
+	rate := getQueryParamInt(v, "rate")
 
 	return &blergpb.StreamRequest{
 		RequestedRate: int32(rate),

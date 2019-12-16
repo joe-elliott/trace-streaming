@@ -23,6 +23,7 @@ message SpanRequest {
   StreamRequest params = 1;
   string OperationName = 2;
   string ProcessName = 3;
+  int32 MinDuration = 4;
 }
 
 message SpanResponse {  

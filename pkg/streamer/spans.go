@@ -64,7 +64,8 @@ func (s *Spans) filterSpan(spans []*blergpb.Span) []*blergpb.Span {
 
 		for _, span := range spans {
 			if (len(s.req.ProcessName) == 0 || span.ProcessName == s.req.ProcessName) &&
-				(len(s.req.OperationName) == 0 || span.OperationName == s.req.OperationName) {
+				(len(s.req.OperationName) == 0 || span.OperationName == s.req.OperationName) &&
+				(s.req.MinDuration > 0 || span.Duration >= int64(s.req.MinDuration)) {
 				filtered = append(filtered, span)
 				continue
 			}
