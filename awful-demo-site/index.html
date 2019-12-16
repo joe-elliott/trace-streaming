@@ -130,7 +130,7 @@
         };
 
         socket.onmessage = msg => {
-            console.log("Message: ", msg)
+            //console.log("Message: ", msg)
 
             if (msg.data.trim() != "{}") {
               traces.push(JSON.parse(msg.data).spans)
@@ -186,7 +186,7 @@
           };
 
           spanSocket.onmessage = msg => {
-              console.log("Message: ", msg)
+              //console.log("Message: ", msg)
 
               if (msg.data.trim() != "{}") {
                 spans.push(...JSON.parse(msg.data).spans)
