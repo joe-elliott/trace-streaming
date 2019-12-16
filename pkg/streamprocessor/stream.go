@@ -229,7 +229,7 @@ func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 		ProcessName:   node.ServiceInfo.Name,
 		OperationName: in.Name.Value,
 		StartTime:     in.StartTime.Seconds,
-		Duration:      int32((in.EndTime.Nanos - in.StartTime.Nanos) / 1000),
+		Duration:      int32((in.EndTime.Nanos - in.StartTime.Nanos) / 1000000),
 	}
 }
 

@@ -32,11 +32,9 @@ func NewSpans(req *blergpb.SpanRequest, stream ClientStream) *Spans {
 func (s *Spans) Do() error {
 
 	for spans := range s.spans {
-		filtered := s.filterSpan(spans)
-
 		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
-			Spans:   filtered,
+			Spans:   spans,
 		})
 
 		s.limiter.Take()
@@ -46,8 +44,14 @@ func (s *Spans) Do() error {
 }
 
 func (s *Spans) ProcessBatch(spans []*blergpb.Span) {
+	filtered := s.filterSpan(spans)
+
+	if len(filtered) == 0 {
+		return
+	}
+
 	select {
-	case s.spans <- spans:
+	case s.spans <- filtered:
 	default:
 		fmt.Println("rate limited!")
 	}

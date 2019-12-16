@@ -32,10 +32,6 @@ func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
 func (s *Traces) Do() error {
 
 	for trace := range s.traces {
-		if !s.sendTrace(trace) {
-			continue
-		}
-
 		s.stream.Send(&blergpb.SpanResponse{
 			Dropped: 0,
 			Spans:   trace,
@@ -48,6 +44,10 @@ func (s *Traces) Do() error {
 }
 
 func (s *Traces) ProcessBatch(trace []*blergpb.Span) {
+	if !s.sendTrace(trace) {
+		return
+	}
+
 	select {
 	case s.traces <- trace:
 	default:
