@@ -114,10 +114,10 @@ func (sp *streamProcessor) pollBatches(pollTime time.Duration) {
 		completed := sp.traceBatcher.completeBatches()
 
 		for _, batch := range completed {
-			buildSpanTree(batch)
+			tree := buildSpanTree(batch)
 
 			for _, t := range sp.traceStreamers {
-				t.ProcessBatch(batch)
+				t.ProcessBatch(tree)
 			}
 		}
 
@@ -220,7 +220,8 @@ func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 	}
 }
 
-func buildSpanTree(trace []*blergpb.Span) {
+func buildSpanTree(trace []*blergpb.Span) []*blergpb.Span {
+	tree := make([]*blergpb.Span, 0)
 
 	// O(n^2)! yay!
 	for _, child := range trace {
@@ -240,8 +241,13 @@ func buildSpanTree(trace []*blergpb.Span) {
 			}
 		}
 
-		if !found {
-			log.Printf("Unable to find parent id %v", child.ParentSpanID)
+		if !found && len(child.ParentSpanID) > 0 {
+			log.Printf("Unable to find parent id %v. Dropping.", child.ParentSpanID)
+			continue
 		}
+
+		tree = append(tree, child)
 	}
+
+	return tree
 }

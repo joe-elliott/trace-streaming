@@ -136,7 +136,11 @@
               traces.push(JSON.parse(msg.data).spans)
               if (traces.length > maxTraces) traces.shift()
               
-              makeTree(traces)
+              worked = makeTree(traces)
+
+              if(!worked) {
+                traces.pop()
+              }
             }
         }
        }
@@ -208,10 +212,15 @@
         }
         allSpans.push(rootSpan)
         
+        try {
         var data = d3.stratify()
                       .id(function(d) { return d.spanID })
                       .parentId(function(d) { return "parentSpanID" in d ? d.parentSpanID : "root" })
                       (allSpans)
+        } catch(err) {
+          //give up!
+          return false
+        }
 
         collapse(data)
 
@@ -221,7 +230,7 @@
 
         if (flamegraph) {
           flamegraph.update(root)
-          return
+          return true
         }
 
         var color = d3.scaleOrdinal(d3.schemePaired)
@@ -257,6 +266,8 @@
           event.preventDefault();
           search();
         });
+
+        return true
       }
 
       function collapse(node) {
