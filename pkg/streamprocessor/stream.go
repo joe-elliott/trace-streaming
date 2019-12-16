@@ -138,7 +138,11 @@ func (sp *streamProcessor) startWebsocket() {
 func (sp *streamProcessor) streamTraces(w http.ResponseWriter, r *http.Request) {
 	s := setupWebsocket(w, r)
 
-	tailer := streamer.NewTraces(&blergpb.TraceRequest{}, s)
+	query := r.URL.Query()
+
+	tailer := streamer.NewTraces(&blergpb.TraceRequest{
+		ProcessName: getQueryParam(query, "processName"),
+	}, s)
 	sp.traceStreamers = append(sp.traceStreamers, tailer)
 
 	tailer.Do()
