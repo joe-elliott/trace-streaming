@@ -78,7 +78,6 @@
                   <thead>
                     <tr>
                       <th scope="col">trace</th>
-                      <th scope="col">span</th>
                       <th scope="col">process name</th>
                       <th scope="col">span name</th>
                       <th scope="col">start</th>
@@ -317,14 +316,27 @@
 
         spans.forEach(s => {
           row = table.append("tr")
-
-          row.append("td").text(s.traceID)
-          row.append("td").text(s.spanID)
+          id = base64toHEX(s.traceID)
+          
+          row.append("td").append("a").text(id).html(`<a href="https://admin-ops-tools1.grafana.net/jaeger/trace/${id}">${id}</a>`)
           row.append("td").text(s.processName)
           row.append("td").text(s.operationName)
           row.append("td").text(new Date(s.startTime * 1000).toLocaleString())
           row.append("td").text(s.duration)
         })
+      }
+
+      function base64toHEX(base64) {
+        var raw = atob(base64);
+        var HEX = '';
+        for ( i = 0; i < raw.length; i++ ) {
+          var _hex = raw.charCodeAt(i).toString(16)
+          HEX += (_hex.length==2?_hex:'0'+_hex);
+        }
+        while(HEX.charAt(0) === '0') {
+          HEX = HEX.substr(1)
+        }
+        return HEX;
       }
     </script>
   </body>
