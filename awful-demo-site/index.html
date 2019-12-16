@@ -111,8 +111,8 @@
 
         var processName = document.getElementById("processName").value;
 
-        uri = "ws://127.0.0.1:31235/v1/stream/traces"
-        if (processName) uri += "?processName=" + encodeURI(processName)
+        uri = "ws://127.0.0.1:31235/v1/stream/traces?rate=5"
+        if (processName) uri += "&processName=" + encodeURI(processName)
 
          traces = []
          socket = new WebSocket(uri);
@@ -164,11 +164,10 @@
           spans = []         
           displaySpans(spans)
 
-          uri = "ws://127.0.0.1:31235/v1/stream/spans?"
+          uri = "ws://127.0.0.1:31235/v1/stream/spans?rate=10"
 
-          if (processName) uri += "processName=" + encodeURI(processName)
-          if (processName && operationName) uri += "&"
-          if (operationName) uri += "operationName=" + encodeURI(operationName)
+          if (processName) uri += "&processName=" + encodeURI(processName)
+          if (operationName) uri += "&operationName=" + encodeURI(operationName)
 
           spanSocket = new WebSocket(uri);
           spanSocket.onopen = () => {

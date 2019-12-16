@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc"
@@ -141,6 +142,7 @@ func (sp *streamProcessor) streamTraces(w http.ResponseWriter, r *http.Request) 
 	query := r.URL.Query()
 
 	tailer := streamer.NewTraces(&blergpb.TraceRequest{
+		Params:      getStreamRequest(query),
 		ProcessName: getQueryParam(query, "processName"),
 	}, s)
 	sp.traceStreamers = append(sp.traceStreamers, tailer)
@@ -154,6 +156,7 @@ func (sp *streamProcessor) streamSpans(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	tailer := streamer.NewSpans(&blergpb.SpanRequest{
+		Params:        getStreamRequest(query),
 		ProcessName:   getQueryParam(query, "processName"),
 		OperationName: getQueryParam(query, "operationName"),
 	}, s)
@@ -175,6 +178,14 @@ func getQueryParam(v url.Values, name string) string {
 	}
 
 	return ""
+}
+
+func getStreamRequest(v url.Values) *blergpb.StreamRequest {
+	rate, _ := strconv.Atoi(getQueryParam(v, "rate"))
+
+	return &blergpb.StreamRequest{
+		RequestedRate: int32(rate),
+	}
 }
 
 func setupWebsocket(w http.ResponseWriter, r *http.Request) *socketSender {

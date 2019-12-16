@@ -1,20 +1,31 @@
 package streamer
 
 import (
+	"fmt"
+
 	"github.com/joe-elliott/blerg/pkg/blergpb"
+	"github.com/joe-elliott/blerg/pkg/util"
+	"go.uber.org/ratelimit"
 )
 
 type Spans struct {
-	req    *blergpb.SpanRequest
-	stream ClientStream
-	spans  chan []*blergpb.Span
+	req     *blergpb.SpanRequest
+	stream  ClientStream
+	spans   chan []*blergpb.Span
+	limiter ratelimit.Limiter
 }
 
 func NewSpans(req *blergpb.SpanRequest, stream ClientStream) *Spans {
+	rate := util.DefaultRate
+	if req.Params.RequestedRate != 0 {
+		rate = int(req.Params.RequestedRate)
+	}
+
 	return &Spans{
-		req:    req,
-		stream: stream,
-		spans:  make(chan []*blergpb.Span),
+		req:     req,
+		stream:  stream,
+		spans:   make(chan []*blergpb.Span),
+		limiter: ratelimit.New(rate),
 	}
 }
 
@@ -27,13 +38,19 @@ func (s *Spans) Do() error {
 			Dropped: 0,
 			Spans:   filtered,
 		})
+
+		s.limiter.Take()
 	}
 
 	return nil
 }
 
 func (s *Spans) ProcessBatch(spans []*blergpb.Span) {
-	s.spans <- spans
+	select {
+	case s.spans <- spans:
+	default:
+		fmt.Println("rate limited!")
+	}
 }
 
 func (s *Spans) Shutdown(spans []*blergpb.Span) {
