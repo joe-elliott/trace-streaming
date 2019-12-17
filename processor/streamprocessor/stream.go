@@ -93,6 +93,18 @@ func (sp *streamProcessor) GetCapabilities() processor.Capabilities {
 	return processor.Capabilities{MutatesConsumedData: false}
 }
 
+func (sp *streamProcessor) Shutdown() error {
+	for _, s := range sp.spanStreamers {
+		s.Shutdown()
+	}
+
+	for _, s := range sp.traceStreamers {
+		s.Shutdown()
+	}
+
+	return nil
+}
+
 func (sp *streamProcessor) QuerySpans(req *blergpb.SpanRequest, stream blergpb.SpanStream_QuerySpansServer) error {
 	tailer := streamer.NewSpans(req, stream)
 	sp.spanStreamers = append(sp.spanStreamers, tailer)

@@ -20,13 +20,25 @@ func main() {
 	factories, err := defaults.Components()
 	handleErr(err)
 
-	// only need one processor for now.  can add more later
-	factories.Processors, err = processor.Build(
+	info := service.ApplicationStartInfo{
+		ExeName:  "blerg",
+		LongName: "blerg",
+		Version:  "blerg",
+		GitHash:  "blerg",
+	}
+
+	customProcessors, err := processor.Build(
 		&streamprocessor.Factory{},
 	)
 	handleErr(err)
 
-	svc := service.New(factories)
+	for k, v := range customProcessors {
+		factories.Processors[k] = v
+	}
+
+	svc, err := service.New(factories, info)
+	handleErr(err)
+
 	err = svc.Start()
 	handleErr(err)
 }

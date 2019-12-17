@@ -57,7 +57,7 @@ func (s *Spans) ProcessBatch(spans []*blergpb.Span) {
 	}
 }
 
-func (s *Spans) Shutdown(spans []*blergpb.Span) {
+func (s *Spans) Shutdown() {
 	close(s.spans)
 }
 
