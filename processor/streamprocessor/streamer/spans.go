@@ -3,8 +3,8 @@ package streamer
 import (
 	"fmt"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 	"go.uber.org/ratelimit"
 )
 

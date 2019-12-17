@@ -8,8 +8,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
 
 func main() {

@@ -14,9 +14,9 @@ import (
 	commonpb "github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1"
 	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/server"
-	"github.com/joe-elliott/blerg/processor/streamprocessor/streamer"
-	"github.com/joe-elliott/blerg/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/server"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 )
 
 type streamProcessor struct {
