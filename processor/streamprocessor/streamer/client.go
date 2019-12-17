@@ -1,7 +1,7 @@
 package streamer
 
-import "github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+import "github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 
 type ClientStream interface {
-	Send(s *blergpb.SpanResponse) error
+	Send(s *streampb.SpanResponse) error
 }

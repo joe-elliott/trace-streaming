@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 )
 
 type batcher struct {
@@ -18,7 +18,7 @@ type batcher struct {
 
 type batch struct {
 	lastAppend time.Time
-	trace      []*blergpb.Span
+	trace      []*streampb.Span
 }
 
 func newBatcher() *batcher {
@@ -30,7 +30,7 @@ func newBatcher() *batcher {
 }
 
 // all spans must be from the same traceid
-func (b *batcher) addBatch(spans []*blergpb.Span) error {
+func (b *batcher) addBatch(spans []*streampb.Span) error {
 	if len(spans) == 0 {
 		return nil
 	}
@@ -57,8 +57,8 @@ func (b *batcher) addBatch(spans []*blergpb.Span) error {
 }
 
 // after calling completeBatches it is the responsibility of the caller do to something with them
-func (b *batcher) completeBatches() [][]*blergpb.Span {
-	var completed [][]*blergpb.Span
+func (b *batcher) completeBatches() [][]*streampb.Span {
+	var completed [][]*streampb.Span
 
 	b.lock.RLock()
 	defer b.lock.RUnlock()

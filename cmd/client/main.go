@@ -8,8 +8,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
-	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
 
 func main() {
@@ -19,9 +19,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	traceReq := &blergpb.TraceRequest{}
+	traceReq := &streampb.TraceRequest{}
 
-	client := blergpb.NewSpanStreamClient(conn)
+	client := streampb.NewSpanStreamClient(conn)
 	stream, err := client.QueryTraces(context.Background(), traceReq)
 
 	for {

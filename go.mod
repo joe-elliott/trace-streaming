@@ -1,4 +1,4 @@
-module github.com/joe-elliott/blerg
+module github.com/joe-elliott/trace-streaming
 
 go 1.13
 
