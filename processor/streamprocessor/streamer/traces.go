@@ -3,19 +3,19 @@ package streamer
 import (
 	"fmt"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/streampb"
 	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
 	"go.uber.org/ratelimit"
 )
 
 type Traces struct {
-	req     *blergpb.TraceRequest
+	req     *streampb.TraceRequest
 	stream  ClientStream
-	traces  chan []*blergpb.Span
+	traces  chan []*streampb.Span
 	limiter ratelimit.Limiter
 }
 
-func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
+func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
 	rate := util.DefaultRate
 	if req.Params.RequestedRate != 0 {
 		rate = int(req.Params.RequestedRate)
@@ -24,7 +24,7 @@ func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
 	return &Traces{
 		req:     req,
 		stream:  stream,
-		traces:  make(chan []*blergpb.Span),
+		traces:  make(chan []*streampb.Span),
 		limiter: ratelimit.New(rate),
 	}
 }
@@ -32,7 +32,7 @@ func NewTraces(req *blergpb.TraceRequest, stream ClientStream) *Traces {
 func (s *Traces) Do() error {
 
 	for trace := range s.traces {
-		s.stream.Send(&blergpb.SpanResponse{
+		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
 			Spans:   trace,
 		})
@@ -43,7 +43,7 @@ func (s *Traces) Do() error {
 	return nil
 }
 
-func (s *Traces) ProcessBatch(trace []*blergpb.Span) {
+func (s *Traces) ProcessBatch(trace []*streampb.Span) {
 	if !s.sendTrace(trace) {
 		return
 	}
@@ -59,7 +59,7 @@ func (s *Traces) Shutdown() {
 	close(s.traces)
 }
 
-func (s *Traces) sendTrace(trace []*blergpb.Span) bool {
+func (s *Traces) sendTrace(trace []*streampb.Span) bool {
 	if len(s.req.ProcessName) > 0 {
 		for _, span := range trace {
 			if span.ProcessName == s.req.ProcessName {

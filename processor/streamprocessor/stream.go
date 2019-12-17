@@ -21,7 +21,7 @@ import (
 	commonpb "github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1"
 	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 
-	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/streampb"
 	"github.com/joe-elliott/blerg/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
 
@@ -57,7 +57,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		log.Fatal("Failed to listen", err)
 	}
 	server := grpc.NewServer()
-	blergpb.RegisterSpanStreamServer(server, sp)
+	streampb.RegisterSpanStreamServer(server, sp)
 	go func() {
 		err := server.Serve(lis)
 		if err != nil {
@@ -73,7 +73,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 }
 
 func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata.TraceData) error {
-	blergSpans := make([]*blergpb.Span, len(td.Spans))
+	blergSpans := make([]*streampb.Span, len(td.Spans))
 
 	for i, span := range td.Spans {
 		blergSpan := spanToSpan(span, td.Node)
@@ -105,14 +105,14 @@ func (sp *streamProcessor) Shutdown() error {
 	return nil
 }
 
-func (sp *streamProcessor) QuerySpans(req *blergpb.SpanRequest, stream blergpb.SpanStream_QuerySpansServer) error {
+func (sp *streamProcessor) QuerySpans(req *streampb.SpanRequest, stream streampb.SpanStream_QuerySpansServer) error {
 	tailer := streamer.NewSpans(req, stream)
 	sp.spanStreamers = append(sp.spanStreamers, tailer)
 
 	return tailer.Do()
 }
 
-func (sp *streamProcessor) QueryTraces(req *blergpb.TraceRequest, stream blergpb.SpanStream_QueryTracesServer) error {
+func (sp *streamProcessor) QueryTraces(req *streampb.TraceRequest, stream streampb.SpanStream_QueryTracesServer) error {
 	tailer := streamer.NewTraces(req, stream)
 	sp.traceStreamers = append(sp.traceStreamers, tailer)
 
@@ -153,7 +153,7 @@ func (sp *streamProcessor) streamTraces(w http.ResponseWriter, r *http.Request) 
 
 	query := r.URL.Query()
 
-	tailer := streamer.NewTraces(&blergpb.TraceRequest{
+	tailer := streamer.NewTraces(&streampb.TraceRequest{
 		Params:      getStreamRequest(query),
 		ProcessName: getQueryParam(query, "processName"),
 	}, s)
@@ -167,7 +167,7 @@ func (sp *streamProcessor) streamSpans(w http.ResponseWriter, r *http.Request) {
 
 	query := r.URL.Query()
 
-	tailer := streamer.NewSpans(&blergpb.SpanRequest{
+	tailer := streamer.NewSpans(&streampb.SpanRequest{
 		Params:        getStreamRequest(query),
 		ProcessName:   getQueryParam(query, "processName"),
 		OperationName: getQueryParam(query, "operationName"),
@@ -178,7 +178,7 @@ func (sp *streamProcessor) streamSpans(w http.ResponseWriter, r *http.Request) {
 	tailer.Do()
 }
 
-func (s *socketSender) Send(span *blergpb.SpanResponse) error {
+func (s *socketSender) Send(span *streampb.SpanResponse) error {
 	return s.ws.WriteJSON(span)
 }
 
@@ -205,10 +205,10 @@ func getQueryParamInt(v url.Values, name string) int {
 	return ret
 }
 
-func getStreamRequest(v url.Values) *blergpb.StreamRequest {
+func getStreamRequest(v url.Values) *streampb.StreamRequest {
 	rate := getQueryParamInt(v, "rate")
 
-	return &blergpb.StreamRequest{
+	return &streampb.StreamRequest{
 		RequestedRate: int32(rate),
 	}
 }
@@ -233,8 +233,8 @@ func setupWebsocket(w http.ResponseWriter, r *http.Request) *socketSender {
 	}
 }
 
-func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
-	return &blergpb.Span{
+func spanToSpan(in *tracepb.Span, node *commonpb.Node) *streampb.Span {
+	return &streampb.Span{
 		TraceID:       in.TraceId,
 		SpanID:        in.SpanId,
 		ParentSpanID:  in.ParentSpanId,
@@ -245,8 +245,8 @@ func spanToSpan(in *tracepb.Span, node *commonpb.Node) *blergpb.Span {
 	}
 }
 
-func buildSpanTree(trace []*blergpb.Span) []*blergpb.Span {
-	tree := make([]*blergpb.Span, 0)
+func buildSpanTree(trace []*streampb.Span) []*streampb.Span {
+	tree := make([]*streampb.Span, 0)
 
 	// O(n^2)! yay!
 	for _, child := range trace {
@@ -257,7 +257,7 @@ func buildSpanTree(trace []*blergpb.Span) []*blergpb.Span {
 			if bytes.Equal(child.ParentSpanID, parent.SpanID) {
 				found = true
 
-				child.Parent = &blergpb.ParentSpan{
+				child.Parent = &streampb.ParentSpan{
 					OperationName: parent.OperationName,
 					ProcessName:   parent.ProcessName,
 					StartTime:     parent.StartTime,
