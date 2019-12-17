@@ -13,3 +13,4 @@ todo:
 - gracefully shutdown batch polling
 - add opentelemetry tracing
 - use uber atomic for shared maps.  note that stuff in stream.go is not concurrency safe.
+- build query frontend.  query frontend only hits enough collectors to satisfy the requested rate limit
