@@ -22,27 +22,19 @@ func TestLoadConfig(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
 
-	p0 := config.Processors["span/custom"]
+	p0 := config.Processors["stream"]
 	assert.Equal(t, p0, &Config{
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
-			NameVal: "span/custom",
-		},
-		Rename: Name{
-			FromAttributes: []string{"db.svc", "operation", "id"},
-			Separator:      "::",
+			NameVal: "stream",
 		},
 	})
 
-	p1 := config.Processors["span/no-separator"]
+	p1 := config.Processors["stream/customname"]
 	assert.Equal(t, p1, &Config{
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
-			NameVal: "span/no-separator",
-		},
-		Rename: Name{
-			FromAttributes: []string{"db.svc", "operation", "id"},
-			Separator:      "",
+			NameVal: "stream/customname",
 		},
 	})
 }
