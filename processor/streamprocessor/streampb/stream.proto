@@ -1,0 +1,51 @@
+// protoc -I processor/streamprocessor/streampb/ processor/streamprocessor/streampb/stream.proto --go_out=plugins=grpc:processor/streamprocessor/streampb
+
+syntax="proto3";
+
+package streampb;
+
+service SpanStream {
+  rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {};
+  rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {};
+}
+
+message StreamRequest {
+    int32 requestedBatchSize = 1;
+    int32 requestedRate = 2;
+}
+
+message TraceRequest {
+  StreamRequest params = 1;
+  string ProcessName = 2;
+}
+
+message SpanRequest {
+  StreamRequest params = 1;
+  string OperationName = 2;
+  string ProcessName = 3;
+  int32 MinDuration = 4;
+}
+
+message SpanResponse {  
+    int32 dropped = 1;
+    repeated Span spans = 2;
+}
+
+message Span {
+  bytes traceID = 1;
+  bytes spanID = 2;
+  bytes parentSpanID = 3;
+  string processName = 4;
+  string operationName = 5;
+  int64 startTime = 6;
+  int32 duration = 7;
+
+  ParentSpan parent = 8;
+}
+
+message ParentSpan {
+  string processName = 1;
+  string operationName = 2;
+  int64 startTime = 3;
+  int32 duration = 4;
+}
