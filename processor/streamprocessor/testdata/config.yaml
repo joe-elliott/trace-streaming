@@ -1,0 +1,16 @@
+receivers:
+  examplereceiver:
+
+processors:
+  stream:
+  stream/customname:
+
+exporters:
+  exampleexporter:
+
+service:
+  pipelines:
+    traces:
+     receivers: [examplereceiver]
+     processors: [stream]
+     exporters: [exampleexporter]
