@@ -213,7 +213,6 @@ func TestSpanProcessor_Values(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
-	//oCfg.Rename.FromAttributes = []string{"key1"}
 
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)
@@ -340,8 +339,6 @@ func TestSpanProcessor_MissingKeys(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
-	//oCfg.Rename.FromAttributes = []string{"key1", "key2", "key3", "key4"}
-	//oCfg.Rename.Separator = "::"
 
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)
