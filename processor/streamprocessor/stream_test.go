@@ -139,7 +139,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 					Value: &tracepb.AttributeValue_StringValue{StringValue: &tracepb.TruncatableString{Value: "bob"}},
 				},
 			},
-			outputName: "bob",
+			outputName: "string type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {
 					Value: &tracepb.AttributeValue_StringValue{StringValue: &tracepb.TruncatableString{Value: "bob"}},
@@ -153,7 +153,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 					Value: &tracepb.AttributeValue_IntValue{IntValue: 123},
 				},
 			},
-			outputName: "123",
+			outputName: "int type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {
 					Value: &tracepb.AttributeValue_IntValue{IntValue: 123},
@@ -167,7 +167,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 					Value: &tracepb.AttributeValue_DoubleValue{DoubleValue: cast.ToFloat64(234.129312)},
 				},
 			},
-			outputName: "234.129312",
+			outputName: "double type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {
 					Value: &tracepb.AttributeValue_DoubleValue{DoubleValue: cast.ToFloat64(234.129312)},
@@ -181,7 +181,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 					Value: &tracepb.AttributeValue_BoolValue{BoolValue: true},
 				},
 			},
-			outputName: "true",
+			outputName: "bool type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {
 					Value: &tracepb.AttributeValue_BoolValue{BoolValue: true},
@@ -193,7 +193,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 			inputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": nil,
 			},
-			outputName: "<nil-attribute-value>",
+			outputName: "nil type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": nil,
 			},
@@ -203,7 +203,7 @@ func TestSpanProcessor_Values(t *testing.T) {
 			inputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {},
 			},
-			outputName: "<unknown-attribute-type>",
+			outputName: "unknown type",
 			outputAttributes: map[string]*tracepb.AttributeValue{
 				"key1": {},
 			},
