@@ -1,6 +1,13 @@
-blerg
+# trace streaming
 
-todo:
+A fledgeling project built on top of the [otel-collector](https://github.com/open-telemetry/opentelemetry-collector) to provide stream processing for traces.
+
+## awful-demo-site
+
+![awful demo site](./awful-demo-site.png)
+
+## todo
+
 - support multiple clients
 - propagate context/trace
 - add support for other streams
