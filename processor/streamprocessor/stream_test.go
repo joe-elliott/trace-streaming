@@ -35,11 +35,11 @@ func TestSpanProcessor_NilEmpty(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
-	//oCfg.Rename.FromAttributes = []string{"test-key"}
 
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)
 	require.NotNil(t, tp)
+
 	traceData := consumerdata.TraceData{
 		Spans: []*tracepb.Span{
 			nil,
