@@ -408,6 +408,8 @@ github.com/open-telemetry/opentelemetry-collector v0.2.0 h1:38/NrGdEEXufWqYFkW/6
 github.com/open-telemetry/opentelemetry-collector v0.2.0/go.mod h1:zZf9V+57o0Fd3ik5HzaHamVsWhudJTOwnKw9kJvWoDo=
 github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191216151622-3b06acccb124 h1:Y5vSmtvVErvuj+75d1PZSG3vxkSq8nqboPOHO025bvM=
 github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191216151622-3b06acccb124/go.mod h1:WxiK9mcisb/hM6M6+2BRV/VIU2c8VzlCRJED2S1MWns=
+github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191217145456-39b9ea98ccc9 h1:Td6n1ivxfMs1Pt3J78CSigD/47cTnUFFKjmXgIbbIGs=
+github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191217145456-39b9ea98ccc9/go.mod h1:WxiK9mcisb/hM6M6+2BRV/VIU2c8VzlCRJED2S1MWns=
 github.com/open-telemetry/opentelemetry-proto v0.0.0-20191210162502-28a7413d3a0a h1:a/LYumj2oBkJNSzPA6HFif+3x1e269lT084kE/Onq7A=
 github.com/open-telemetry/opentelemetry-proto v0.0.0-20191210162502-28a7413d3a0a/go.mod h1:PMR5GI0F7BSpio+rBGFxNm6SLzg3FypDTcFuQZnO+F8=
 github.com/opentracing-contrib/go-stdlib v0.0.0-20190519235532-cf7a6c988dc9/go.mod h1:PLldrQSroqzH70Xl+1DQcGnefIbqsKR7UDaiux3zV+w=

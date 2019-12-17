@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/websocket v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1
-	github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191216151622-3b06acccb124
+	github.com/open-telemetry/opentelemetry-collector v0.2.1-0.20191217145456-39b9ea98ccc9
 	github.com/open-telemetry/opentelemetry-proto v0.0.0-20191210162502-28a7413d3a0a
 	github.com/spf13/cast v1.3.0
 	github.com/stretchr/testify v1.4.0
