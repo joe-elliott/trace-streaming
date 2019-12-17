@@ -17,7 +17,7 @@ type Traces struct {
 
 func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
 	rate := util.DefaultRate
-	if req.Params.RequestedRate != 0 {
+	if req.Params != nil && req.Params.RequestedRate != 0 {
 		rate = int(req.Params.RequestedRate)
 	}
 

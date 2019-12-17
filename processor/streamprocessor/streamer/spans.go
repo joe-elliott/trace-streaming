@@ -17,7 +17,7 @@ type Spans struct {
 
 func NewSpans(req *streampb.SpanRequest, stream ClientStream) *Spans {
 	rate := util.DefaultRate
-	if req.Params.RequestedRate != 0 {
+	if req.Params != nil && req.Params.RequestedRate != 0 {
 		rate = int(req.Params.RequestedRate)
 	}
 
