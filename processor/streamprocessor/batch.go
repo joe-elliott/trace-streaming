@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/joe-elliott/blerg/pkg/blergpb"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
 )
 
 type batcher struct {

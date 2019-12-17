@@ -8,8 +8,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/joe-elliott/blerg/pkg/blergpb"
-	"github.com/joe-elliott/blerg/pkg/util"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
 )
 
 func main() {

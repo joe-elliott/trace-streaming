@@ -7,7 +7,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/processor"
 	"github.com/open-telemetry/opentelemetry-collector/service"
 
-	"github.com/joe-elliott/blerg/pkg/streamprocessor"
+	"github.com/joe-elliott/blerg/processor/streamprocessor"
 )
 
 func main() {

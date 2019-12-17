@@ -21,9 +21,9 @@ import (
 	commonpb "github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1"
 	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 
-	"github.com/joe-elliott/blerg/pkg/blergpb"
-	"github.com/joe-elliott/blerg/pkg/streamer"
-	"github.com/joe-elliott/blerg/pkg/util"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/blergpb"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/streamer"
+	"github.com/joe-elliott/blerg/processor/streamprocessor/util"
 
 	"github.com/gorilla/websocket"
 )
