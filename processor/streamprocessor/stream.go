@@ -27,6 +27,8 @@ type streamProcessor struct {
 	traceStreamers []*streamer.Traces
 
 	traceBatcher *batcher
+
+	servers []server.StreamServer
 }
 
 // NewTraceProcessor returns the span processor.
@@ -41,8 +43,16 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		traceBatcher: newBatcher(),
 	}
 
-	server.DoGRPC(sp, config.GRPC)
-	server.DoWebsocket(sp, config.Websocket)
+	sp.servers = append(sp.servers, server.NewGRPC(sp, config.GRPC))
+	sp.servers = append(sp.servers, server.NewWebsocket(sp, config.Websocket))
+
+	for _, srv := range sp.servers {
+		err := srv.Do()
+
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	go sp.pollBatches(5 * time.Second)
 
@@ -87,6 +97,10 @@ func (sp *streamProcessor) Shutdown() error {
 
 	for _, s := range sp.traceStreamers {
 		s.Shutdown()
+	}
+
+	for _, srv := range sp.servers {
+		srv.Shutdown()
 	}
 
 	return nil

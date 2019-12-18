@@ -17,34 +17,45 @@ type GRPCConfig struct {
 }
 
 type grpcServer struct {
-	s StreamProcessor
+	s      StreamProcessor
+	cfg    GRPCConfig
+	server *grpc.Server
 }
 
-func DoGRPC(s StreamProcessor, cfg GRPCConfig) error {
-	if !cfg.Enabled {
+func NewGRPC(s StreamProcessor, cfg GRPCConfig) StreamServer {
+	return &grpcServer{
+		s:   s,
+		cfg: cfg,
+	}
+}
+
+func (g *grpcServer) Do() error {
+	if !g.cfg.Enabled {
 		return nil
 	}
 
-	g := &grpcServer{
-		s: s,
-	}
-
-	// GRPC
-	grpcEndpoint := fmt.Sprintf(":%d", cfg.Port)
+	grpcEndpoint := fmt.Sprintf(":%d", g.cfg.Port)
 	lis, err := net.Listen("tcp", grpcEndpoint)
 	if err != nil {
-		log.Fatal("Failed to listen", err)
+		return fmt.Errorf("grpc failed to listen %v", err)
 	}
-	server := grpc.NewServer()
-	streampb.RegisterSpanStreamServer(server, g)
+
+	g.server = grpc.NewServer()
+	streampb.RegisterSpanStreamServer(g.server, g)
 	go func() {
-		err := server.Serve(lis)
+		err := g.server.Serve(lis)
 		if err != nil {
 			log.Fatal("Failed to start GRPC Server", err)
 		}
 	}()
 
 	return nil
+}
+
+func (g *grpcServer) Shutdown() {
+	if g.server != nil {
+		g.server.Stop()
+	}
 }
 
 func (g *grpcServer) QuerySpans(req *streampb.SpanRequest, stream streampb.SpanStream_QuerySpansServer) error {
