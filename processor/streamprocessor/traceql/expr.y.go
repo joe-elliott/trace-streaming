@@ -28,11 +28,9 @@ const GT = 57356
 const GTE = 57357
 const LT = 57358
 const LTE = 57359
-const OPEN_PARENTHESIS = 57360
-const CLOSE_PARENTHESIS = 57361
-const STREAM_TYPE_SPANS = 57362
-const FIELD_DURATION = 57363
-const FIELD_NAME = 57364
+const STREAM_TYPE_SPANS = 57360
+const FIELD_DURATION = 57361
+const FIELD_NAME = 57362
 
 var yyToknames = [...]string{
 	"$end",
@@ -52,8 +50,6 @@ var yyToknames = [...]string{
 	"GTE",
 	"LT",
 	"LTE",
-	"OPEN_PARENTHESIS",
-	"CLOSE_PARENTHESIS",
 	"STREAM_TYPE_SPANS",
 	"FIELD_DURATION",
 	"FIELD_NAME",
@@ -80,19 +76,19 @@ const yyLast = 30
 var yyAct = [...]int{
 
 	12, 13, 14, 15, 16, 17, 18, 19, 8, 9,
-	6, 2, 11, 4, 30, 10, 23, 24, 21, 22,
-	29, 28, 20, 27, 26, 25, 3, 7, 5, 1,
+	2, 6, 11, 4, 30, 10, 23, 24, 21, 22,
+	29, 28, 27, 20, 26, 25, 3, 7, 5, 1,
 }
 var yyPact = [...]int{
 
-	-9, -1000, 5, -1000, -13, 6, -1000, -10, -1000, -1000,
-	-1000, -13, 14, 12, 21, 20, 18, 16, 15, 9,
+	-8, -1000, 5, -1000, -11, 6, -1000, -10, -1000, -1000,
+	-1000, -11, 14, 12, 21, 20, 17, 16, 15, 9,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000,
 }
 var yyPgo = [...]int{
 
-	0, 29, 28, 10, 27, 26,
+	0, 29, 28, 11, 27, 26,
 }
 var yyR1 = [...]int{
 
@@ -106,7 +102,7 @@ var yyR2 = [...]int{
 }
 var yyChk = [...]int{
 
-	-1000, -1, 20, -5, 8, -2, -3, -4, 21, 22,
+	-1000, -1, 18, -5, 8, -2, -3, -4, 19, 20,
 	9, 6, 10, 11, 12, 13, 14, 15, 16, 17,
 	-3, 4, 5, 4, 5, 4, 4, 5, 5, 5,
 	5,
@@ -125,8 +121,7 @@ var yyTok1 = [...]int{
 var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-	22,
+	12, 13, 14, 15, 16, 17, 18, 19, 20,
 }
 var yyTok3 = [...]int{
 	0,

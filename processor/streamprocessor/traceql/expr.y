@@ -18,7 +18,7 @@ package traceql
 
 %token <str>      STRING
 %token <num>      NUMBER
-%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE OPEN_PARENTHESIS CLOSE_PARENTHESIS
+%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS
                   FIELD_DURATION FIELD_NAME
 

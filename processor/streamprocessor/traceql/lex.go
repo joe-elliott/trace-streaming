@@ -18,8 +18,6 @@ var tokens = map[string]int{
 	">=":       GTE,
 	"<":        LT,
 	"<=":       LTE,
-	"(":        OPEN_PARENTHESIS,
-	")":        CLOSE_PARENTHESIS,
 	"spans":    STREAM_TYPE_SPANS,
 	"duration": FIELD_DURATION,
 	"name":     FIELD_NAME,
