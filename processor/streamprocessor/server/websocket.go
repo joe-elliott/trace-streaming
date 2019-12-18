@@ -10,8 +10,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
+
+type WebsocketConfig struct {
+	Port    int  `mapstructure:"port"`
+	Enabled bool `mapstructure:"enabled"`
+}
 
 type socketSender struct {
 	ws *websocket.Conn
@@ -25,7 +29,11 @@ type websocketServer struct {
 	s StreamProcessor
 }
 
-func DoWebsocket(s StreamProcessor) error {
+func DoWebsocket(s StreamProcessor, cfg WebsocketConfig) error {
+	if !cfg.Enabled {
+		return nil
+	}
+
 	w := websocketServer{
 		s: s,
 	}
@@ -33,7 +41,7 @@ func DoWebsocket(s StreamProcessor) error {
 	http.HandleFunc("/v1/stream/traces", w.streamTraces)
 	http.HandleFunc("/v1/stream/spans", w.streamSpans)
 
-	go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), nil)
+	go http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), nil)
 
 	return nil
 }

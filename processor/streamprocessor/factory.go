@@ -3,6 +3,7 @@ package streamprocessor
 import (
 	"go.uber.org/zap"
 
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/server"
 	"github.com/open-telemetry/opentelemetry-collector/config/configerror"
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 	"github.com/open-telemetry/opentelemetry-collector/consumer"
@@ -29,6 +30,14 @@ func (f *Factory) CreateDefaultConfig() configmodels.Processor {
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
 			NameVal: typeStr,
+		},
+		GRPC: server.GRPCConfig{
+			Port:    31234,
+			Enabled: true,
+		},
+		Websocket: server.WebsocketConfig{
+			Port:    31235,
+			Enabled: true,
 		},
 	}
 }

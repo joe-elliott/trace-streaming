@@ -41,8 +41,8 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		traceBatcher: newBatcher(),
 	}
 
-	server.DoGRPC(sp)
-	server.DoWebsocket(sp)
+	server.DoGRPC(sp, config.GRPC)
+	server.DoWebsocket(sp, config.Websocket)
 
 	go sp.pollBatches(5 * time.Second)
 

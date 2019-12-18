@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 	"go.uber.org/ratelimit"
 )
 
@@ -16,7 +15,7 @@ type Spans struct {
 }
 
 func NewSpans(req *streampb.SpanRequest, stream ClientStream) *Spans {
-	rate := util.DefaultRate
+	rate := 10
 	if req.Params != nil && req.Params.RequestedRate != 0 {
 		rate = int(req.Params.RequestedRate)
 	}

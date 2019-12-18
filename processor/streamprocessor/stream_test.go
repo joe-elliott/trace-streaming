@@ -20,6 +20,10 @@ func TestNewTraceProcessor(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
+
+	oCfg.GRPC.Enabled = false
+	oCfg.Websocket.Enabled = false
+
 	tp, err := NewTraceProcessor(nil, *oCfg)
 	require.Error(t, oterr.ErrNilNextConsumer, err)
 	require.Nil(t, tp)
@@ -35,6 +39,9 @@ func TestSpanProcessor_NilEmpty(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
+
+	oCfg.GRPC.Enabled = false
+	oCfg.Websocket.Enabled = false
 
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)
@@ -214,6 +221,9 @@ func TestSpanProcessor_Values(t *testing.T) {
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
 
+	oCfg.GRPC.Enabled = false
+	oCfg.Websocket.Enabled = false
+
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)
 	require.NotNil(t, tp)
@@ -339,6 +349,9 @@ func TestSpanProcessor_MissingKeys(t *testing.T) {
 	factory := Factory{}
 	cfg := factory.CreateDefaultConfig()
 	oCfg := cfg.(*Config)
+
+	oCfg.GRPC.Enabled = false
+	oCfg.Websocket.Enabled = false
 
 	tp, err := factory.CreateTraceProcessor(zap.NewNop(), exportertest.NewNopTraceExporter(), oCfg)
 	require.Nil(t, err)

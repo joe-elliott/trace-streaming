@@ -4,6 +4,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/server"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/open-telemetry/opentelemetry-collector/config"
@@ -28,6 +29,14 @@ func TestLoadConfig(t *testing.T) {
 			TypeVal: typeStr,
 			NameVal: "stream",
 		},
+		GRPC: server.GRPCConfig{
+			Port:    1111,
+			Enabled: true,
+		},
+		Websocket: server.WebsocketConfig{
+			Port:    1234,
+			Enabled: false,
+		},
 	})
 
 	p1 := config.Processors["stream/customname"]
@@ -35,6 +44,14 @@ func TestLoadConfig(t *testing.T) {
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
 			NameVal: "stream/customname",
+		},
+		GRPC: server.GRPCConfig{
+			Port:    31234,
+			Enabled: true,
+		},
+		Websocket: server.WebsocketConfig{
+			Port:    31235,
+			Enabled: true,
 		},
 	})
 }

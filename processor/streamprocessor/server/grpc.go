@@ -9,20 +9,28 @@ import (
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
+
+type GRPCConfig struct {
+	Port    int  `mapstructure:"port"`
+	Enabled bool `mapstructure:"enabled"`
+}
 
 type grpcServer struct {
 	s StreamProcessor
 }
 
-func DoGRPC(s StreamProcessor) error {
+func DoGRPC(s StreamProcessor, cfg GRPCConfig) error {
+	if !cfg.Enabled {
+		return nil
+	}
+
 	g := &grpcServer{
 		s: s,
 	}
 
 	// GRPC
-	grpcEndpoint := fmt.Sprintf(":%d", util.DefaultGRPCPort)
+	grpcEndpoint := fmt.Sprintf(":%d", cfg.Port)
 	lis, err := net.Listen("tcp", grpcEndpoint)
 	if err != nil {
 		log.Fatal("Failed to listen", err)
