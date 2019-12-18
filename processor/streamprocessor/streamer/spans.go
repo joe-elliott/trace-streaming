@@ -29,7 +29,6 @@ func NewSpans(req *streampb.SpanRequest, stream ClientStream) *Spans {
 }
 
 func (s *Spans) Do() error {
-
 	for spans := range s.spans {
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
@@ -61,7 +60,6 @@ func (s *Spans) Shutdown() {
 }
 
 func (s *Spans) filterSpan(spans []*streampb.Span) []*streampb.Span {
-
 	if len(s.req.ProcessName) > 0 || len(s.req.OperationName) > 0 || s.req.MinDuration > 0 {
 		filtered := make([]*streampb.Span, 0)
 

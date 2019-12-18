@@ -29,7 +29,6 @@ func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
 }
 
 func (s *Traces) Do() error {
-
 	for trace := range s.traces {
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
