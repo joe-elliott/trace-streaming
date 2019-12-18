@@ -14,28 +14,31 @@ type yySymType struct {
 	Matcher  string
 }
 
-const STRING = 57346
-const NUMBER = 57347
-const COMMA = 57348
-const DOT = 57349
-const OPEN_BRACE = 57350
-const CLOSE_BRACE = 57351
-const EQ = 57352
-const NEQ = 57353
-const RE = 57354
-const NRE = 57355
-const GT = 57356
-const GTE = 57357
-const LT = 57358
-const LTE = 57359
-const STREAM_TYPE_SPANS = 57360
-const FIELD_DURATION = 57361
-const FIELD_NAME = 57362
+const IDENTIFIER = 57346
+const STRING = 57347
+const NUMBER = 57348
+const COMMA = 57349
+const DOT = 57350
+const OPEN_BRACE = 57351
+const CLOSE_BRACE = 57352
+const EQ = 57353
+const NEQ = 57354
+const RE = 57355
+const NRE = 57356
+const GT = 57357
+const GTE = 57358
+const LT = 57359
+const LTE = 57360
+const STREAM_TYPE_SPANS = 57361
+const FIELD_DURATION = 57362
+const FIELD_NAME = 57363
+const FIELD_TAGS = 57364
 
 var yyToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
+	"IDENTIFIER",
 	"STRING",
 	"NUMBER",
 	"COMMA",
@@ -53,6 +56,7 @@ var yyToknames = [...]string{
 	"STREAM_TYPE_SPANS",
 	"FIELD_DURATION",
 	"FIELD_NAME",
+	"FIELD_TAGS",
 }
 var yyStatenames = [...]string{}
 
@@ -60,7 +64,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:57
+//line processor/streamprocessor/traceql/expr.y:59
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -71,48 +75,49 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 30
+const yyLast = 33
 
 var yyAct = [...]int{
 
-	12, 13, 14, 15, 16, 17, 18, 19, 8, 9,
-	2, 6, 11, 4, 30, 10, 23, 24, 21, 22,
-	29, 28, 27, 20, 26, 25, 3, 7, 5, 1,
+	13, 14, 15, 16, 17, 18, 19, 20, 8, 9,
+	10, 2, 6, 12, 4, 21, 11, 25, 26, 23,
+	24, 32, 31, 30, 29, 22, 28, 27, 33, 3,
+	7, 5, 1,
 }
 var yyPact = [...]int{
 
-	-8, -1000, 5, -1000, -11, 6, -1000, -10, -1000, -1000,
-	-1000, -11, 14, 12, 21, 20, 17, 16, 15, 9,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000,
+	-8, -1000, 5, -1000, -12, 6, -1000, -11, -1000, -1000,
+	7, -1000, -12, 14, 12, 22, 21, 18, 17, 16,
+	15, 24, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 29, 28, 11, 27, 26,
+	0, 32, 31, 12, 30, 29,
 }
 var yyR1 = [...]int{
 
 	0, 1, 5, 2, 2, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 4, 4,
+	3, 3, 3, 3, 3, 4, 4, 4,
 }
 var yyR2 = [...]int{
 
 	0, 2, 3, 1, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 1, 1,
+	3, 3, 3, 3, 3, 1, 1, 3,
 }
 var yyChk = [...]int{
 
-	-1000, -1, 18, -5, 8, -2, -3, -4, 19, 20,
-	9, 6, 10, 11, 12, 13, 14, 15, 16, 17,
-	-3, 4, 5, 4, 5, 4, 4, 5, 5, 5,
-	5,
+	-1000, -1, 19, -5, 9, -2, -3, -4, 20, 21,
+	22, 10, 7, 11, 12, 13, 14, 15, 16, 17,
+	18, 8, -3, 5, 6, 5, 6, 5, 5, 6,
+	6, 6, 6, 4,
 }
 var yyDef = [...]int{
 
 	0, -2, 0, 1, 0, 0, 3, 0, 15, 16,
-	2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	4, 5, 9, 6, 10, 7, 8, 11, 12, 13,
-	14,
+	0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 4, 5, 9, 6, 10, 7, 8, 11,
+	12, 13, 14, 17,
 }
 var yyTok1 = [...]int{
 
@@ -121,7 +126,8 @@ var yyTok1 = [...]int{
 var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17, 18, 19, 20,
+	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+	22,
 }
 var yyTok3 = [...]int{
 	0,
@@ -534,6 +540,11 @@ yydefault:
 	case 16:
 		yyDollar = yyS[yypt-1 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:55
+		{
+		}
+	case 17:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:56
 		{
 		}
 	}

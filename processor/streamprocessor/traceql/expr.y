@@ -16,11 +16,11 @@ package traceql
 %type <Matcher>               matcher
 %type <Field>                 field
 
-%token <str>      STRING
+%token <str>      IDENTIFIER STRING
 %token <num>      NUMBER
 %token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS
-                  FIELD_DURATION FIELD_NAME
+                  FIELD_DURATION FIELD_NAME FIELD_TAGS
 
 %%
 
@@ -53,5 +53,7 @@ matcher:
 field:
       FIELD_DURATION                   { }
     | FIELD_NAME                       { }
+    | FIELD_TAGS DOT IDENTIFIER        { }
     ;
+
 %%

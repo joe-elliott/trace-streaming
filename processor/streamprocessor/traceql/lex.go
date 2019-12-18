@@ -21,6 +21,7 @@ var tokens = map[string]int{
 	"spans":    STREAM_TYPE_SPANS,
 	"duration": FIELD_DURATION,
 	"name":     FIELD_NAME,
+	"tags":     FIELD_TAGS,
 }
 
 type lexer struct {
@@ -53,7 +54,7 @@ func (l *lexer) Lex(lval *yySymType) int {
 		return tok
 	}
 
-	return 0
+	return IDENTIFIER
 }
 
 func (l *lexer) Error(msg string) {
