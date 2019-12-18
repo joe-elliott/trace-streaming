@@ -9,11 +9,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
 
 func main() {
-	conn, err := grpc.Dial(fmt.Sprintf(":%d", util.DefaultGRPCPort), grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf(":%d", 31234), grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Failed to listen", err)
 	}

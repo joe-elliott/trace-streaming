@@ -19,3 +19,4 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - gracefully shutdown batch polling
 - stream.go is not concurrency safe.
 - build query frontend.  query frontend only hits enough collectors to satisfy the requested rate limit
+- propagate and use zap logger

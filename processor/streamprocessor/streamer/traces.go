@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 	"go.uber.org/ratelimit"
 )
 
@@ -16,7 +15,7 @@ type Traces struct {
 }
 
 func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
-	rate := util.DefaultRate
+	rate := 10
 	if req.Params != nil && req.Params.RequestedRate != 0 {
 		rate = int(req.Params.RequestedRate)
 	}
@@ -30,7 +29,6 @@ func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
 }
 
 func (s *Traces) Do() error {
-
 	for trace := range s.traces {
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,

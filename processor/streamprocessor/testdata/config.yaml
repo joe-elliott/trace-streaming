@@ -1,0 +1,22 @@
+receivers:
+  examplereceiver:
+
+processors:
+  stream:
+    grpc: 
+      enabled: true
+      port: 1111
+    websocket:
+      enabled: false
+      port: 1234
+  stream/customname:
+
+exporters:
+  exampleexporter:
+
+service:
+  pipelines:
+    traces:
+     receivers: [examplereceiver]
+     processors: [stream]
+     exporters: [exampleexporter]

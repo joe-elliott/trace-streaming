@@ -6,3 +6,8 @@ type StreamProcessor interface {
 	AddSpanStreamer(s *streamer.Spans)
 	AddTraceStreamer(s *streamer.Traces)
 }
+
+type StreamServer interface {
+	Do() error
+	Shutdown()
+}

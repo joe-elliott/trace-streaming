@@ -27,6 +27,8 @@ type streamProcessor struct {
 	traceStreamers []*streamer.Traces
 
 	traceBatcher *batcher
+
+	servers []server.StreamServer
 }
 
 // NewTraceProcessor returns the span processor.
@@ -41,8 +43,16 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 		traceBatcher: newBatcher(),
 	}
 
-	server.DoGRPC(sp)
-	server.DoWebsocket(sp)
+	sp.servers = append(sp.servers, server.NewGRPC(sp, config.GRPC))
+	sp.servers = append(sp.servers, server.NewWebsocket(sp, config.Websocket))
+
+	for _, srv := range sp.servers {
+		err := srv.Do()
+
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	go sp.pollBatches(5 * time.Second)
 
@@ -51,17 +61,27 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 
 func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata.TraceData) error {
 	blergSpans := make([]*streampb.Span, len(td.Spans))
+	i := 0
 
-	for i, span := range td.Spans {
+	for _, span := range td.Spans {
+		if !isSpanValid(span) {
+			continue
+		}
+
 		blergSpan := spanToSpan(span, td.Node)
 		blergSpans[i] = blergSpan
+		i++
 	}
 
-	for _, s := range sp.spanStreamers {
-		s.ProcessBatch(blergSpans)
-	}
+	if i > 0 {
+		blergSpans = blergSpans[:i-1]
 
-	sp.traceBatcher.addBatch(blergSpans)
+		for _, s := range sp.spanStreamers {
+			s.ProcessBatch(blergSpans)
+		}
+
+		sp.traceBatcher.addBatch(blergSpans)
+	}
 
 	return sp.nextConsumer.ConsumeTraceData(ctx, td)
 }
@@ -77,6 +97,10 @@ func (sp *streamProcessor) Shutdown() error {
 
 	for _, s := range sp.traceStreamers {
 		s.Shutdown()
+	}
+
+	for _, srv := range sp.servers {
+		srv.Shutdown()
 	}
 
 	return nil
@@ -112,15 +136,40 @@ func (sp *streamProcessor) pollBatches(pollTime time.Duration) {
 	}
 }
 
+func isSpanValid(span *tracepb.Span) bool {
+	return span != nil && len(span.TraceId) > 0 && len(span.SpanId) > 0
+}
+
 func spanToSpan(in *tracepb.Span, node *commonpb.Node) *streampb.Span {
+	name := "unknown"
+	processName := "unknown"
+	startTime := int64(0)
+	duration := int32(0)
+
+	if node != nil && node.ServiceInfo != nil {
+		processName = node.ServiceInfo.Name
+	}
+
+	if in.Name != nil {
+		name = in.Name.Value
+	}
+
+	if in.StartTime != nil {
+		startTime = in.StartTime.Seconds
+
+		if in.EndTime != nil {
+			duration = int32((in.EndTime.Nanos - in.StartTime.Nanos) / 1000000)
+		}
+	}
+
 	return &streampb.Span{
 		TraceID:       in.TraceId,
 		SpanID:        in.SpanId,
 		ParentSpanID:  in.ParentSpanId,
-		ProcessName:   node.ServiceInfo.Name,
-		OperationName: in.Name.Value,
-		StartTime:     in.StartTime.Seconds,
-		Duration:      int32((in.EndTime.Nanos - in.StartTime.Nanos) / 1000000),
+		ProcessName:   processName,
+		OperationName: name,
+		StartTime:     startTime,
+		Duration:      duration,
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/server"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/open-telemetry/opentelemetry-collector/config"
@@ -22,27 +23,35 @@ func TestLoadConfig(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
 
-	p0 := config.Processors["span/custom"]
+	p0 := config.Processors["stream"]
 	assert.Equal(t, p0, &Config{
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
-			NameVal: "span/custom",
+			NameVal: "stream",
 		},
-		Rename: Name{
-			FromAttributes: []string{"db.svc", "operation", "id"},
-			Separator:      "::",
+		GRPC: server.GRPCConfig{
+			Port:    1111,
+			Enabled: true,
+		},
+		Websocket: server.WebsocketConfig{
+			Port:    1234,
+			Enabled: false,
 		},
 	})
 
-	p1 := config.Processors["span/no-separator"]
+	p1 := config.Processors["stream/customname"]
 	assert.Equal(t, p1, &Config{
 		ProcessorSettings: configmodels.ProcessorSettings{
 			TypeVal: typeStr,
-			NameVal: "span/no-separator",
+			NameVal: "stream/customname",
 		},
-		Rename: Name{
-			FromAttributes: []string{"db.svc", "operation", "id"},
-			Separator:      "",
+		GRPC: server.GRPCConfig{
+			Port:    31234,
+			Enabled: true,
+		},
+		Websocket: server.WebsocketConfig{
+			Port:    31235,
+			Enabled: true,
 		},
 	})
 }

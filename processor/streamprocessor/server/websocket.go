@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +11,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
-	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/util"
 )
+
+type WebsocketConfig struct {
+	Port    int  `mapstructure:"port"`
+	Enabled bool `mapstructure:"enabled"`
+}
 
 type socketSender struct {
 	ws *websocket.Conn
@@ -22,20 +27,41 @@ func (s *socketSender) Send(span *streampb.SpanResponse) error {
 }
 
 type websocketServer struct {
-	s StreamProcessor
+	s      StreamProcessor
+	cfg    WebsocketConfig
+	server *http.Server
 }
 
-func DoWebsocket(s StreamProcessor) error {
-	w := websocketServer{
-		s: s,
+func NewWebsocket(s StreamProcessor, cfg WebsocketConfig) StreamServer {
+	return &websocketServer{
+		s:   s,
+		cfg: cfg,
+	}
+}
+
+func (w *websocketServer) Do() error {
+	if !w.cfg.Enabled {
+		return nil
 	}
 
 	http.HandleFunc("/v1/stream/traces", w.streamTraces)
 	http.HandleFunc("/v1/stream/spans", w.streamSpans)
 
-	go http.ListenAndServe(fmt.Sprintf(":%d", util.DefaultHTTPPort), nil)
+	w.server = &http.Server{Addr: fmt.Sprintf(":%d", w.cfg.Port)}
+
+	go func() {
+		if err := w.server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %s", err)
+		}
+	}()
 
 	return nil
+}
+
+func (w *websocketServer) Shutdown() {
+	if w.server != nil {
+		w.server.Shutdown(context.TODO())
+	}
 }
 
 func (s *websocketServer) streamTraces(w http.ResponseWriter, r *http.Request) {
