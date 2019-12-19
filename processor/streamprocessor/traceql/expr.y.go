@@ -10,9 +10,13 @@ import __yyfmt__ "fmt"
 //line processor/streamprocessor/traceql/expr.y:8
 type yySymType struct {
 	yys      int
-	Matchers []string
-	Matcher  string
+	Selector []ValueOperator
+	Matchers []ValueOperator
+	Matcher  ValueOperator
 	Field    int
+
+	integer int
+	float   float64
 }
 
 const IDENTIFIER = 57346
@@ -67,7 +71,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:67
+//line processor/streamprocessor/traceql/expr.y:72
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -85,7 +89,7 @@ var yyAct = [...]int{
 	13, 14, 15, 16, 17, 18, 19, 20, 8, 9,
 	10, 2, 6, 12, 4, 21, 11, 26, 27, 28,
 	23, 24, 25, 37, 38, 22, 35, 36, 33, 34,
-	31, 32, 30, 29, 39, 3, 7, 5, 1,
+	31, 32, 30, 29, 39, 7, 5, 3, 1,
 }
 var yyPact = [...]int{
 
@@ -96,13 +100,13 @@ var yyPact = [...]int{
 }
 var yyPgo = [...]int{
 
-	0, 38, 37, 12, 36, 35,
+	0, 38, 37, 36, 12, 35,
 }
 var yyR1 = [...]int{
 
-	0, 1, 5, 2, 2, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 4, 4, 4,
+	0, 1, 2, 3, 3, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 5, 5, 5,
 }
 var yyR2 = [...]int{
 
@@ -112,9 +116,9 @@ var yyR2 = [...]int{
 }
 var yyChk = [...]int{
 
-	-1000, -1, 20, -5, 10, -2, -3, -4, 21, 22,
+	-1000, -1, 20, -2, 10, -3, -4, -5, 21, 22,
 	23, 11, 8, 12, 13, 14, 15, 16, 17, 18,
-	19, 9, -3, 5, 6, 7, 5, 6, 7, 5,
+	19, 9, -4, 5, 6, 7, 5, 6, 7, 5,
 	5, 6, 7, 6, 7, 6, 7, 6, 7, 4,
 }
 var yyDef = [...]int{
@@ -475,112 +479,133 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
+	case 1:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:35
+		{
+			yylex.(*lexer).expr = newExpr(streamSpans, yyDollar[2].Selector)
+		}
+	case 2:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:39
+		{
+			yyVAL.Selector = yyDollar[2].Matchers
+		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:38
+//line processor/streamprocessor/traceql/expr.y:43
 		{
-			yyVAL.Matchers = []string{yyDollar[1].Matcher}
+			yyVAL.Matchers = []ValueOperator{yyDollar[1].Matcher}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:39
+//line processor/streamprocessor/traceql/expr.y:44
 		{
 			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:43
+//line processor/streamprocessor/traceql/expr.y:48
 		{
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:44
+//line processor/streamprocessor/traceql/expr.y:49
 		{
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:45
+//line processor/streamprocessor/traceql/expr.y:50
 		{
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:46
+//line processor/streamprocessor/traceql/expr.y:51
 		{
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:47
+//line processor/streamprocessor/traceql/expr.y:52
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opEQ, yyDollar[1].Field)
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:48
+//line processor/streamprocessor/traceql/expr.y:53
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opNEQ, yyDollar[1].Field)
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:49
+//line processor/streamprocessor/traceql/expr.y:54
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opGT, yyDollar[1].Field)
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:50
+//line processor/streamprocessor/traceql/expr.y:55
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opGTE, yyDollar[1].Field)
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:51
+//line processor/streamprocessor/traceql/expr.y:56
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opLT, yyDollar[1].Field)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:52
-		{
-		}
-	case 15:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:53
-		{
-		}
-	case 16:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:54
-		{
-		}
-	case 17:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:55
-		{
-		}
-	case 18:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:56
-		{
-		}
-	case 19:
-		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:57
 		{
+			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, opLTE, yyDollar[1].Field)
 		}
-	case 20:
+	case 15:
 		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:58
 		{
 		}
-	case 21:
-		yyDollar = yyS[yypt-1 : yypt+1]
+	case 16:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:59
+		{
+		}
+	case 17:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:60
+		{
+		}
+	case 18:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:61
+		{
+		}
+	case 19:
+		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:62
 		{
 		}
-	case 22:
-		yyDollar = yyS[yypt-1 : yypt+1]
+	case 20:
+		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:63
 		{
 		}
+	case 21:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:67
+		{
+			yyVAL.Field = fieldDuration
+		}
+	case 22:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:68
+		{
+			yyVAL.Field = fieldName
+		}
 	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:64
+//line processor/streamprocessor/traceql/expr.y:69
 		{
+			yyVAL.Field = fieldTags
 		}
 	}
 	goto yystack /* stack new state and value */

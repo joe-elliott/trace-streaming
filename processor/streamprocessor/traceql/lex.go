@@ -25,7 +25,7 @@ var tokens = map[string]int{
 
 type lexer struct {
 	scanner.Scanner
-	expr   string
+	expr   *Expr
 	errs   []ParseError
 	parser *yyParserImpl
 }
