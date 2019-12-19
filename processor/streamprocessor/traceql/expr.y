@@ -46,22 +46,26 @@ matchers:
     ;
 
 matcher:
-      field EQ STRING                  { }
-    | field NEQ STRING                 { }
-    | field RE STRING                  { }
-    | field NRE STRING                 { }
+      field EQ STRING                  { $$ = newStringOperator($3, EQ,  $1) }
+    | field NEQ STRING                 { $$ = newStringOperator($3, NEQ, $1) }
+    | field RE STRING                  { $$ = newStringOperator($3, RE,  $1) }
+    | field NRE STRING                 { $$ = newStringOperator($3, NRE, $1) }
+    | field GT STRING                  { $$ = newStringOperator($3, GT,  $1) }
+    | field GTE STRING                 { $$ = newStringOperator($3, GTE, $1) }
+    | field LT STRING                  { $$ = newStringOperator($3, LT,  $1) }
+    | field LTE STRING                 { $$ = newStringOperator($3, LTE, $1) }
     | field EQ INTEGER                 { $$ = newIntOperator($3, EQ,  $1) }
     | field NEQ INTEGER                { $$ = newIntOperator($3, NEQ, $1) }
     | field GT INTEGER                 { $$ = newIntOperator($3, GT,  $1) }
     | field GTE INTEGER                { $$ = newIntOperator($3, GTE, $1) }
     | field LT INTEGER                 { $$ = newIntOperator($3, LT,  $1) }
     | field LTE INTEGER                { $$ = newIntOperator($3, LTE, $1) }
-    | field EQ FLOAT                   { }
-    | field NEQ FLOAT                  { }
-    | field GT FLOAT                   { }
-    | field GTE FLOAT                  { }
-    | field LT FLOAT                   { }
-    | field LTE FLOAT                  { }
+    | field EQ FLOAT                   { $$ = newFloatOperator($3, EQ, $1) }
+    | field NEQ FLOAT                  { $$ = newFloatOperator($3, NEQ, $1) }
+    | field GT FLOAT                   { $$ = newFloatOperator($3, GT, $1) }
+    | field GTE FLOAT                  { $$ = newFloatOperator($3, GTE, $1) }
+    | field LT FLOAT                   { $$ = newFloatOperator($3, LT, $1) }
+    | field LTE FLOAT                  { $$ = newFloatOperator($3, LTE, $1) }
     ;
 
 field:
