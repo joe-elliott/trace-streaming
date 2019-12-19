@@ -50,11 +50,11 @@ matcher:
     | field NEQ STRING                 { }
     | field RE STRING                  { }
     | field NRE STRING                 { }
-    | field EQ INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field EQ INTEGER                 { $$ = newIntOperator($3, $2, $1) }
     | field NEQ INTEGER                { $$ = newIntOperator($3, $2, $1) }
-    | field GT INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field GT INTEGER                 { $$ = newIntOperator($3, $2, $1) }
     | field GTE INTEGER                { $$ = newIntOperator($3, $2, $1) }
-    | field LT INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field LT INTEGER                 { $$ = newIntOperator($3, $2, $1) }
     | field LTE INTEGER                { $$ = newIntOperator($3, $2, $1) }
     | field EQ FLOAT                   { }
     | field NEQ FLOAT                  { }
