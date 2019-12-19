@@ -40,6 +40,22 @@ func TestParse(t *testing.T) {
 				col:  7,
 			},
 		},
+		{
+			in: `blerg{foo="bar"}`,
+			err: ParseError{
+				msg:  "syntax error: unexpected IDENTIFIER, expecting STREAM_TYPE_SPANS",
+				line: 1,
+				col:  1,
+			},
+		},
+		{
+			in: `spans{status.grub="bar"}`,
+			err: ParseError{
+				msg:  "syntax error: unexpected IDENTIFIER, expecting FIELD_STATUS_CODE or FIELD_STATUS_MSG",
+				line: 1,
+				col:  14,
+			},
+		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
 			expr, err := ParseExpr(tc.in)
