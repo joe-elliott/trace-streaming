@@ -21,10 +21,10 @@ func TestLex(t *testing.T) {
 		{` spans{ name <= "test" } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_NAME, LTE, STRING, CLOSE_BRACE}},
 		{` spans{ name =~ "test" } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_NAME, RE, STRING, CLOSE_BRACE}},
 		{` spans{ name !~ "test" } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_NAME, NRE, STRING, CLOSE_BRACE}},
-		{` spans{ name <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_NAME, LTE, NUMBER, CLOSE_BRACE}},
-		{` spans{ duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DURATION, LTE, NUMBER, CLOSE_BRACE}},
-		{` spans{ duration <= 1.21 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DURATION, LTE, NUMBER, CLOSE_BRACE}},
-		{` spans{ tags.thing <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_TAGS, DOT, IDENTIFIER, LTE, NUMBER, CLOSE_BRACE}},
+		{` spans{ name <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DURATION, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ duration <= 1.21 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DURATION, LTE, FLOAT, CLOSE_BRACE}},
+		{` spans{ tags.thing <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_TAGS, DOT, IDENTIFIER, LTE, INTEGER, CLOSE_BRACE}},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			actual := []int{}

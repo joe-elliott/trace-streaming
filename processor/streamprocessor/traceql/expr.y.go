@@ -12,27 +12,29 @@ type yySymType struct {
 	yys      int
 	Matchers []string
 	Matcher  string
+	Field    int
 }
 
 const IDENTIFIER = 57346
 const STRING = 57347
-const NUMBER = 57348
-const COMMA = 57349
-const DOT = 57350
-const OPEN_BRACE = 57351
-const CLOSE_BRACE = 57352
-const EQ = 57353
-const NEQ = 57354
-const RE = 57355
-const NRE = 57356
-const GT = 57357
-const GTE = 57358
-const LT = 57359
-const LTE = 57360
-const STREAM_TYPE_SPANS = 57361
-const FIELD_DURATION = 57362
-const FIELD_NAME = 57363
-const FIELD_TAGS = 57364
+const INTEGER = 57348
+const FLOAT = 57349
+const COMMA = 57350
+const DOT = 57351
+const OPEN_BRACE = 57352
+const CLOSE_BRACE = 57353
+const EQ = 57354
+const NEQ = 57355
+const RE = 57356
+const NRE = 57357
+const GT = 57358
+const GTE = 57359
+const LT = 57360
+const LTE = 57361
+const STREAM_TYPE_SPANS = 57362
+const FIELD_DURATION = 57363
+const FIELD_NAME = 57364
+const FIELD_TAGS = 57365
 
 var yyToknames = [...]string{
 	"$end",
@@ -40,7 +42,8 @@ var yyToknames = [...]string{
 	"$unk",
 	"IDENTIFIER",
 	"STRING",
-	"NUMBER",
+	"INTEGER",
+	"FLOAT",
 	"COMMA",
 	"DOT",
 	"OPEN_BRACE",
@@ -64,7 +67,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:59
+//line processor/streamprocessor/traceql/expr.y:67
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -75,49 +78,51 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 33
+const yyLast = 39
 
 var yyAct = [...]int{
 
 	13, 14, 15, 16, 17, 18, 19, 20, 8, 9,
-	10, 2, 6, 12, 4, 21, 11, 25, 26, 23,
-	24, 32, 31, 30, 29, 22, 28, 27, 33, 3,
-	7, 5, 1,
+	10, 2, 6, 12, 4, 21, 11, 26, 27, 28,
+	23, 24, 25, 37, 38, 22, 35, 36, 33, 34,
+	31, 32, 30, 29, 39, 3, 7, 5, 1,
 }
 var yyPact = [...]int{
 
-	-8, -1000, 5, -1000, -12, 6, -1000, -11, -1000, -1000,
-	7, -1000, -12, 14, 12, 22, 21, 18, 17, 16,
-	15, 24, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000,
+	-9, -1000, 4, -1000, -13, 5, -1000, -12, -1000, -1000,
+	6, -1000, -13, 15, 12, 28, 27, 24, 22, 20,
+	17, 30, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 32, 31, 12, 30, 29,
+	0, 38, 37, 12, 36, 35,
 }
 var yyR1 = [...]int{
 
 	0, 1, 5, 2, 2, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 4, 4, 4,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 4, 4, 4,
 }
 var yyR2 = [...]int{
 
 	0, 2, 3, 1, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 1, 1, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 1, 1, 3,
 }
 var yyChk = [...]int{
 
-	-1000, -1, 19, -5, 9, -2, -3, -4, 20, 21,
-	22, 10, 7, 11, 12, 13, 14, 15, 16, 17,
-	18, 8, -3, 5, 6, 5, 6, 5, 5, 6,
-	6, 6, 6, 4,
+	-1000, -1, 20, -5, 10, -2, -3, -4, 21, 22,
+	23, 11, 8, 12, 13, 14, 15, 16, 17, 18,
+	19, 9, -3, 5, 6, 7, 5, 6, 7, 5,
+	5, 6, 7, 6, 7, 6, 7, 6, 7, 4,
 }
 var yyDef = [...]int{
 
-	0, -2, 0, 1, 0, 0, 3, 0, 15, 16,
+	0, -2, 0, 1, 0, 0, 3, 0, 21, 22,
 	0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 4, 5, 9, 6, 10, 7, 8, 11,
-	12, 13, 14, 17,
+	0, 0, 4, 5, 9, 15, 6, 10, 16, 7,
+	8, 11, 17, 12, 18, 13, 19, 14, 20, 23,
 }
 var yyTok1 = [...]int{
 
@@ -127,7 +132,7 @@ var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-	22,
+	22, 23,
 }
 var yyTok3 = [...]int{
 	0,
@@ -472,79 +477,109 @@ yydefault:
 
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:36
+//line processor/streamprocessor/traceql/expr.y:38
 		{
 			yyVAL.Matchers = []string{yyDollar[1].Matcher}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:37
+//line processor/streamprocessor/traceql/expr.y:39
 		{
 			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:41
+//line processor/streamprocessor/traceql/expr.y:43
 		{
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:42
+//line processor/streamprocessor/traceql/expr.y:44
 		{
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:43
+//line processor/streamprocessor/traceql/expr.y:45
 		{
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:44
+//line processor/streamprocessor/traceql/expr.y:46
 		{
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:45
+//line processor/streamprocessor/traceql/expr.y:47
 		{
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:46
+//line processor/streamprocessor/traceql/expr.y:48
 		{
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:47
+//line processor/streamprocessor/traceql/expr.y:49
 		{
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:48
+//line processor/streamprocessor/traceql/expr.y:50
 		{
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:49
+//line processor/streamprocessor/traceql/expr.y:51
 		{
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:50
+//line processor/streamprocessor/traceql/expr.y:52
 		{
 		}
 	case 15:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:54
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:53
 		{
 		}
 	case 16:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:55
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:54
 		{
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:55
+		{
+		}
+	case 18:
+		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:56
+		{
+		}
+	case 19:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:57
+		{
+		}
+	case 20:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:58
+		{
+		}
+	case 21:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:62
+		{
+		}
+	case 22:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:63
+		{
+		}
+	case 23:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:64
 		{
 		}
 	}

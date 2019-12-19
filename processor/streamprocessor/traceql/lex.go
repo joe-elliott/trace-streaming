@@ -1,7 +1,6 @@
 package traceql
 
 import (
-	"log"
 	"text/scanner"
 )
 
@@ -26,7 +25,9 @@ var tokens = map[string]int{
 
 type lexer struct {
 	scanner.Scanner
-	expr string
+	expr   string
+	errs   []ParseError
+	parser *yyParserImpl
 }
 
 func (l *lexer) Lex(lval *yySymType) int {
@@ -39,10 +40,10 @@ func (l *lexer) Lex(lval *yySymType) int {
 		return STRING
 
 	case scanner.Int:
-		return NUMBER
+		return INTEGER
 
 	case scanner.Float:
-		return NUMBER
+		return FLOAT
 	}
 
 	if tok, ok := tokens[l.TokenText()+string(l.Peek())]; ok {
@@ -58,5 +59,5 @@ func (l *lexer) Lex(lval *yySymType) int {
 }
 
 func (l *lexer) Error(msg string) {
-	log.Fatalf("oops %v", msg)
+	l.errs = append(l.errs, newParseError(msg, l.Line, l.Column))
 }

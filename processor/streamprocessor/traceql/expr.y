@@ -8,6 +8,7 @@ package traceql
 %union{
   Matchers  []string
   Matcher   string
+  Field     int
 }
 
 %start root
@@ -17,7 +18,8 @@ package traceql
 %type <Field>                 field
 
 %token <str>      IDENTIFIER STRING
-%token <num>      NUMBER
+%token <int>      INTEGER
+%token <float>    FLOAT
 %token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS
                   FIELD_DURATION FIELD_NAME FIELD_TAGS
@@ -42,12 +44,18 @@ matcher:
     | field NEQ STRING                 { }
     | field RE STRING                  { }
     | field NRE STRING                 { }
-    | field EQ NUMBER                  { }
-    | field NEQ NUMBER                 { }
-    | field GT NUMBER                  { }
-    | field GTE NUMBER                 { }
-    | field LT NUMBER                  { }
-    | field LTE NUMBER                 { }
+    | field EQ INTEGER                 { }
+    | field NEQ INTEGER                { }
+    | field GT INTEGER                 { }
+    | field GTE INTEGER                { }
+    | field LT INTEGER                 { }
+    | field LTE INTEGER                { }
+    | field EQ FLOAT                   { }
+    | field NEQ FLOAT                  { }
+    | field GT FLOAT                   { }
+    | field GTE FLOAT                  { }
+    | field LT FLOAT                   { }
+    | field LTE FLOAT                  { }
     ;
 
 field:
