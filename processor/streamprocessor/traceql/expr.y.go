@@ -40,7 +40,11 @@ const LTE = 57361
 const STREAM_TYPE_SPANS = 57362
 const FIELD_DURATION = 57363
 const FIELD_NAME = 57364
-const FIELD_TAGS = 57365
+const FIELD_ATTS = 57365
+const FIELD_EVENTS = 57366
+const FIELD_STATUS = 57367
+const FIELD_STATUS_CODE = 57368
+const FIELD_STATUS_MSG = 57369
 
 var yyToknames = [...]string{
 	"$end",
@@ -65,7 +69,11 @@ var yyToknames = [...]string{
 	"STREAM_TYPE_SPANS",
 	"FIELD_DURATION",
 	"FIELD_NAME",
-	"FIELD_TAGS",
+	"FIELD_ATTS",
+	"FIELD_EVENTS",
+	"FIELD_STATUS",
+	"FIELD_STATUS_CODE",
+	"FIELD_STATUS_MSG",
 }
 var yyStatenames = [...]string{}
 
@@ -73,7 +81,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:71
+//line processor/streamprocessor/traceql/expr.y:74
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -84,45 +92,51 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 26
+const yyLast = 33
 
 var yyAct = [...]int{
 
-	8, 9, 10, 14, 15, 16, 2, 17, 18, 19,
-	20, 6, 12, 4, 21, 11, 23, 24, 25, 26,
-	13, 7, 5, 3, 22, 1,
+	8, 9, 11, 12, 10, 2, 30, 31, 16, 17,
+	18, 6, 19, 20, 21, 22, 14, 4, 25, 13,
+	27, 28, 29, 24, 33, 23, 26, 32, 15, 7,
+	5, 3, 1,
 }
 var yyPact = [...]int{
 
-	-14, -1000, 3, -1000, -21, 4, -1000, -9, -1000, -1000,
-	5, -1000, -21, 11, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, 15, -1000, -1000, -1000, -1000, -1000,
+	-15, -1000, 7, -1000, -21, 8, -1000, -4, -1000, -1000,
+	16, 14, 9, -1000, -21, 15, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -20, 23, 20, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 25, 23, 22, 11, 21, 20,
+	0, 32, 31, 30, 11, 29, 28,
 }
 var yyR1 = [...]int{
 
 	0, 1, 2, 3, 3, 4, 4, 4, 6, 6,
-	6, 6, 6, 6, 6, 5, 5, 5,
+	6, 6, 6, 6, 6, 5, 5, 5, 5, 5,
+	5,
 }
 var yyR2 = [...]int{
 
 	0, 2, 3, 1, 3, 3, 3, 3, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 3,
+	1, 1, 1, 1, 1, 1, 1, 3, 3, 3,
+	3,
 }
 var yyChk = [...]int{
 
 	-1000, -1, 20, -2, 10, -3, -4, -5, 21, 22,
-	23, 11, 8, -6, 12, 13, 14, 16, 17, 18,
-	19, 9, -4, 5, 6, 7, 4,
+	25, 23, 24, 11, 8, -6, 12, 13, 14, 16,
+	17, 18, 19, 9, 9, 9, -4, 5, 6, 7,
+	26, 27, 4, 4,
 }
 var yyDef = [...]int{
 
 	0, -2, 0, 1, 0, 0, 3, 0, 15, 16,
-	0, 2, 0, 0, 8, 9, 10, 11, 12, 13,
-	14, 0, 4, 5, 6, 7, 17,
+	0, 0, 0, 2, 0, 0, 8, 9, 10, 11,
+	12, 13, 14, 0, 0, 0, 4, 5, 6, 7,
+	17, 18, 19, 20,
 }
 var yyTok1 = [...]int{
 
@@ -132,7 +146,7 @@ var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-	22, 23,
+	22, 23, 24, 25, 26, 27,
 }
 var yyTok3 = [...]int{
 	0,
@@ -575,7 +589,25 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 //line processor/streamprocessor/traceql/expr.y:68
 		{
-			yyVAL.Field = newComplexField(FIELD_TAGS, yyDollar[3].str)
+			yyVAL.Field = newComplexField(FIELD_STATUS_CODE, "")
+		}
+	case 18:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:69
+		{
+			yyVAL.Field = newComplexField(FIELD_STATUS_MSG, "")
+		}
+	case 19:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:70
+		{
+			yyVAL.Field = newComplexField(FIELD_ATTS, yyDollar[3].str)
+		}
+	case 20:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line processor/streamprocessor/traceql/expr.y:71
+		{
+			yyVAL.Field = newComplexField(FIELD_EVENTS, yyDollar[3].str)
 		}
 	}
 	goto yystack /* stack new state and value */

@@ -21,7 +21,11 @@ var tokens = map[string]int{
 	"spans":    STREAM_TYPE_SPANS,
 	"duration": FIELD_DURATION,
 	"name":     FIELD_NAME,
-	"tags":     FIELD_TAGS,
+	"atts":     FIELD_ATTS,
+	"events":   FIELD_EVENTS,
+	"status":   FIELD_STATUS,
+	"code":     FIELD_STATUS_CODE,
+	"message":  FIELD_STATUS_MSG,
 }
 
 type lexer struct {

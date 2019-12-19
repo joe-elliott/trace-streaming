@@ -21,15 +21,21 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{"", ""},
 		},
 		{
-			in:         `spans{duration=3, tags.test="blerg"}`,
+			in:         `spans{duration=3, atts.test="blerg"}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   []int{FIELD_DURATION, FIELD_TAGS},
+			fieldIds:   []int{FIELD_DURATION, FIELD_ATTS},
 			fieldNames: []string{"", "test"},
+		},
+		{
+			in:         `spans{duration=3, atts.test="blerg", status.message=~".*blerg", status.code=400}`,
+			stream:     STREAM_TYPE_SPANS,
+			fieldIds:   []int{FIELD_DURATION, FIELD_ATTS, FIELD_STATUS_MSG, FIELD_STATUS_CODE},
+			fieldNames: []string{"", "test", "", ""},
 		},
 		{
 			in: `spans{foo="bar"}`,
 			err: ParseError{
-				msg:  "syntax error: unexpected IDENTIFIER, expecting FIELD_DURATION or FIELD_NAME or FIELD_TAGS",
+				msg:  "syntax error: unexpected IDENTIFIER",
 				line: 1,
 				col:  7,
 			},

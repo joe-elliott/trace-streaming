@@ -29,7 +29,7 @@ package traceql
 %token <float>    FLOAT
 %token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS
-                  FIELD_DURATION FIELD_NAME FIELD_TAGS
+                  FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_STATUS_CODE FIELD_STATUS_MSG
 
 %%
 
@@ -63,9 +63,12 @@ operator:
     ;
 
 field:
-      FIELD_DURATION                   { $$ = newComplexField(FIELD_DURATION, "") }
-    | FIELD_NAME                       { $$ = newComplexField(FIELD_NAME, "")     }
-    | FIELD_TAGS DOT IDENTIFIER        { $$ = newComplexField(FIELD_TAGS, $3)   }
+      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
+    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
+    | FIELD_STATUS DOT FIELD_STATUS_CODE  { $$ = newComplexField(FIELD_STATUS_CODE, "") }
+    | FIELD_STATUS DOT FIELD_STATUS_MSG   { $$ = newComplexField(FIELD_STATUS_MSG, "")  }
+    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
     ;
 
 %%
