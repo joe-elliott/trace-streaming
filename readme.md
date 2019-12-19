@@ -20,3 +20,7 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - stream.go is not concurrency safe.
 - build query frontend.  query frontend only hits enough collectors to satisfy the requested rate limit
 - propagate and use zap logger
+- make rate limiting not suck
+- chain filters?
+- start designing HA
+- add CI (codecov/build/tests)
