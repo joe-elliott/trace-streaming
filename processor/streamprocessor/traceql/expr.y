@@ -13,6 +13,7 @@ package traceql
 
   integer   int
   float     float64
+  val       int
 }
 
 %start expr
@@ -32,7 +33,7 @@ package traceql
 %%
 
 expr:
-      STREAM_TYPE_SPANS selector       { yylex.(*lexer).expr = newExpr(streamSpans, $2) }
+      STREAM_TYPE_SPANS selector       { yylex.(*lexer).expr = newExpr($1, $2) }
     ;
 
 selector:
@@ -49,12 +50,12 @@ matcher:
     | field NEQ STRING                 { }
     | field RE STRING                  { }
     | field NRE STRING                 { }
-    | field EQ INTEGER                 { $$ = newIntOperator($3, opEQ,  $1) }
-    | field NEQ INTEGER                { $$ = newIntOperator($3, opNEQ, $1) }
-    | field GT INTEGER                 { $$ = newIntOperator($3, opGT,  $1) }
-    | field GTE INTEGER                { $$ = newIntOperator($3, opGTE, $1) }
-    | field LT INTEGER                 { $$ = newIntOperator($3, opLT,  $1) }
-    | field LTE INTEGER                { $$ = newIntOperator($3, opLTE, $1) }
+    | field EQ INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field NEQ INTEGER                { $$ = newIntOperator($3, $2, $1) }
+    | field GT INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field GTE INTEGER                { $$ = newIntOperator($3, $2, $1) }
+    | field LT INTEGER                 { $$ = newIntOperator($3, $2,  $1) }
+    | field LTE INTEGER                { $$ = newIntOperator($3, $2, $1) }
     | field EQ FLOAT                   { }
     | field NEQ FLOAT                  { }
     | field GT FLOAT                   { }
@@ -64,9 +65,9 @@ matcher:
     ;
 
 field:
-      FIELD_DURATION                   { $$ = fieldDuration }
-    | FIELD_NAME                       { $$ = fieldName     }
-    | FIELD_TAGS DOT IDENTIFIER        { $$ = fieldTags     }
+      FIELD_DURATION                   { $$ = $1 }
+    | FIELD_NAME                       { $$ = $1 }
+    | FIELD_TAGS DOT IDENTIFIER        { $$ = $1 }
     ;
 
 %%

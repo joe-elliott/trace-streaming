@@ -2,23 +2,6 @@ package traceql
 
 import "strconv"
 
-const (
-	opEQ int = iota
-	opNEQ
-	opRE
-	opNRE
-	opGT
-	opGTE
-	opLT
-	opLTE
-
-	streamSpans int = iota
-
-	fieldDuration int = iota
-	fieldName
-	fieldTags
-)
-
 //
 type Expr struct {
 	stream    int
