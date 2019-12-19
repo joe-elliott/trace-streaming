@@ -122,7 +122,6 @@ func TestFloatOperator(t *testing.T) {
 			assert.Equalf(t, tc.s.expected, tc.in.compareString(tc.s.compare), "string test")
 		})
 	}
-
 }
 
 func TestStringOperator(t *testing.T) {
