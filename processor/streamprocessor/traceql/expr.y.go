@@ -15,6 +15,7 @@ type yySymType struct {
 	Matcher  ValueOperator
 	Field    int
 
+	str     string
 	integer int
 	float   float64
 }
@@ -71,7 +72,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:72
+//line processor/streamprocessor/traceql/expr.y:73
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -481,129 +482,129 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:35
+//line processor/streamprocessor/traceql/expr.y:36
 		{
 			yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, yyDollar[2].Selector)
 		}
 	case 2:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:39
+//line processor/streamprocessor/traceql/expr.y:40
 		{
 			yyVAL.Selector = yyDollar[2].Matchers
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:43
+//line processor/streamprocessor/traceql/expr.y:44
 		{
 			yyVAL.Matchers = []ValueOperator{yyDollar[1].Matcher}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:44
+//line processor/streamprocessor/traceql/expr.y:45
 		{
 			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:48
+//line processor/streamprocessor/traceql/expr.y:49
 		{
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:49
+//line processor/streamprocessor/traceql/expr.y:50
 		{
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:50
+//line processor/streamprocessor/traceql/expr.y:51
 		{
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:51
+//line processor/streamprocessor/traceql/expr.y:52
 		{
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:52
+//line processor/streamprocessor/traceql/expr.y:53
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, EQ, yyDollar[1].Field)
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:53
+//line processor/streamprocessor/traceql/expr.y:54
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, NEQ, yyDollar[1].Field)
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:54
+//line processor/streamprocessor/traceql/expr.y:55
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, GT, yyDollar[1].Field)
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:55
+//line processor/streamprocessor/traceql/expr.y:56
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, GTE, yyDollar[1].Field)
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:56
+//line processor/streamprocessor/traceql/expr.y:57
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, LT, yyDollar[1].Field)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:57
+//line processor/streamprocessor/traceql/expr.y:58
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, LTE, yyDollar[1].Field)
 		}
 	case 15:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:58
+//line processor/streamprocessor/traceql/expr.y:59
 		{
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:59
+//line processor/streamprocessor/traceql/expr.y:60
 		{
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:60
+//line processor/streamprocessor/traceql/expr.y:61
 		{
 		}
 	case 18:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:61
+//line processor/streamprocessor/traceql/expr.y:62
 		{
 		}
 	case 19:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:62
+//line processor/streamprocessor/traceql/expr.y:63
 		{
 		}
 	case 20:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:63
+//line processor/streamprocessor/traceql/expr.y:64
 		{
 		}
 	case 21:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:67
+//line processor/streamprocessor/traceql/expr.y:68
 		{
 			yyVAL.Field = FIELD_DURATION
 		}
 	case 22:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:68
+//line processor/streamprocessor/traceql/expr.y:69
 		{
 			yyVAL.Field = FIELD_NAME
 		}
 	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:69
+//line processor/streamprocessor/traceql/expr.y:70
 		{
 			yyVAL.Field = FIELD_TAGS
 		}

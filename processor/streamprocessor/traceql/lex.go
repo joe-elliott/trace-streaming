@@ -1,6 +1,7 @@
 package traceql
 
 import (
+	"strconv"
 	"text/scanner"
 )
 
@@ -37,12 +38,30 @@ func (l *lexer) Lex(lval *yySymType) int {
 		return 0
 
 	case scanner.String:
+		var err error
+		lval.str, err = strconv.Unquote(l.TokenText())
+		if err != nil {
+			l.Error(err.Error())
+			return 0
+		}
 		return STRING
 
 	case scanner.Int:
+		var err error
+		lval.integer, err = strconv.Atoi(l.TokenText())
+		if err != nil {
+			l.Error(err.Error())
+			return 0
+		}
 		return INTEGER
 
 	case scanner.Float:
+		var err error
+		lval.float, err = strconv.ParseFloat(l.TokenText(), 64)
+		if err != nil {
+			l.Error(err.Error())
+			return 0
+		}
 		return FLOAT
 	}
 
@@ -55,6 +74,7 @@ func (l *lexer) Lex(lval *yySymType) int {
 		return tok
 	}
 
+	lval.str = l.TokenText()
 	return IDENTIFIER
 }
 

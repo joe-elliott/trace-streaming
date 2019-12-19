@@ -11,6 +11,7 @@ package traceql
   Matcher   ValueOperator
   Field     int
 
+  str       string
   integer   int
   float     float64
 }
