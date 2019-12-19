@@ -21,6 +21,10 @@ func TestParse(t *testing.T) {
 			exp: `spans{foo="bar"}`,
 		},
 		{
+			in:  `spans{duration=3, tags.test="blerg"}`,
+			exp: `spans{foo="bar"}`,
+		},
+		{
 			in: `spans{foo="bar"} foo`,
 			err: ParseError{
 				msg:  "syntax error: unexpected IDENTIFIER, expecting != or !~ or |~ or |=",

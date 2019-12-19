@@ -22,6 +22,19 @@ func newExpr(stream int, o []ValueOperator) *Expr {
 	}
 }
 
+// complexField
+type complexField struct {
+	fieldID   int
+	fieldName string // only valid if fieldID = FIELD_TAGS
+}
+
+func newComplexField(id int, name string) complexField {
+	return complexField{
+		fieldID:   id,
+		fieldName: name,
+	}
+}
+
 //
 type ValueOperator interface {
 	compareInt(int) bool
@@ -31,11 +44,11 @@ type ValueOperator interface {
 
 // int operator
 type intOperator struct {
-	field   int
+	field   complexField
 	compare intCompareFunc
 }
 
-func newIntOperator(val int, op int, field int) intOperator {
+func newIntOperator(val int, op int, field complexField) intOperator {
 	var compare intCompareFunc
 
 	switch op {
@@ -82,11 +95,11 @@ func (o intOperator) compareString(s string) bool {
 
 // float operator
 type floatOperator struct {
-	field   int
+	field   complexField
 	compare floatCompareFunc
 }
 
-func newFloatOperator(val float64, op int, field int) floatOperator {
+func newFloatOperator(val float64, op int, field complexField) floatOperator {
 	var compare floatCompareFunc
 
 	switch op {
@@ -132,11 +145,11 @@ func (o floatOperator) compareString(s string) bool {
 
 // string operator
 type stringOperator struct {
-	field   int
+	field   complexField
 	compare stringCompareFunc
 }
 
-func newStringOperator(val string, op int, field int) stringOperator {
+func newStringOperator(val string, op int, field complexField) stringOperator {
 	var compare stringCompareFunc
 	// if op is a regex, let's build the regex now
 

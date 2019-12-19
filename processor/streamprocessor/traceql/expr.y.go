@@ -7,13 +7,13 @@ import __yyfmt__ "fmt"
 
 //line processor/streamprocessor/traceql/expr.y:4
 
-//line processor/streamprocessor/traceql/expr.y:8
+//line processor/streamprocessor/traceql/expr.y:7
 type yySymType struct {
 	yys      int
 	Selector []ValueOperator
 	Matchers []ValueOperator
 	Matcher  ValueOperator
-	Field    int
+	Field    complexField
 	Operator int
 
 	str     string
@@ -73,7 +73,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line processor/streamprocessor/traceql/expr.y:72
+//line processor/streamprocessor/traceql/expr.y:71
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -477,105 +477,105 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:38
+//line processor/streamprocessor/traceql/expr.y:37
 		{
 			yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, yyDollar[2].Selector)
 		}
 	case 2:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:42
+//line processor/streamprocessor/traceql/expr.y:41
 		{
 			yyVAL.Selector = yyDollar[2].Matchers
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:46
+//line processor/streamprocessor/traceql/expr.y:45
 		{
 			yyVAL.Matchers = []ValueOperator{yyDollar[1].Matcher}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:47
+//line processor/streamprocessor/traceql/expr.y:46
 		{
 			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:51
+//line processor/streamprocessor/traceql/expr.y:50
 		{
 			yyVAL.Matcher = newStringOperator(yyDollar[3].str, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:52
+//line processor/streamprocessor/traceql/expr.y:51
 		{
 			yyVAL.Matcher = newIntOperator(yyDollar[3].integer, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:53
+//line processor/streamprocessor/traceql/expr.y:52
 		{
 			yyVAL.Matcher = newFloatOperator(yyDollar[3].float, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:57
+//line processor/streamprocessor/traceql/expr.y:56
 		{
 			yyVAL.Operator = EQ
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:58
+//line processor/streamprocessor/traceql/expr.y:57
 		{
 			yyVAL.Operator = NEQ
 		}
 	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:59
+//line processor/streamprocessor/traceql/expr.y:58
 		{
 			yyVAL.Operator = RE
 		}
 	case 11:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:60
+//line processor/streamprocessor/traceql/expr.y:59
 		{
 			yyVAL.Operator = GT
 		}
 	case 12:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:61
+//line processor/streamprocessor/traceql/expr.y:60
 		{
 			yyVAL.Operator = GTE
 		}
 	case 13:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:62
+//line processor/streamprocessor/traceql/expr.y:61
 		{
 			yyVAL.Operator = LT
 		}
 	case 14:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:63
+//line processor/streamprocessor/traceql/expr.y:62
 		{
 			yyVAL.Operator = LTE
 		}
 	case 15:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:67
+//line processor/streamprocessor/traceql/expr.y:66
 		{
-			yyVAL.Field = FIELD_DURATION
+			yyVAL.Field = newComplexField(FIELD_DURATION, "")
 		}
 	case 16:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:68
+//line processor/streamprocessor/traceql/expr.y:67
 		{
-			yyVAL.Field = FIELD_NAME
+			yyVAL.Field = newComplexField(FIELD_NAME, "")
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line processor/streamprocessor/traceql/expr.y:69
+//line processor/streamprocessor/traceql/expr.y:68
 		{
-			yyVAL.Field = FIELD_TAGS
+			yyVAL.Field = newComplexField(FIELD_TAGS, yyDollar[3].str)
 		}
 	}
 	goto yystack /* stack new state and value */

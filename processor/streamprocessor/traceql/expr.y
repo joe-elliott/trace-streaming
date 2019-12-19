@@ -2,14 +2,13 @@
 
 %{
 package traceql
-
 %}
 
 %union{
   Selector  []ValueOperator
   Matchers  []ValueOperator
   Matcher   ValueOperator
-  Field     int
+  Field     complexField
   Operator  int
 
   str       string
@@ -64,9 +63,9 @@ operator:
     ;
 
 field:
-      FIELD_DURATION                   { $$ = FIELD_DURATION }
-    | FIELD_NAME                       { $$ = FIELD_NAME     }
-    | FIELD_TAGS DOT IDENTIFIER        { $$ = FIELD_TAGS     }
+      FIELD_DURATION                   { $$ = newComplexField(FIELD_DURATION, "") }
+    | FIELD_NAME                       { $$ = newComplexField(FIELD_NAME, "")     }
+    | FIELD_TAGS DOT IDENTIFIER        { $$ = newComplexField(FIELD_TAGS, $3)   }
     ;
 
 %%
