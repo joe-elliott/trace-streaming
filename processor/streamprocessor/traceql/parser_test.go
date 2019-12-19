@@ -17,7 +17,7 @@ func TestParse(t *testing.T) {
 		err error
 	}{
 		{
-			in:  `spans{duration=3}`,
+			in:  `spans{duration=3, name="asdf"}`,
 			exp: `spans{foo="bar"}`,
 		},
 		{
