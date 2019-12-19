@@ -11,6 +11,8 @@ func newString(s string) *string {
 }
 
 func TestParse(t *testing.T) {
+	t.Skip("TODO")
+
 	for _, tc := range []struct {
 		in  string
 		exp string

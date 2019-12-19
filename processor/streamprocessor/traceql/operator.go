@@ -9,19 +9,6 @@ type intCompareFunc func(int) bool
 type floatCompareFunc func(float64) bool
 type stringCompareFunc func(string) bool
 
-//
-type Expr struct {
-	stream    int
-	operators []ValueOperator
-}
-
-func newExpr(stream int, o []ValueOperator) *Expr {
-	return &Expr{
-		stream:    stream,
-		operators: o,
-	}
-}
-
 // complexField
 type complexField struct {
 	fieldID   int
