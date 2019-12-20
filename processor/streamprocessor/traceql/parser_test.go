@@ -69,6 +69,12 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{""},
 		},
 		{
+			in:         `traces{rootSpan.parent.duration = 3}`,
+			stream:     STREAM_TYPE_TRACES,
+			fieldIds:   [][]int{[]int{FIELD_ROOT_SPAN, FIELD_PARENT, FIELD_DURATION}},
+			fieldNames: []string{""},
+		},
+		{
 			in: `spans{foo="bar"}`,
 			err: ParseError{
 				msg:  "syntax error: unexpected IDENTIFIER",
