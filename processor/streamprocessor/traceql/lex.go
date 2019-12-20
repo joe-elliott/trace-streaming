@@ -19,6 +19,7 @@ var tokens = map[string]int{
 	"<":        LT,
 	"<=":       LTE,
 	"spans":    STREAM_TYPE_SPANS,
+	"traces":   STREAM_TYPE_TRACES,
 	"duration": FIELD_DURATION,
 	"name":     FIELD_NAME,
 	"atts":     FIELD_ATTS,
@@ -29,6 +30,8 @@ var tokens = map[string]int{
 	"process":  FIELD_PROCESS,
 	"parent":   FIELD_PARENT,
 	"parent*":  FIELD_DESCENDANT,
+	"span":     FIELD_SPAN,
+	"rootSpan": FIELD_ROOT_SPAN,
 }
 
 type lexer struct {

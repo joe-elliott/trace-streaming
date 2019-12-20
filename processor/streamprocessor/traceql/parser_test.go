@@ -51,6 +51,12 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{"test"},
 		},
 		{
+			in:         `traces{span.duration = 3}`,
+			stream:     STREAM_TYPE_TRACES,
+			fieldIds:   [][]int{[]int{FIELD_SPAN, FIELD_DURATION}},
+			fieldNames: []string{""},
+		},
+		{
 			in: `spans{foo="bar"}`,
 			err: ParseError{
 				msg:  "syntax error: unexpected IDENTIFIER",
@@ -61,7 +67,7 @@ func TestParse(t *testing.T) {
 		{
 			in: `blerg{foo="bar"}`,
 			err: ParseError{
-				msg:  "syntax error: unexpected IDENTIFIER, expecting STREAM_TYPE_SPANS",
+				msg:  "syntax error: unexpected IDENTIFIER, expecting STREAM_TYPE_SPANS or STREAM_TYPE_TRACES",
 				line: 1,
 				col:  1,
 			},
@@ -83,6 +89,10 @@ func TestParse(t *testing.T) {
 			// if we were expecting an error, just bail out at this point
 			if tc.err != nil {
 				return
+			}
+
+			if expr == nil {
+				assert.FailNow(t, "expr is unexpectedly nil.")
 			}
 
 			assert.Equal(t, tc.stream, expr.stream)
