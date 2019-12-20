@@ -65,18 +65,18 @@ func TestParse(t *testing.T) {
 			if tc.stream != 0 {
 				assert.Equal(t, tc.stream, expr.stream)
 
-				for i, o := range expr.operators {
+				for i, o := range expr.matchers {
 					var fieldID int
 					var fieldName string
 
 					switch v := o.(type) {
-					case intOperator:
+					case intMatcher:
 						fieldID = v.field.fieldID
 						fieldName = v.field.fieldName
-					case floatOperator:
+					case floatMatcher:
 						fieldID = v.field.fieldID
 						fieldName = v.field.fieldName
-					case stringOperator:
+					case stringMatcher:
 						fieldID = v.field.fieldID
 						fieldName = v.field.fieldName
 					default:

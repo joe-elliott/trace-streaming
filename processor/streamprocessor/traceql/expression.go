@@ -2,13 +2,13 @@ package traceql
 
 //
 type Expr struct {
-	stream    int
-	operators []ValueOperator
+	stream   int
+	matchers []ValueMatcher
 }
 
-func newExpr(stream int, o []ValueOperator) *Expr {
+func newExpr(stream int, m []ValueMatcher) *Expr {
 	return &Expr{
-		stream:    stream,
-		operators: o,
+		stream:   stream,
+		matchers: m,
 	}
 }

@@ -5,9 +5,9 @@ package traceql
 %}
 
 %union{
-  Selector  []ValueOperator
-  Matchers  []ValueOperator
-  Matcher   ValueOperator
+  Selector  []ValueMatcher
+  Matchers  []ValueMatcher
+  Matcher   ValueMatcher
   Field     complexField
   Operator  int
 
@@ -42,14 +42,14 @@ selector:
     ;
 
 matchers:
-      matcher                          { $$ = []ValueOperator{ $1 } }
+      matcher                          { $$ = []ValueMatcher{ $1 } }
     | matchers COMMA matcher           { $$ = append($1, $3) }
     ;
 
 matcher:
-      field operator STRING            { $$ = newStringOperator($3, $2, $1) }
-    | field operator INTEGER           { $$ = newIntOperator($3, $2,  $1) }
-    | field operator FLOAT             { $$ = newFloatOperator($3, $2, $1) }
+      field operator STRING            { $$ = newStringMatcher($3, $2, $1) }
+    | field operator INTEGER           { $$ = newIntMatcher($3, $2,  $1) }
+    | field operator FLOAT             { $$ = newFloatMatcher($3, $2, $1) }
     ;
 
 operator:
