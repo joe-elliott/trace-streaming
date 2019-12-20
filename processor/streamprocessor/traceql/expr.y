@@ -18,10 +18,11 @@ package traceql
 
 %start expr
 
-%type <Selector>              selector
-%type <Matchers>              matchers
-%type <Matcher>               matcher
-%type <Field>                 field
+%type <Selector>              spanSelector
+%type <Matchers>              spanMatchers
+%type <Matcher>               spanMatcher
+%type <Field>                 spanField
+
 %type <Operator>              operator
 
 %token <str>      IDENTIFIER STRING
@@ -34,22 +35,31 @@ package traceql
 %%
 
 expr:
-      STREAM_TYPE_SPANS selector       { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
+      STREAM_TYPE_SPANS spanSelector       { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
     ;
 
-selector:
-      OPEN_BRACE matchers CLOSE_BRACE  { $$ = $2 }
+spanSelector:
+      OPEN_BRACE spanMatchers CLOSE_BRACE  { $$ = $2 }
     ;
 
-matchers:
-      matcher                          { $$ = []ValueMatcher{ $1 } }
-    | matchers COMMA matcher           { $$ = append($1, $3) }
+spanMatchers:
+      spanMatcher                          { $$ = []ValueMatcher{ $1 } }
+    | spanMatchers COMMA spanMatcher           { $$ = append($1, $3) }
     ;
 
-matcher:
-      field operator STRING            { $$ = newStringMatcher($3, $2, $1) }
-    | field operator INTEGER           { $$ = newIntMatcher($3, $2,  $1) }
-    | field operator FLOAT             { $$ = newFloatMatcher($3, $2, $1) }
+spanMatcher:
+      spanField operator STRING            { $$ = newStringMatcher($3, $2, $1) }
+    | spanField operator INTEGER           { $$ = newIntMatcher($3, $2,  $1) }
+    | spanField operator FLOAT             { $$ = newFloatMatcher($3, $2, $1) }
+    ;
+
+spanField:
+      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
+    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
+    | FIELD_STATUS DOT FIELD_STATUS_CODE  { $$ = newComplexField(FIELD_STATUS_CODE, "") }
+    | FIELD_STATUS DOT FIELD_STATUS_MSG   { $$ = newComplexField(FIELD_STATUS_MSG, "")  }
+    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
     ;
 
 operator:
@@ -61,15 +71,6 @@ operator:
     | GTE                              { $$ = GTE }
     | LT                               { $$ =  LT }
     | LTE                              { $$ = LTE }
-    ;
-
-field:
-      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
-    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
-    | FIELD_STATUS DOT FIELD_STATUS_CODE  { $$ = newComplexField(FIELD_STATUS_CODE, "") }
-    | FIELD_STATUS DOT FIELD_STATUS_MSG   { $$ = newComplexField(FIELD_STATUS_MSG, "")  }
-    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
-    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
     ;
 
 %%
