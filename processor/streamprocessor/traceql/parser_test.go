@@ -15,6 +15,12 @@ func TestParse(t *testing.T) {
 		err        error
 	}{
 		{
+			in:         `spans{}`,
+			stream:     STREAM_TYPE_SPANS,
+			fieldIds:   [][]int{},
+			fieldNames: []string{},
+		},
+		{
 			in:         `spans{duration=3, name="asdf"}`,
 			stream:     STREAM_TYPE_SPANS,
 			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
@@ -49,6 +55,12 @@ func TestParse(t *testing.T) {
 			stream:     STREAM_TYPE_SPANS,
 			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
 			fieldNames: []string{"test"},
+		},
+		{
+			in:         `traces{}`,
+			stream:     STREAM_TYPE_TRACES,
+			fieldIds:   [][]int{},
+			fieldNames: []string{},
 		},
 		{
 			in:         `traces{span.duration = 3}`,

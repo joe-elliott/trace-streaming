@@ -47,7 +47,8 @@ expr:
     ;
 
 spanSelector:
-      OPEN_BRACE spanMatchers CLOSE_BRACE  { $$ = $2 }
+      OPEN_BRACE CLOSE_BRACE               { }
+    | OPEN_BRACE spanMatchers CLOSE_BRACE  { $$ = $2 }
     ;
 
 spanMatchers:
@@ -62,7 +63,8 @@ spanMatcher:
     ;
 
 traceSelector:
-      OPEN_BRACE traceMatchers CLOSE_BRACE { $$ = $2 }
+      OPEN_BRACE CLOSE_BRACE               { }
+    | OPEN_BRACE traceMatchers CLOSE_BRACE { $$ = $2 }
     ;
 
 traceMatchers:

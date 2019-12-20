@@ -96,66 +96,67 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 64
+const yyLast = 76
 
 var yyAct = [...]int{
 
-	10, 20, 11, 12, 17, 18, 16, 22, 23, 15,
-	14, 13, 55, 56, 27, 28, 29, 30, 31, 32,
-	33, 34, 9, 53, 2, 3, 42, 26, 25, 41,
-	45, 24, 7, 5, 44, 40, 50, 51, 60, 61,
-	62, 47, 48, 49, 59, 63, 64, 39, 46, 43,
-	38, 37, 36, 35, 58, 57, 54, 52, 21, 19,
-	6, 8, 4, 1,
+	11, 22, 8, 12, 13, 18, 19, 17, 20, 10,
+	16, 15, 14, 12, 13, 18, 19, 17, 24, 25,
+	16, 15, 14, 57, 58, 55, 2, 3, 44, 24,
+	25, 43, 27, 28, 47, 26, 7, 48, 52, 53,
+	5, 62, 63, 64, 46, 60, 61, 65, 66, 29,
+	30, 31, 32, 33, 34, 35, 36, 45, 49, 50,
+	51, 42, 56, 41, 40, 39, 38, 37, 59, 54,
+	23, 21, 6, 9, 4, 1,
 }
 var yyPact = [...]int{
 
-	4, -1000, 23, 22, -1000, -20, -1000, -25, 20, -1000,
-	2, -1000, -1000, 44, 43, 42, 41, 38, 26, 18,
-	-1000, 2, 25, 21, -1000, -20, 36, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -20, -20, 0, -15, 51,
-	50, -1000, -25, 33, -20, -20, -1000, -1000, -1000, -1000,
+	6, -1000, 30, 26, -1000, -9, -1000, -3, -1000, 24,
+	-1000, 37, -1000, -1000, 58, 57, 56, 55, 54, 52,
+	-1000, 20, -1000, 37, 35, 25, -1000, -19, 53, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -19, -19, 2,
+	-4, 64, 41, -1000, -14, 36, -19, -19, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 63, 62, 61, 22, 60, 59, 1, 58, 0,
-	57, 56, 27,
+	0, 75, 74, 73, 9, 72, 71, 1, 70, 0,
+	69, 62, 33,
 }
 var yyR1 = [...]int{
 
-	0, 1, 1, 2, 3, 3, 4, 4, 4, 5,
-	6, 6, 7, 7, 7, 8, 8, 9, 9, 9,
-	9, 9, 9, 9, 9, 10, 11, 11, 12, 12,
-	12, 12, 12, 12, 12, 12,
+	0, 1, 1, 2, 2, 3, 3, 4, 4, 4,
+	5, 5, 6, 6, 7, 7, 7, 8, 8, 9,
+	9, 9, 9, 9, 9, 9, 9, 10, 11, 11,
+	12, 12, 12, 12, 12, 12, 12, 12,
 }
 var yyR2 = [...]int{
 
-	0, 2, 2, 3, 1, 3, 3, 3, 3, 3,
-	1, 3, 3, 3, 3, 3, 3, 1, 1, 3,
-	3, 3, 3, 3, 3, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1,
+	0, 2, 2, 2, 3, 1, 3, 3, 3, 3,
+	2, 3, 1, 3, 3, 3, 3, 3, 3, 1,
+	1, 3, 3, 3, 3, 3, 3, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
 }
 var yyChk = [...]int{
 
-	-1000, -1, 20, 21, -2, 10, -5, 10, -3, -4,
-	-9, 22, 23, 31, 30, 29, 26, 24, 25, -6,
-	-7, -8, 32, 33, 11, 8, -12, 12, 13, 14,
-	15, 16, 17, 18, 19, 9, 9, 9, 9, 9,
-	9, 11, 8, -12, 9, 9, -4, 5, 6, 7,
-	-9, -9, -10, 23, -11, 27, 28, 4, 4, -7,
-	5, 6, 7, -9, -9,
+	-1000, -1, 20, 21, -2, 10, -5, 10, 11, -3,
+	-4, -9, 22, 23, 31, 30, 29, 26, 24, 25,
+	11, -6, -7, -8, 32, 33, 11, 8, -12, 12,
+	13, 14, 15, 16, 17, 18, 19, 9, 9, 9,
+	9, 9, 9, 11, 8, -12, 9, 9, -4, 5,
+	6, 7, -9, -9, -10, 23, -11, 27, 28, 4,
+	4, -7, 5, 6, 7, -9, -9,
 }
 var yyDef = [...]int{
 
-	0, -2, 0, 0, 1, 0, 2, 0, 0, 4,
-	0, 17, 18, 0, 0, 0, 0, 0, 0, 0,
-	10, 0, 0, 0, 3, 0, 0, 28, 29, 30,
-	31, 32, 33, 34, 35, 0, 0, 0, 0, 0,
-	0, 9, 0, 0, 0, 0, 5, 6, 7, 8,
-	19, 20, 21, 25, 22, 26, 27, 23, 24, 11,
-	12, 13, 14, 15, 16,
+	0, -2, 0, 0, 1, 0, 2, 0, 3, 0,
+	5, 0, 19, 20, 0, 0, 0, 0, 0, 0,
+	10, 0, 12, 0, 0, 0, 4, 0, 0, 30,
+	31, 32, 33, 34, 35, 36, 37, 0, 0, 0,
+	0, 0, 0, 11, 0, 0, 0, 0, 6, 7,
+	8, 9, 21, 22, 23, 27, 24, 28, 29, 25,
+	26, 13, 14, 15, 16, 17, 18,
 }
 var yyTok1 = [...]int{
 
@@ -518,166 +519,174 @@ yydefault:
 			yylex.(*lexer).expr = newExpr(STREAM_TYPE_TRACES, yyDollar[2].Selector)
 		}
 	case 3:
+		yyDollar = yyS[yypt-2 : yypt+1]
+		{
+		}
+	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
 			yyVAL.Selector = yyDollar[2].Matchers
 		}
-	case 4:
+	case 5:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.Matchers = []ValueMatcher{yyDollar[1].Matcher}
-		}
-	case 5:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		{
-			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matcher = newStringMatcher(yyDollar[3].str, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matcher = newIntMatcher(yyDollar[3].integer, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matcher = newStringMatcher(yyDollar[3].str, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matcher = newFloatMatcher(yyDollar[3].float, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matcher = newIntMatcher(yyDollar[3].integer, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Selector = yyDollar[2].Matchers
+			yyVAL.Matcher = newFloatMatcher(yyDollar[3].float, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 10:
-		yyDollar = yyS[yypt-1 : yypt+1]
+		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.Matchers = []ValueMatcher{yyDollar[1].Matcher}
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
+			yyVAL.Selector = yyDollar[2].Matchers
 		}
 	case 12:
-		yyDollar = yyS[yypt-3 : yypt+1]
+		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Matcher = newStringMatcher(yyDollar[3].str, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matchers = []ValueMatcher{yyDollar[1].Matcher}
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matcher = newIntMatcher(yyDollar[3].integer, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matchers = append(yyDollar[1].Matchers, yyDollar[3].Matcher)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Matcher = newFloatMatcher(yyDollar[3].float, yyDollar[2].Operator, yyDollar[1].Field)
+			yyVAL.Matcher = newStringMatcher(yyDollar[3].str, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 15:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = wrapComplexField(FIELD_SPAN, yyDollar[3].Field)
+			yyVAL.Matcher = newIntMatcher(yyDollar[3].integer, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = wrapComplexField(FIELD_ROOT_SPAN, yyDollar[3].Field)
+			yyVAL.Matcher = newFloatMatcher(yyDollar[3].float, yyDollar[2].Operator, yyDollar[1].Field)
 		}
 	case 17:
+		yyDollar = yyS[yypt-3 : yypt+1]
+		{
+			yyVAL.Field = wrapComplexField(FIELD_SPAN, yyDollar[3].Field)
+		}
+	case 18:
+		yyDollar = yyS[yypt-3 : yypt+1]
+		{
+			yyVAL.Field = wrapComplexField(FIELD_ROOT_SPAN, yyDollar[3].Field)
+		}
+	case 19:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.Field = newComplexField(FIELD_DURATION, "")
 		}
-	case 18:
+	case 20:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.Field = newComplexField(FIELD_NAME, "")
-		}
-	case 19:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		{
-			yyVAL.Field = wrapComplexField(FIELD_DESCENDANT, yyDollar[3].Field)
-		}
-	case 20:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		{
-			yyVAL.Field = wrapComplexField(FIELD_PARENT, yyDollar[3].Field)
 		}
 	case 21:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = wrapComplexField(FIELD_PROCESS, yyDollar[3].Field)
+			yyVAL.Field = wrapComplexField(FIELD_DESCENDANT, yyDollar[3].Field)
 		}
 	case 22:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = wrapComplexField(FIELD_STATUS, yyDollar[3].Field)
+			yyVAL.Field = wrapComplexField(FIELD_PARENT, yyDollar[3].Field)
 		}
 	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = newComplexField(FIELD_ATTS, yyDollar[3].str)
+			yyVAL.Field = wrapComplexField(FIELD_PROCESS, yyDollar[3].Field)
 		}
 	case 24:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = newComplexField(FIELD_EVENTS, yyDollar[3].str)
+			yyVAL.Field = wrapComplexField(FIELD_STATUS, yyDollar[3].Field)
 		}
 	case 25:
-		yyDollar = yyS[yypt-1 : yypt+1]
+		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = newComplexField(FIELD_NAME, "")
+			yyVAL.Field = newComplexField(FIELD_ATTS, yyDollar[3].str)
 		}
 	case 26:
-		yyDollar = yyS[yypt-1 : yypt+1]
+		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = newComplexField(FIELD_CODE, "")
+			yyVAL.Field = newComplexField(FIELD_EVENTS, yyDollar[3].str)
 		}
 	case 27:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Field = newComplexField(FIELD_MSG, "")
+			yyVAL.Field = newComplexField(FIELD_NAME, "")
 		}
 	case 28:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = EQ
+			yyVAL.Field = newComplexField(FIELD_CODE, "")
 		}
 	case 29:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = NEQ
+			yyVAL.Field = newComplexField(FIELD_MSG, "")
 		}
 	case 30:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = RE
+			yyVAL.Operator = EQ
 		}
 	case 31:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = NRE
+			yyVAL.Operator = NEQ
 		}
 	case 32:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = GT
+			yyVAL.Operator = RE
 		}
 	case 33:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = GTE
+			yyVAL.Operator = NRE
 		}
 	case 34:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.Operator = LT
+			yyVAL.Operator = GT
 		}
 	case 35:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		{
+			yyVAL.Operator = GTE
+		}
+	case 36:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		{
+			yyVAL.Operator = LT
+		}
+	case 37:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.Operator = LTE
