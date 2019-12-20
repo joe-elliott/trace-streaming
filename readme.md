@@ -23,4 +23,6 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - make rate limiting not suck
 - chain filters?
 - start designing HA
+  - custom topology keys to control sharding.
 - add CI (codecov/build/tests)
+- TCO
