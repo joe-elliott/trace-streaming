@@ -24,8 +24,11 @@ var tokens = map[string]int{
 	"atts":     FIELD_ATTS,
 	"events":   FIELD_EVENTS,
 	"status":   FIELD_STATUS,
-	"code":     FIELD_STATUS_CODE,
-	"message":  FIELD_STATUS_MSG,
+	"code":     FIELD_CODE,
+	"message":  FIELD_MSG,
+	"process":  FIELD_PROCESS,
+	"parent":   FIELD_PARENT,
+	"parent*":  FIELD_DESCENDANT,
 }
 
 type lexer struct {

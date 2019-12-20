@@ -26,8 +26,12 @@ func TestLex(t *testing.T) {
 		{` spans{ duration <= 1.21 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DURATION, LTE, FLOAT, CLOSE_BRACE}},
 		{` spans{ atts.thing <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_ATTS, DOT, IDENTIFIER, LTE, INTEGER, CLOSE_BRACE}},
 		{` spans{ events.thing <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_EVENTS, DOT, IDENTIFIER, LTE, INTEGER, CLOSE_BRACE}},
-		{` spans{ status.code <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_STATUS, DOT, FIELD_STATUS_CODE, LTE, INTEGER, CLOSE_BRACE}},
-		{` spans{ status.message <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_STATUS, DOT, FIELD_STATUS_MSG, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ status.code <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_STATUS, DOT, FIELD_CODE, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ status.message <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_STATUS, DOT, FIELD_MSG, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ parent*.duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DESCENDANT, DOT, FIELD_DURATION, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ parent.duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_PARENT, DOT, FIELD_DURATION, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ parent.parent.duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_PARENT, DOT, FIELD_PARENT, DOT, FIELD_DURATION, LTE, INTEGER, CLOSE_BRACE}},
+		{` spans{ process.name <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_PROCESS, DOT, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			actual := []int{}

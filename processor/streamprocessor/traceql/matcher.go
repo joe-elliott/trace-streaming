@@ -11,14 +11,21 @@ type stringCompareFunc func(string) bool
 
 // complexField
 type complexField struct {
-	fieldID   int
-	fieldName string // only valid if fieldID = FIELD_TAGS
+	fieldID   []int
+	fieldName string // only valid if fieldID = FIELD_ATTS or FIELD_EVENTS
 }
 
 func newComplexField(id int, name string) complexField {
 	return complexField{
-		fieldID:   id,
+		fieldID:   []int{id},
 		fieldName: name,
+	}
+}
+
+func wrapComplexField(id int, c complexField) complexField {
+	return complexField{
+		fieldID:   append([]int{id}, c.fieldID...),
+		fieldName: c.fieldName,
 	}
 }
 
