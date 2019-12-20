@@ -56,6 +56,7 @@ operator:
       EQ                               { $$ =  EQ }
     | NEQ                              { $$ = NEQ }
     | RE                               { $$ =  RE }
+    | NRE                              { $$ = NRE }
     | GT                               { $$ =  GT }
     | GTE                              { $$ = GTE }
     | LT                               { $$ =  LT }
