@@ -13,6 +13,7 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
   - traceheader
 - web interface
 - query language
+  - friendlier error messages (remove FIELD_BLERG)
 - export metrics
 - cleanup/add tests
 - streamers never removed from the slice in stream processor :)
@@ -25,4 +26,4 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - start designing HA
   - custom topology keys to control sharding.
 - add CI (codecov/build/tests)
-- TCO
+- rough understanding of cpu usage
