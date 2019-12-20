@@ -537,7 +537,7 @@ yydefault:
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.Field = wrapComplexField(FIELD_PARENT, yyDollar[3].Field)
+			yyVAL.Field = wrapComplexField(FIELD_DESCENDANT, yyDollar[3].Field)
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]

@@ -56,14 +56,14 @@ spanMatcher:
     ;
 
 spanField:
-      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")  }
-    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")      }
-    | FIELD_DESCENDANT DOT spanField      { $$ = wrapComplexField(FIELD_PARENT, $3)   }
-    | FIELD_PARENT DOT spanField          { $$ = wrapComplexField(FIELD_PARENT, $3)   }
-    | FIELD_PROCESS DOT processField      { $$ = wrapComplexField(FIELD_PROCESS, $3)  }
-    | FIELD_STATUS DOT statusField        { $$ = wrapComplexField(FIELD_STATUS, $3)   }
-    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)      }
-    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)    }
+      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
+    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
+    | FIELD_DESCENDANT DOT spanField      { $$ = wrapComplexField(FIELD_DESCENDANT, $3) }  
+    | FIELD_PARENT DOT spanField          { $$ = wrapComplexField(FIELD_PARENT, $3)     }
+    | FIELD_PROCESS DOT processField      { $$ = wrapComplexField(FIELD_PROCESS, $3)    }
+    | FIELD_STATUS DOT statusField        { $$ = wrapComplexField(FIELD_STATUS, $3)     }
+    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
     ;
 
 processField:

@@ -45,6 +45,12 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{""},
 		},
 		{
+			in:         `spans{parent.parent.atts.test=3}`,
+			stream:     STREAM_TYPE_SPANS,
+			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
+			fieldNames: []string{"test"},
+		},
+		{
 			in: `spans{foo="bar"}`,
 			err: ParseError{
 				msg:  "syntax error: unexpected IDENTIFIER",
@@ -74,8 +80,9 @@ func TestParse(t *testing.T) {
 
 			assert.Equal(t, tc.err, err)
 
-			if tc.stream != 0 && expr == nil {
-				assert.FailNow(t, "expr was nil")
+			// if we were expecting an error, just bail out at this point
+			if tc.err != nil {
+				return
 			}
 
 			assert.Equal(t, tc.stream, expr.stream)
