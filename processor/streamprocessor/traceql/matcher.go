@@ -34,11 +34,13 @@ type ValueMatcher interface {
 	compareInt(int) bool
 	compareFloat(float64) bool
 	compareString(string) bool
+
+	field() complexField
 }
 
 // int Matcher
 type intMatcher struct {
-	field   complexField
+	f       complexField
 	compare intCompareFunc
 }
 
@@ -63,7 +65,7 @@ func newIntMatcher(val int, op int, field complexField) intMatcher {
 	}
 
 	return intMatcher{
-		field:   field,
+		f:       field,
 		compare: compare,
 	}
 }
@@ -87,9 +89,13 @@ func (o intMatcher) compareString(s string) bool {
 	return o.compare(n)
 }
 
+func (o intMatcher) field() complexField {
+	return o.f
+}
+
 // float Matcher
 type floatMatcher struct {
-	field   complexField
+	f       complexField
 	compare floatCompareFunc
 }
 
@@ -114,7 +120,7 @@ func newFloatMatcher(val float64, op int, field complexField) floatMatcher {
 	}
 
 	return floatMatcher{
-		field:   field,
+		f:       field,
 		compare: compare,
 	}
 }
@@ -137,9 +143,13 @@ func (o floatMatcher) compareString(s string) bool {
 	return o.compare(f)
 }
 
+func (o floatMatcher) field() complexField {
+	return o.f
+}
+
 // string Matcher
 type stringMatcher struct {
-	field   complexField
+	f       complexField
 	compare stringCompareFunc
 }
 
@@ -171,7 +181,7 @@ func newStringMatcher(val string, op int, field complexField) stringMatcher {
 	}
 
 	return stringMatcher{
-		field:   field,
+		f:       field,
 		compare: compare,
 	}
 }
@@ -186,4 +196,8 @@ func (o stringMatcher) compareFloat(f float64) bool {
 
 func (o stringMatcher) compareString(s string) bool {
 	return o.compare(s)
+}
+
+func (o stringMatcher) field() complexField {
+	return o.f
 }

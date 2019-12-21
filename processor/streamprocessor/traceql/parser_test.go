@@ -116,25 +116,10 @@ func TestParse(t *testing.T) {
 			assert.Equal(t, tc.stream, expr.stream)
 
 			for i, o := range expr.matchers {
-				var fieldID []int
-				var fieldName string
+				f := o.field()
 
-				switch v := o.(type) {
-				case intMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				case floatMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				case stringMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				default:
-					assert.Failf(t, "", "Unkown type %T", v)
-				}
-
-				assert.Equalf(t, tc.fieldIds[i], fieldID, "actual %v", o)
-				assert.Equalf(t, tc.fieldNames[i], fieldName, "actual %v", o)
+				assert.Equalf(t, tc.fieldIds[i], f.fieldID, "actual %v", o)
+				assert.Equalf(t, tc.fieldNames[i], f.fieldName, "actual %v", o)
 			}
 		})
 	}
