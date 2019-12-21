@@ -154,7 +154,7 @@ func newStringMatcher(val string, op int, field complexField) stringMatcher {
 		compare = func(n string) bool { return n != val }
 	case RE:
 		regex := regexp.MustCompile(val)
-		compare = func(n string) bool { return regex.Match([]byte(n)) } // jpe - consider performance.  should we use strings at all or only []byte?
+		compare = func(n string) bool { return regex.Match([]byte(n)) } // todo - consider performance.  should we use strings at all or only []byte?
 	case NRE:
 		regex := regexp.MustCompile(val)
 		compare = func(n string) bool { return !regex.Match([]byte(n)) }

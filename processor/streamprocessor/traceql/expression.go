@@ -15,6 +15,7 @@ type Expr struct {
 }
 
 func newExpr(stream int, m []ValueMatcher) *Expr {
+	// todo:  sort matchers by execution cost
 	return &Expr{
 		stream:   stream,
 		matchers: m,
