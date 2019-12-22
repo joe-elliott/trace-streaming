@@ -103,11 +103,43 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{duration=3, name="asdf"}`,
+			in:           `spans{duration=3}`,
 			matchesSpans: []int{},
 		},
 		{
 			in:           `spans{duration > 5}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{duration < 5}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{name = "rootSpan"}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{name != "rootSpan"}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{name =~ ".*Span"}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{name !~ ".*Span"}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{atts.test = "test2"}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{atts.test = 0}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{events.test > "abc"}`,
 			matchesSpans: []int{0},
 		},
 	} {
