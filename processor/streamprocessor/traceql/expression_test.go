@@ -107,7 +107,7 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{duration < 5}`,
+			in:           `spans{duration > 5}`,
 			matchesSpans: []int{0},
 		},
 	} {
