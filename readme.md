@@ -26,4 +26,8 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - start designing HA
   - custom topology keys to control sharding.
 - add CI (codecov/build/tests)
-- rough understanding of cpu usage
+- rough understanding of load
+- syncpool for stream spans
+- use sync.Map instead of custom locking
+  - https://www.cockroachlabs.com/blog/how-to-optimize-garbage-collection-in-go/
+- status code int matching instead of string?

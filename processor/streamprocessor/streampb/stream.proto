@@ -35,17 +35,65 @@ message Span {
   bytes traceID = 1;
   bytes spanID = 2;
   bytes parentSpanID = 3;
-  string processName = 4;
-  string operationName = 5;
+  string name = 5;
   int64 startTime = 6;
   int32 duration = 7;
+  Status status = 8;
 
-  ParentSpan parent = 8;
+  map <string,KeyValuePair> events = 9;
+  map <string,KeyValuePair> attributes = 10;
+
+  Process process = 11;
+
+  int32 parentIndex = 12;
 }
 
-message ParentSpan {
-  string processName = 1;
-  string operationName = 2;
-  int64 startTime = 3;
-  int32 duration = 4;
+message Process {
+  string name = 1;
+}
+
+message KeyValuePair {
+  enum ValueType {
+    STRING  = 0;
+    INT     = 1;
+    DOUBLE  = 2;
+    BOOL    = 3;
+  };
+
+  string key = 1;
+  ValueType type = 2;
+
+  // Only one of the following fields is supposed to contain data (determined by `type` field).
+  // This is deliberately not using Protobuf `oneof` for performance reasons (verified by benchmarks).
+  string string_value = 3;
+  int64 int_value = 4;
+  double double_value = 5;
+  bool bool_value = 6;
+}
+
+// The Status type defines a logical error model that is suitable for different
+// programming environments, including REST APIs and RPC APIs.
+message Status {
+  enum StatusCode {
+    Ok                 = 0;
+    Cancelled          = 1;
+    UnknownError       = 2;
+    InvalidArgument    = 3;
+    DeadlineExceeded   = 4;
+    NotFound           = 5;
+    AlreadyExists      = 6;
+    PermissionDenied   = 7;
+    ResourceExhausted  = 8;
+    FailedPrecondition = 9;
+    Aborted            = 10;
+    OutOfRange         = 11;
+    Unimplemented      = 12;
+    InternalError      = 13;
+    Unavailable        = 14;
+    DataLoss           = 15;
+    Unauthenticated    = 16;
+  };
+
+  StatusCode code = 1;
+  string message = 2;
 }

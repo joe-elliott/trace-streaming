@@ -22,9 +22,9 @@ func newExpr(stream int, m []ValueMatcher) *Expr {
 	}
 }
 
-func (e *Expr) MatchesSpan(s *streampb.Span) bool {
+func (e *Expr) MatchesSpan(s *streampb.Span, trace []*streampb.Span) bool {
 	for _, m := range e.matchers {
-		if !matchesField(m, s) {
+		if !matchesField(m, m.field().fieldID, s, trace) {
 			return false
 		}
 	}
@@ -32,10 +32,9 @@ func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 	return true
 }
 
-// jpe - change shape of "trace" and make recursive?
 func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 	for _, s := range t {
-		if e.MatchesSpan(s) {
+		if e.MatchesSpan(s, t) {
 			return true
 		}
 	}
@@ -64,40 +63,87 @@ func (e *Expr) RequiresTraceBatching() bool {
 	return false
 }
 
-func matchesField(m ValueMatcher, s *streampb.Span) bool {
-	f := m.field()
-
-	if len(f.fieldID) == 0 {
+func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span, trace []*streampb.Span) bool {
+	if len(fieldID) == 0 {
 		return false
 	}
 
+	f := m.field()
 	id := f.fieldID[0]
 
 	switch id {
 	case FIELD_DURATION:
 		return m.compareInt(int(s.Duration))
 	case FIELD_NAME:
-		return m.compareString(s.OperationName)
+		return m.compareString(s.Name)
 	case FIELD_ATTS:
-		// todo
+		if a, ok := s.Attributes[m.field().fieldName]; ok {
+			switch a.Type {
+			case streampb.KeyValuePair_DOUBLE:
+				return m.compareFloat(a.DoubleValue)
+			case streampb.KeyValuePair_INT:
+				return m.compareInt(int(a.IntValue))
+			case streampb.KeyValuePair_STRING:
+				return m.compareString(a.StringValue)
+			case streampb.KeyValuePair_BOOL:
+				if a.BoolValue {
+					return m.compareInt(1)
+				} else {
+					return m.compareInt(0)
+				}
+			}
+		}
 	case FIELD_EVENTS:
-		// todo
+		if e, ok := s.Events[m.field().fieldName]; ok {
+			switch e.Type {
+			case streampb.KeyValuePair_DOUBLE:
+				return m.compareFloat(e.DoubleValue)
+			case streampb.KeyValuePair_INT:
+				return m.compareInt(int(e.IntValue))
+			case streampb.KeyValuePair_STRING:
+				return m.compareString(e.StringValue)
+			case streampb.KeyValuePair_BOOL:
+				if e.BoolValue {
+					return m.compareInt(1)
+				} else {
+					return m.compareInt(0)
+				}
+			}
+		}
 	case FIELD_STATUS:
-		// todo
-	case FIELD_CODE:
-		// todo
-	case FIELD_MSG:
-		// todo
+		// unsafe check for code/msg
+		subfield := fieldID[1]
+		if subfield == FIELD_CODE {
+			return m.compareString(s.Status.Code.String())
+		}
+		if subfield == FIELD_MSG {
+			return m.compareString(s.Status.Message)
+		}
 	case FIELD_PROCESS:
-		// todo
+		// unsafe check
+		subfield := fieldID[1]
+		if subfield == FIELD_NAME {
+			return m.compareString(s.Process.Name)
+		}
 	case FIELD_PARENT:
-		// todo
+		if int(s.ParentIndex) < len(trace) {
+			return matchesField(m, fieldID[1:], trace[s.ParentIndex], trace)
+		}
 	case FIELD_DESCENDANT:
-		// todo
+		parentIdx := s.ParentIndex
+		for parentIdx >= 0 && int(parentIdx) < len(trace) {
+			s = trace[parentIdx]
+
+			if matchesField(m, fieldID[1:], s, trace) {
+				return true
+			}
+
+			parentIdx = s.ParentIndex
+		}
 	case FIELD_SPAN:
-		// todo
+		return matchesField(m, fieldID[1:], s, trace)
 	case FIELD_ROOT_SPAN:
-		// todo
+		return matchesField(m, fieldID[1:], trace[0], trace) // assumes trace[0] is the rootspan
 	}
 
 	return false

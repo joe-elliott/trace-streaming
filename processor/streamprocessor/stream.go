@@ -173,6 +173,7 @@ func spanToSpan(in *tracepb.Span, node *commonpb.Node) *streampb.Span {
 	}
 }
 
+// todo: make root span at position 0
 func buildSpanTree(trace []*streampb.Span) []*streampb.Span {
 	tree := make([]*streampb.Span, 0)
 
