@@ -139,7 +139,23 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
+			in:           `spans{atts.blerg = 0}`,
+			matchesSpans: []int{},
+		},
+		{
 			in:           `spans{events.test > "abc"}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{events.blerg = 0}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{status.code != 12}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{status.message = "status"}`,
 			matchesSpans: []int{0},
 		},
 	} {
