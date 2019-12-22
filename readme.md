@@ -28,6 +28,6 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - add CI (codecov/build/tests)
 - rough understanding of load
 - syncpool for stream spans
-- use sync.Map instead of custom locking
   - https://www.cockroachlabs.com/blog/how-to-optimize-garbage-collection-in-go/
+- use sync.Map instead of custom locking
 - status code int matching instead of string?

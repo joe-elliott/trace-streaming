@@ -72,15 +72,39 @@ func TestMatchesSpan(t *testing.T) {
 			Name:     "rootSpan",
 			Duration: 100,
 			Events: map[string]*streampb.KeyValuePair{
-				"test": &streampb.KeyValuePair{
+				"testString": &streampb.KeyValuePair{
 					Type:        streampb.KeyValuePair_STRING,
 					StringValue: "test2",
 				},
+				"testInt": &streampb.KeyValuePair{
+					Type:     streampb.KeyValuePair_INT,
+					IntValue: 3,
+				},
+				"testFloat": &streampb.KeyValuePair{
+					Type:        streampb.KeyValuePair_DOUBLE,
+					DoubleValue: 3.14,
+				},
+				"testBool": &streampb.KeyValuePair{
+					Type:      streampb.KeyValuePair_BOOL,
+					BoolValue: true,
+				},
 			},
 			Attributes: map[string]*streampb.KeyValuePair{
-				"test": &streampb.KeyValuePair{
+				"testString": &streampb.KeyValuePair{
 					Type:        streampb.KeyValuePair_STRING,
 					StringValue: "test2",
+				},
+				"testInt": &streampb.KeyValuePair{
+					Type:     streampb.KeyValuePair_INT,
+					IntValue: 3,
+				},
+				"testFloat": &streampb.KeyValuePair{
+					Type:        streampb.KeyValuePair_DOUBLE,
+					DoubleValue: 3.14,
+				},
+				"testBool": &streampb.KeyValuePair{
+					Type:      streampb.KeyValuePair_BOOL,
+					BoolValue: true,
 				},
 			},
 			ParentIndex: -1,
@@ -131,11 +155,23 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{atts.test = "test2"}`,
+			in:           `spans{atts.testString = "test2"}`,
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{atts.test = 0}`,
+			in:           `spans{atts.testString = 0}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{atts.testFloat = 3.14}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{atts.testBool = 1}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{atts.testInt = 1}`,
 			matchesSpans: []int{},
 		},
 		{
@@ -143,8 +179,24 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{events.test > "abc"}`,
+			in:           `spans{events.testString > "abc"}`,
 			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{events.testFloat = 3.14}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{events.testBool = 1}`,
+			matchesSpans: []int{0},
+		},
+		{
+			in:           `spans{events.testInt = "1"}`,
+			matchesSpans: []int{},
+		},
+		{
+			in:           `spans{events.blerg = 0}`,
+			matchesSpans: []int{},
 		},
 		{
 			in:           `spans{events.blerg = 0}`,
