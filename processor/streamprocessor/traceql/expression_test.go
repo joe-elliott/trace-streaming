@@ -158,6 +158,10 @@ func TestMatchesSpan(t *testing.T) {
 			in:           `spans{status.message = "status"}`,
 			matchesSpans: []int{0},
 		},
+		{
+			in:           `spans{process.name = "proc1"}`,
+			matchesSpans: []int{0},
+		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
 			expr, err := ParseExpr(tc.in)
