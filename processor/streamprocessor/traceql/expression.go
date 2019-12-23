@@ -114,7 +114,7 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span, trace []*stre
 		// unsafe check for code/msg
 		subfield := fieldID[1]
 		if subfield == FIELD_CODE {
-			return m.compareString(s.Status.Code.String())
+			return m.compareInt(int(s.Status.Code))
 		}
 		if subfield == FIELD_MSG {
 			return m.compareString(s.Status.Message)
