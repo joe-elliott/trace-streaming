@@ -66,124 +66,124 @@ func TestRequiresTraceBatching(t *testing.T) {
 	}
 }
 
-func TestMatchesSpan(t *testing.T) {
-	trace := []*streampb.Span{
-		&streampb.Span{
-			Name:     "rootSpan",
-			Duration: 100,
-			Events: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
-				"testInt": &streampb.KeyValuePair{
-					Type:     streampb.KeyValuePair_INT,
-					IntValue: 3,
-				},
-				"testFloat": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_DOUBLE,
-					DoubleValue: 3.14,
-				},
-				"testBool": &streampb.KeyValuePair{
-					Type:      streampb.KeyValuePair_BOOL,
-					BoolValue: true,
-				},
+var trace = []*streampb.Span{
+	&streampb.Span{
+		Name:     "rootSpan",
+		Duration: 100,
+		Events: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
 			},
-			Attributes: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
-				"testInt": &streampb.KeyValuePair{
-					Type:     streampb.KeyValuePair_INT,
-					IntValue: 3,
-				},
-				"testFloat": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_DOUBLE,
-					DoubleValue: 3.14,
-				},
-				"testBool": &streampb.KeyValuePair{
-					Type:      streampb.KeyValuePair_BOOL,
-					BoolValue: true,
-				},
+			"testInt": &streampb.KeyValuePair{
+				Type:     streampb.KeyValuePair_INT,
+				IntValue: 3,
 			},
-			ParentIndex: -1,
-			Process: &streampb.Process{
-				Name: "proc1",
+			"testFloat": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_DOUBLE,
+				DoubleValue: 3.14,
 			},
-			Status: &streampb.Status{
-				Code:    12,
-				Message: "status",
+			"testBool": &streampb.KeyValuePair{
+				Type:      streampb.KeyValuePair_BOOL,
+				BoolValue: true,
 			},
 		},
-		&streampb.Span{
-			Name:     "childSpan",
-			Duration: 100,
-			Events: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
+		Attributes: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
 			},
-			Attributes: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
+			"testInt": &streampb.KeyValuePair{
+				Type:     streampb.KeyValuePair_INT,
+				IntValue: 3,
 			},
-			ParentIndex: 0,
-			Process: &streampb.Process{
-				Name: "proc1",
+			"testFloat": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_DOUBLE,
+				DoubleValue: 3.14,
 			},
-			Status: &streampb.Status{
-				Code:    12,
-				Message: "status",
+			"testBool": &streampb.KeyValuePair{
+				Type:      streampb.KeyValuePair_BOOL,
+				BoolValue: true,
 			},
 		},
-		&streampb.Span{
-			Name:     "child2",
-			Duration: 100,
-			Events: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
-			},
-			Attributes: map[string]*streampb.KeyValuePair{
-				"testString": &streampb.KeyValuePair{
-					Type:        streampb.KeyValuePair_STRING,
-					StringValue: "test2",
-				},
-			},
-			ParentIndex: 1,
-			Process: &streampb.Process{
-				Name: "proc2",
-			},
-			Status: &streampb.Status{
-				Code:    12,
-				Message: "status",
+		ParentIndex: -1,
+		Process: &streampb.Process{
+			Name: "proc1",
+		},
+		Status: &streampb.Status{
+			Code:    12,
+			Message: "status",
+		},
+	},
+	&streampb.Span{
+		Name:     "childSpan",
+		Duration: 100,
+		Events: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
 			},
 		},
-		&streampb.Span{
-			Name:        "noparent",
-			Duration:    100,
-			Events:      map[string]*streampb.KeyValuePair{},
-			Attributes:  map[string]*streampb.KeyValuePair{},
-			ParentIndex: 1000,
-			Process:     &streampb.Process{},
-			Status:      &streampb.Status{},
+		Attributes: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
+			},
 		},
-		&streampb.Span{
-			Name:        "noparent2",
-			Duration:    3,
-			Events:      map[string]*streampb.KeyValuePair{},
-			Attributes:  map[string]*streampb.KeyValuePair{},
-			ParentIndex: -1,
-			Process:     &streampb.Process{},
-			Status:      &streampb.Status{},
+		ParentIndex: 0,
+		Process: &streampb.Process{
+			Name: "proc1",
 		},
-	}
+		Status: &streampb.Status{
+			Code:    12,
+			Message: "status",
+		},
+	},
+	&streampb.Span{
+		Name:     "child2",
+		Duration: 100,
+		Events: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
+			},
+		},
+		Attributes: map[string]*streampb.KeyValuePair{
+			"testString": &streampb.KeyValuePair{
+				Type:        streampb.KeyValuePair_STRING,
+				StringValue: "test2",
+			},
+		},
+		ParentIndex: 1,
+		Process: &streampb.Process{
+			Name: "proc2",
+		},
+		Status: &streampb.Status{
+			Code:    12,
+			Message: "status",
+		},
+	},
+	&streampb.Span{
+		Name:        "noparent",
+		Duration:    100,
+		Events:      map[string]*streampb.KeyValuePair{},
+		Attributes:  map[string]*streampb.KeyValuePair{},
+		ParentIndex: 1000,
+		Process:     &streampb.Process{},
+		Status:      &streampb.Status{},
+	},
+	&streampb.Span{
+		Name:        "noparent2",
+		Duration:    3,
+		Events:      map[string]*streampb.KeyValuePair{},
+		Attributes:  map[string]*streampb.KeyValuePair{},
+		ParentIndex: -1,
+		Process:     &streampb.Process{},
+		Status:      &streampb.Status{},
+	},
+}
 
+func TestMatchesSpan(t *testing.T) {
 	for _, tc := range []struct {
 		in           string
 		matchesSpans []int
@@ -288,6 +288,45 @@ func TestMatchesSpan(t *testing.T) {
 			for i, span := range trace {
 				assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpan(span, trace), "failed for span %d", i)
 			}
+		})
+	}
+}
+
+func TestMatchesTrace(t *testing.T) {
+	for _, tc := range []struct {
+		in           string
+		matchesTrace bool
+	}{
+		{
+			in:           `traces{}`,
+			matchesTrace: true,
+		},
+		{
+			in:           `traces{span.name="blerg"}`,
+			matchesTrace: false,
+		},
+		{
+			in:           `traces{span.name="child"}`,
+			matchesTrace: true,
+		},
+		{
+			in:           `traces{rootSpan.name="rootSpan"}`,
+			matchesTrace: true,
+		},
+		{
+			in:           `traces{rootSpan.duration > 5}`,
+			matchesTrace: true,
+		},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			expr, err := ParseExpr(tc.in)
+
+			assert.Nil(t, err)
+			if expr == nil {
+				assert.FailNow(t, "expr is unexpectedly nil.")
+			}
+
+			assert.Equal(t, tc.matchesTrace, expr.MatchesTrace(trace))
 		})
 	}
 }

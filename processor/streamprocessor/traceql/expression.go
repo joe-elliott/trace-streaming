@@ -125,6 +125,8 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span, trace []*stre
 		if subfield == FIELD_NAME {
 			return m.compareString(s.Process.Name)
 		}
+
+	// jpe/todo/now:  this needs to be handled outside this method
 	case FIELD_PARENT:
 		if int(s.ParentIndex) < len(trace) {
 			return matchesField(m, fieldID[1:], trace[s.ParentIndex], trace)
