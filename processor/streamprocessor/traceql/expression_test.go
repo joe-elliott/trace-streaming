@@ -286,7 +286,7 @@ func TestMatchesSpan(t *testing.T) {
 			}
 
 			for i, span := range trace {
-				assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpan(span, trace), "failed for span %d", i)
+				assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpan(span), "failed for span %d", i)
 			}
 		})
 	}

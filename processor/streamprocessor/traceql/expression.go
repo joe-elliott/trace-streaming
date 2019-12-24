@@ -22,9 +22,9 @@ func newExpr(stream int, m []ValueMatcher) *Expr {
 	}
 }
 
-func (e *Expr) MatchesSpan(s *streampb.Span, trace []*streampb.Span) bool {
+func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 	for _, m := range e.matchers {
-		if !matchesField(m, m.field().fieldID, s, trace) {
+		if !matchesField(m, m.field().fieldID, s) {
 			return false
 		}
 	}
@@ -33,8 +33,18 @@ func (e *Expr) MatchesSpan(s *streampb.Span, trace []*streampb.Span) bool {
 }
 
 func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
+
 	for _, s := range t {
-		if e.MatchesSpan(s, t) {
+		matches := true
+
+		for _, m := range e.matchers {
+			if !matchesTraceField(m, m.field().fieldID, s, t) {
+				matches = false
+				break
+			}
+		}
+
+		if matches {
 			return true
 		}
 	}
@@ -63,7 +73,44 @@ func (e *Expr) RequiresTraceBatching() bool {
 	return false
 }
 
-func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span, trace []*streampb.Span) bool {
+func matchesTraceField(m ValueMatcher, fieldID []int, s *streampb.Span, t []*streampb.Span) bool {
+	if len(fieldID) == 0 {
+		return false
+	}
+
+	f := m.field()
+	id := f.fieldID[0]
+
+	switch id {
+	case FIELD_PARENT:
+		if int(s.ParentIndex) < len(t) {
+			return matchesTraceField(m, fieldID[1:], t[s.ParentIndex], t)
+		}
+
+		return false
+	case FIELD_DESCENDANT:
+		for _, s := range t {
+			parentIdx := s.ParentIndex
+			for parentIdx >= 0 && int(parentIdx) < len(t) {
+				s = t[parentIdx]
+
+				if matchesTraceField(m, fieldID[1:], s, t) {
+					return true
+				}
+
+				parentIdx = s.ParentIndex
+			}
+		}
+	case FIELD_SPAN:
+		return matchesTraceField(m, fieldID[1:], s, t)
+	case FIELD_ROOT_SPAN:
+		return matchesTraceField(m, fieldID[1:], t[0], t) // assumes trace[0] is the rootspan
+	}
+
+	return matchesField(m, fieldID, s)
+}
+
+func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span) bool {
 	if len(fieldID) == 0 {
 		return false
 	}
@@ -125,27 +172,6 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span, trace []*stre
 		if subfield == FIELD_NAME {
 			return m.compareString(s.Process.Name)
 		}
-
-	// jpe/todo/now:  this needs to be handled outside this method
-	case FIELD_PARENT:
-		if int(s.ParentIndex) < len(trace) {
-			return matchesField(m, fieldID[1:], trace[s.ParentIndex], trace)
-		}
-	case FIELD_DESCENDANT:
-		parentIdx := s.ParentIndex
-		for parentIdx >= 0 && int(parentIdx) < len(trace) {
-			s = trace[parentIdx]
-
-			if matchesField(m, fieldID[1:], s, trace) {
-				return true
-			}
-
-			parentIdx = s.ParentIndex
-		}
-	case FIELD_SPAN:
-		return matchesField(m, fieldID[1:], s, trace)
-	case FIELD_ROOT_SPAN:
-		return matchesField(m, fieldID[1:], trace[0], trace) // assumes trace[0] is the rootspan
 	}
 
 	return false
