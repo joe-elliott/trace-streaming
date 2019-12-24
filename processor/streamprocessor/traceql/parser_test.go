@@ -10,68 +10,68 @@ func TestParse(t *testing.T) {
 	for _, tc := range []struct {
 		in         string
 		stream     int
-		fieldIds   [][]int
+		fieldIds   []fieldID
 		fieldNames []string
 		err        error
 	}{
 		{
 			in:         `spans{}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{},
+			fieldIds:   []fieldID{},
 			fieldNames: []string{},
 		},
 		{
 			in:         `spans{duration=3, name="asdf"}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
+			fieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
 			fieldNames: []string{"", ""},
 		},
 		{
 			in:         `spans{duration=3, atts.test="blerg"}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_ATTS}},
+			fieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}},
 			fieldNames: []string{"", "test"},
 		},
 		{
 			in:         `spans{duration=3, atts.test="blerg", status.message=~".*blerg", status.code=400}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_ATTS}, []int{FIELD_STATUS, FIELD_MSG}, []int{FIELD_STATUS, FIELD_CODE}},
+			fieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}, []int{FIELD_STATUS, FIELD_MSG}, []int{FIELD_STATUS, FIELD_CODE}},
 			fieldNames: []string{"", "test", "", ""},
 		},
 		{
 			in:         `spans{parent*.duration=3}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DESCENDANT, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_DESCENDANT, FIELD_DURATION}},
 			fieldNames: []string{""},
 		},
 		{
 			in:         `spans{parent.parent.duration=3}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_DURATION}},
 			fieldNames: []string{""},
 		},
 		{
 			in:         `spans{parent.parent.atts.test=3}`,
 			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
+			fieldIds:   []fieldID{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
 			fieldNames: []string{"test"},
 		},
 		{
 			in:         `traces{}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{},
+			fieldIds:   []fieldID{},
 			fieldNames: []string{},
 		},
 		{
 			in:         `traces{span.duration = 3}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{[]int{FIELD_SPAN, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_SPAN, FIELD_DURATION}},
 			fieldNames: []string{""},
 		},
 		{
 			in:         `traces{rootSpan.parent.duration = 3}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{[]int{FIELD_ROOT_SPAN, FIELD_PARENT, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_ROOT_SPAN, FIELD_PARENT, FIELD_DURATION}},
 			fieldNames: []string{""},
 		},
 		{
@@ -118,8 +118,8 @@ func TestParse(t *testing.T) {
 			for i, o := range expr.matchers {
 				f := o.field()
 
-				assert.Equalf(t, tc.fieldIds[i], f.fieldID, "actual %v", o)
-				assert.Equalf(t, tc.fieldNames[i], f.fieldName, "actual %v", o)
+				assert.Equalf(t, tc.fieldIds[i], f.id, "actual %v", o)
+				assert.Equalf(t, tc.fieldNames[i], f.name, "actual %v", o)
 			}
 		})
 	}

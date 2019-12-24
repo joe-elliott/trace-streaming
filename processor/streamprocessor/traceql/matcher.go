@@ -5,27 +5,37 @@ import (
 	"strconv"
 )
 
+type fieldID []int
+
+func (f fieldID) isRoot() bool {
+	if len(f) == 0 {
+		return false
+	}
+
+	return f[0] == FIELD_ROOT_SPAN
+}
+
 type intCompareFunc func(int) bool
 type floatCompareFunc func(float64) bool
 type stringCompareFunc func(string) bool
 
 // complexField
 type complexField struct {
-	fieldID   []int
-	fieldName string // only valid if fieldID = FIELD_ATTS or FIELD_EVENTS
+	id   fieldID
+	name string // only valid if id = FIELD_ATTS or FIELD_EVENTS
 }
 
 func newComplexField(id int, name string) complexField {
 	return complexField{
-		fieldID:   []int{id},
-		fieldName: name,
+		id:   []int{id},
+		name: name,
 	}
 }
 
 func wrapComplexField(id int, c complexField) complexField {
 	return complexField{
-		fieldID:   append([]int{id}, c.fieldID...),
-		fieldName: c.fieldName,
+		id:   append([]int{id}, c.id...),
+		name: c.name,
 	}
 }
 

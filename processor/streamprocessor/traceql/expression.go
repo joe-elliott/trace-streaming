@@ -24,7 +24,7 @@ func newExpr(stream int, m []ValueMatcher) *Expr {
 
 func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 	for _, m := range e.matchers {
-		if !matchesField(m, m.field().fieldID, s) {
+		if !matchesField(m, m.field().id, s) {
 			return false
 		}
 	}
@@ -34,11 +34,16 @@ func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 
 func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 
-	for _, s := range t {
+	// check other filters
+	for i, s := range t {
 		matches := true
 
 		for _, m := range e.matchers {
-			if !matchesTraceField(m, m.field().fieldID, s, t) {
+			if m.field().id.isRoot() && i != 0 { // assumes root span is at index 0
+				continue
+			}
+
+			if !matchesTraceField(m, m.field().id, s, t) {
 				matches = false
 				break
 			}
@@ -61,7 +66,7 @@ func (e *Expr) RequiresTraceBatching() bool {
 
 	// if any matchers have descendant or parent fields then we require trace batching
 	for _, m := range e.matchers {
-		fields := m.field().fieldID
+		fields := m.field().id
 
 		for _, f := range fields {
 			if f == FIELD_DESCENDANT || f == FIELD_PARENT {
@@ -73,18 +78,17 @@ func (e *Expr) RequiresTraceBatching() bool {
 	return false
 }
 
-func matchesTraceField(m ValueMatcher, fieldID []int, s *streampb.Span, t []*streampb.Span) bool {
-	if len(fieldID) == 0 {
+func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*streampb.Span) bool {
+	if len(id) == 0 {
 		return false
 	}
 
-	f := m.field()
-	id := f.fieldID[0]
+	rootID := id[0]
 
-	switch id {
+	switch rootID {
 	case FIELD_PARENT:
 		if int(s.ParentIndex) < len(t) {
-			return matchesTraceField(m, fieldID[1:], t[s.ParentIndex], t)
+			return matchesTraceField(m, id[1:], t[s.ParentIndex], t)
 		}
 
 		return false
@@ -94,7 +98,7 @@ func matchesTraceField(m ValueMatcher, fieldID []int, s *streampb.Span, t []*str
 			for parentIdx >= 0 && int(parentIdx) < len(t) {
 				s = t[parentIdx]
 
-				if matchesTraceField(m, fieldID[1:], s, t) {
+				if matchesTraceField(m, id[1:], s, t) {
 					return true
 				}
 
@@ -102,29 +106,26 @@ func matchesTraceField(m ValueMatcher, fieldID []int, s *streampb.Span, t []*str
 			}
 		}
 	case FIELD_SPAN:
-		return matchesTraceField(m, fieldID[1:], s, t)
-	case FIELD_ROOT_SPAN:
-		return matchesTraceField(m, fieldID[1:], t[0], t) // assumes trace[0] is the rootspan
+		return matchesField(m, id[1:], s)
 	}
 
-	return matchesField(m, fieldID, s)
+	return matchesField(m, id, s)
 }
 
-func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span) bool {
-	if len(fieldID) == 0 {
+func matchesField(m ValueMatcher, id fieldID, s *streampb.Span) bool {
+	if len(id) == 0 {
 		return false
 	}
 
-	f := m.field()
-	id := f.fieldID[0]
+	rootID := id[0]
 
-	switch id {
+	switch rootID {
 	case FIELD_DURATION:
 		return m.compareInt(int(s.Duration))
 	case FIELD_NAME:
 		return m.compareString(s.Name)
 	case FIELD_ATTS:
-		if a, ok := s.Attributes[m.field().fieldName]; ok {
+		if a, ok := s.Attributes[m.field().name]; ok {
 			switch a.Type {
 			case streampb.KeyValuePair_DOUBLE:
 				return m.compareFloat(a.DoubleValue)
@@ -141,7 +142,7 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span) bool {
 			}
 		}
 	case FIELD_EVENTS:
-		if e, ok := s.Events[m.field().fieldName]; ok {
+		if e, ok := s.Events[m.field().name]; ok {
 			switch e.Type {
 			case streampb.KeyValuePair_DOUBLE:
 				return m.compareFloat(e.DoubleValue)
@@ -159,7 +160,7 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span) bool {
 		}
 	case FIELD_STATUS:
 		// unsafe check for code/msg
-		subfield := fieldID[1]
+		subfield := id[1]
 		if subfield == FIELD_CODE {
 			return m.compareInt(int(s.Status.Code))
 		}
@@ -168,7 +169,7 @@ func matchesField(m ValueMatcher, fieldID []int, s *streampb.Span) bool {
 		}
 	case FIELD_PROCESS:
 		// unsafe check
-		subfield := fieldID[1]
+		subfield := id[1]
 		if subfield == FIELD_NAME {
 			return m.compareString(s.Process.Name)
 		}

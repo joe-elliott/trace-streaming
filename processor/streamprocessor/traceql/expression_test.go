@@ -298,16 +298,20 @@ func TestMatchesTrace(t *testing.T) {
 		matchesTrace bool
 	}{
 		{
+			in:           `traces{rootSpan.name!="rootSpan"}`,
+			matchesTrace: false,
+		},
+		{
+			in:           `traces{span.name="childSpan"}`,
+			matchesTrace: true,
+		},
+		{
 			in:           `traces{}`,
 			matchesTrace: true,
 		},
 		{
 			in:           `traces{span.name="blerg"}`,
 			matchesTrace: false,
-		},
-		{
-			in:           `traces{span.name="child"}`,
-			matchesTrace: true,
 		},
 		{
 			in:           `traces{rootSpan.name="rootSpan"}`,
