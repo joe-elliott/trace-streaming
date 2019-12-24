@@ -218,6 +218,10 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{1, 2, 3, 4},
 		},
 		{
+			in:           `spans{name != "rootSpan", name =~ ".*Span"}`,
+			matchesSpans: []int{1},
+		},
+		{
 			in:           `spans{name =~ ".*Span"}`,
 			matchesSpans: []int{0, 1},
 		},
@@ -276,6 +280,10 @@ func TestMatchesSpan(t *testing.T) {
 		{
 			in:           `spans{status.message = "status"}`,
 			matchesSpans: []int{0, 1, 2},
+		},
+		{
+			in:           `spans{status.message = "status", process.name = "proc1"}`,
+			matchesSpans: []int{0, 1},
 		},
 		{
 			in:           `spans{process.name = "proc1"}`,
