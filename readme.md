@@ -32,3 +32,4 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - use sync.Map instead of custom locking
 - status code int matching instead of string?
 - order matchers by cost.  i.e. int comparisons are fast, descendant/regex expressions are slow
+- make root span first in trace slice for efficiency?
