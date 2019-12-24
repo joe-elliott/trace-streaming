@@ -330,6 +330,22 @@ func TestMatchesTrace(t *testing.T) {
 			in:           `traces{span.duration = 5, span.isRoot=1}`,
 			matchesTrace: false,
 		},
+		{
+			in:           `traces{span.parent*.atts.testInt = 3, span.name="child2"}`,
+			matchesTrace: true,
+		},
+		{
+			in:           `traces{span.parent*.atts.testInt = 4, span.name="child2"}`,
+			matchesTrace: false,
+		},
+		{
+			in:           `traces{span.parent.atts.testInt = 3, span.name="childSpan"}`,
+			matchesTrace: true,
+		},
+		{
+			in:           `traces{span.parent.atts.testInt = 4, span.name="childSpan"}`,
+			matchesTrace: false,
+		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
 			expr, err := ParseExpr(tc.in)

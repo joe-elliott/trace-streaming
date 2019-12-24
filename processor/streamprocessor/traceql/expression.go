@@ -83,7 +83,7 @@ func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*stream
 
 	switch rootID {
 	case FIELD_PARENT:
-		if int(s.ParentIndex) < len(t) {
+		if int(s.ParentIndex) < len(t) && s.ParentIndex >= 0 {
 			return matchesField(m, id[1:], t[s.ParentIndex])
 		}
 
@@ -102,7 +102,7 @@ func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*stream
 			}
 		}
 	case FIELD_SPAN:
-		return matchesField(m, id[1:], s)
+		return matchesTraceField(m, id[1:], s, t)
 	}
 
 	return matchesField(m, id, s)
