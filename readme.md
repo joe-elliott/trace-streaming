@@ -31,3 +31,4 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
   - https://www.cockroachlabs.com/blog/how-to-optimize-garbage-collection-in-go/
 - use sync.Map instead of custom locking
 - status code int matching instead of string?
+- order matchers by cost.  i.e. int comparisons are fast, descendant/regex expressions are slow
