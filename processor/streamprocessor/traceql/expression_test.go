@@ -49,7 +49,7 @@ func TestRequiresTraceBatching(t *testing.T) {
 			expected: true,
 		},
 		{
-			in:       `traces{rootSpan.parent.duration = 3}`,
+			in:       `traces{span.parent.duration = 3, span.isRoot = 1}`,
 			expected: true,
 		},
 	} {
@@ -106,7 +106,8 @@ var trace = []*streampb.Span{
 				BoolValue: true,
 			},
 		},
-		ParentIndex: -1,
+		ParentIndex:  -1,
+		ParentSpanID: []byte{},
 		Process: &streampb.Process{
 			Name: "proc1",
 		},
@@ -130,7 +131,8 @@ var trace = []*streampb.Span{
 				StringValue: "test2",
 			},
 		},
-		ParentIndex: 0,
+		ParentIndex:  0,
+		ParentSpanID: []byte{1},
 		Process: &streampb.Process{
 			Name: "proc1",
 		},
@@ -154,7 +156,8 @@ var trace = []*streampb.Span{
 				StringValue: "test2",
 			},
 		},
-		ParentIndex: 1,
+		ParentIndex:  1,
+		ParentSpanID: []byte{2},
 		Process: &streampb.Process{
 			Name: "proc2",
 		},
@@ -164,22 +167,24 @@ var trace = []*streampb.Span{
 		},
 	},
 	&streampb.Span{
-		Name:        "noparent",
-		Duration:    100,
-		Events:      map[string]*streampb.KeyValuePair{},
-		Attributes:  map[string]*streampb.KeyValuePair{},
-		ParentIndex: 1000,
-		Process:     &streampb.Process{},
-		Status:      &streampb.Status{},
+		Name:         "noparent",
+		Duration:     100,
+		Events:       map[string]*streampb.KeyValuePair{},
+		Attributes:   map[string]*streampb.KeyValuePair{},
+		ParentIndex:  1000,
+		ParentSpanID: []byte{3},
+		Process:      &streampb.Process{},
+		Status:       &streampb.Status{},
 	},
 	&streampb.Span{
-		Name:        "noparent2",
-		Duration:    3,
-		Events:      map[string]*streampb.KeyValuePair{},
-		Attributes:  map[string]*streampb.KeyValuePair{},
-		ParentIndex: -1,
-		Process:     &streampb.Process{},
-		Status:      &streampb.Status{},
+		Name:         "noparent2",
+		Duration:     3,
+		Events:       map[string]*streampb.KeyValuePair{},
+		Attributes:   map[string]*streampb.KeyValuePair{},
+		ParentIndex:  -1,
+		ParentSpanID: []byte{4},
+		Process:      &streampb.Process{},
+		Status:       &streampb.Status{},
 	},
 }
 
@@ -298,7 +303,7 @@ func TestMatchesTrace(t *testing.T) {
 		matchesTrace bool
 	}{
 		{
-			in:           `traces{rootSpan.name!="rootSpan"}`,
+			in:           `traces{span.name!="rootSpan", span.isRoot=1}`,
 			matchesTrace: false,
 		},
 		{
@@ -314,12 +319,16 @@ func TestMatchesTrace(t *testing.T) {
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{rootSpan.name="rootSpan"}`,
+			in:           `traces{span.name="rootSpan", span.isRoot=1}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{rootSpan.duration > 5}`,
+			in:           `traces{span.duration > 5, span.isRoot=1}`,
 			matchesTrace: true,
+		},
+		{
+			in:           `traces{span.duration = 5, span.isRoot=1}`,
+			matchesTrace: false,
 		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {

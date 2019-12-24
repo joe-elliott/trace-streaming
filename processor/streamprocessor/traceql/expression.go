@@ -35,14 +35,10 @@ func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 
 	// check other filters
-	for i, s := range t {
+	for _, s := range t {
 		matches := true
 
 		for _, m := range e.matchers {
-			if m.field().id.isRoot() && i != 0 { // assumes root span is at index 0
-				continue
-			}
-
 			if !matchesTraceField(m, m.field().id, s, t) {
 				matches = false
 				break
@@ -88,7 +84,7 @@ func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*stream
 	switch rootID {
 	case FIELD_PARENT:
 		if int(s.ParentIndex) < len(t) {
-			return matchesTraceField(m, id[1:], t[s.ParentIndex], t)
+			return matchesField(m, id[1:], t[s.ParentIndex])
 		}
 
 		return false
@@ -98,7 +94,7 @@ func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*stream
 			for parentIdx >= 0 && int(parentIdx) < len(t) {
 				s = t[parentIdx]
 
-				if matchesTraceField(m, id[1:], s, t) {
+				if matchesField(m, id[1:], s) {
 					return true
 				}
 
@@ -173,6 +169,12 @@ func matchesField(m ValueMatcher, id fieldID, s *streampb.Span) bool {
 		if subfield == FIELD_NAME {
 			return m.compareString(s.Process.Name)
 		}
+	case FIELD_IS_ROOT:
+		isRoot := 0
+		if len(s.ParentSpanID) == 0 {
+			isRoot = 1
+		}
+		return m.compareInt(isRoot)
 	}
 
 	return false

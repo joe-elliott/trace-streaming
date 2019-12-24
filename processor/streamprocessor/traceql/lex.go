@@ -31,7 +31,7 @@ var tokens = map[string]int{
 	"parent":   FIELD_PARENT,
 	"parent*":  FIELD_DESCENDANT,
 	"span":     FIELD_SPAN,
-	"rootSpan": FIELD_ROOT_SPAN,
+	"isRoot":   FIELD_IS_ROOT,
 }
 
 type lexer struct {

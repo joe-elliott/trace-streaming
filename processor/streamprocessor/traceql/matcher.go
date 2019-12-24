@@ -7,14 +7,6 @@ import (
 
 type fieldID []int
 
-func (f fieldID) isRoot() bool {
-	if len(f) == 0 {
-		return false
-	}
-
-	return f[0] == FIELD_ROOT_SPAN
-}
-
 type intCompareFunc func(int) bool
 type floatCompareFunc func(float64) bool
 type stringCompareFunc func(string) bool

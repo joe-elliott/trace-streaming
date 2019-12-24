@@ -69,9 +69,9 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{""},
 		},
 		{
-			in:         `traces{rootSpan.parent.duration = 3}`,
+			in:         `traces{span.isRoot = 1}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   []fieldID{[]int{FIELD_ROOT_SPAN, FIELD_PARENT, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_SPAN, FIELD_IS_ROOT}},
 			fieldNames: []string{""},
 		},
 		{

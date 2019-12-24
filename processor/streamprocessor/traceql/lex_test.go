@@ -33,7 +33,7 @@ func TestLex(t *testing.T) {
 		{` spans{ parent.parent.duration <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_PARENT, DOT, FIELD_PARENT, DOT, FIELD_DURATION, LTE, INTEGER, CLOSE_BRACE}},
 		{` spans{ process.name <= 13 } `, []int{STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_PROCESS, DOT, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
 		{` traces{ span.process.name <= 13 } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_SPAN, DOT, FIELD_PROCESS, DOT, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
-		{` traces{ rootSpan.process.name <= 13 } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_ROOT_SPAN, DOT, FIELD_PROCESS, DOT, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
+		{` traces{ span.isRoot = 1 } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_SPAN, DOT, FIELD_IS_ROOT, EQ, INTEGER, CLOSE_BRACE}},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			actual := []int{}

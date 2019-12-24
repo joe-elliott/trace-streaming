@@ -37,7 +37,7 @@ package traceql
 %token <float>    FLOAT
 %token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS STREAM_TYPE_TRACES
-                  FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_SPAN FIELD_ROOT_SPAN
+                  FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_SPAN FIELD_IS_ROOT
 
 %%
 
@@ -80,11 +80,11 @@ traceMatcher:
 
 traceField:
       FIELD_SPAN DOT spanField             { $$ = wrapComplexField(FIELD_SPAN, $3)      }
-    | FIELD_ROOT_SPAN DOT spanField        { $$ = wrapComplexField(FIELD_ROOT_SPAN, $3) }
     ;
 
 spanField:
       FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
+    | FIELD_IS_ROOT                       { $$ = newComplexField(FIELD_IS_ROOT, "")     }
     | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
     | FIELD_DESCENDANT DOT spanField      { $$ = wrapComplexField(FIELD_DESCENDANT, $3) }  
     | FIELD_PARENT DOT spanField          { $$ = wrapComplexField(FIELD_PARENT, $3)     }
