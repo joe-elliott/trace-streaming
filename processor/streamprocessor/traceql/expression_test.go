@@ -41,6 +41,10 @@ func TestRequiresTraceBatching(t *testing.T) {
 			expected: true,
 		},
 		{
+			in:       `spans{isRoot=3}`,
+			expected: false,
+		},
+		{
 			in:       `traces{}`,
 			expected: true,
 		},
