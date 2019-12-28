@@ -63,15 +63,15 @@ func TestParse(t *testing.T) {
 			fieldNames: []string{},
 		},
 		{
-			in:         `traces{span.duration = 3}`,
+			in:         `traces{duration = 3}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   []fieldID{[]int{FIELD_SPAN, FIELD_DURATION}},
+			fieldIds:   []fieldID{[]int{FIELD_DURATION}},
 			fieldNames: []string{""},
 		},
 		{
-			in:         `traces{span.isRoot = 1}`,
+			in:         `traces{isRoot = 1}`,
 			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   []fieldID{[]int{FIELD_SPAN, FIELD_IS_ROOT}},
+			fieldIds:   []fieldID{[]int{FIELD_IS_ROOT}},
 			fieldNames: []string{""},
 		},
 		{

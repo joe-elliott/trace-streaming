@@ -101,8 +101,6 @@ func matchesTraceField(m ValueMatcher, id fieldID, s *streampb.Span, t []*stream
 				parentIdx = s.ParentIndex
 			}
 		}
-	case FIELD_SPAN:
-		return matchesTraceField(m, id[1:], s, t)
 	}
 
 	return matchesField(m, id, s)

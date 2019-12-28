@@ -30,7 +30,6 @@ var tokens = map[string]int{
 	"process":  FIELD_PROCESS,
 	"parent":   FIELD_PARENT,
 	"parent*":  FIELD_DESCENDANT,
-	"span":     FIELD_SPAN,
 	"isRoot":   FIELD_IS_ROOT,
 }
 

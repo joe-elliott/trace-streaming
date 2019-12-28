@@ -49,11 +49,11 @@ func TestRequiresTraceBatching(t *testing.T) {
 			expected: true,
 		},
 		{
-			in:       `traces{span.duration = 3}`,
+			in:       `traces{duration = 3}`,
 			expected: true,
 		},
 		{
-			in:       `traces{span.parent.duration = 3, span.isRoot = 1}`,
+			in:       `traces{parent.duration = 3, isRoot = 1}`,
 			expected: true,
 		},
 	} {
@@ -315,11 +315,11 @@ func TestMatchesTrace(t *testing.T) {
 		matchesTrace bool
 	}{
 		{
-			in:           `traces{span.name!="rootSpan", span.isRoot=1}`,
+			in:           `traces{name!="rootSpan", isRoot=1}`,
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{span.name="childSpan"}`,
+			in:           `traces{name="childSpan"}`,
 			matchesTrace: true,
 		},
 		{
@@ -327,35 +327,35 @@ func TestMatchesTrace(t *testing.T) {
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{span.name="blerg"}`,
+			in:           `traces{name="blerg"}`,
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{span.name="rootSpan", span.isRoot=1}`,
+			in:           `traces{name="rootSpan", isRoot=1}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{span.duration > 5, span.isRoot=1}`,
+			in:           `traces{duration > 5, isRoot=1}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{span.duration = 5, span.isRoot=1}`,
+			in:           `traces{duration = 5, isRoot=1}`,
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{span.parent*.atts.testInt = 3, span.name="child2"}`,
+			in:           `traces{parent*.atts.testInt = 3, name="child2"}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{span.parent*.atts.testInt = 4, span.name="child2"}`,
+			in:           `traces{parent*.atts.testInt = 4, name="child2"}`,
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{span.parent.atts.testInt = 3, span.name="childSpan"}`,
+			in:           `traces{parent.atts.testInt = 3, name="childSpan"}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{span.parent.atts.testInt = 4, span.name="childSpan"}`,
+			in:           `traces{parent.atts.testInt = 4, name="childSpan"}`,
 			matchesTrace: false,
 		},
 	} {
