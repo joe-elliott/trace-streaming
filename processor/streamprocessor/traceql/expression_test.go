@@ -71,6 +71,7 @@ func TestRequiresTraceBatching(t *testing.T) {
 }
 
 var trace = []*streampb.Span{
+	// 0
 	&streampb.Span{
 		Name:     "rootSpan",
 		Duration: 100,
@@ -120,6 +121,7 @@ var trace = []*streampb.Span{
 			Message: "status",
 		},
 	},
+	// 1
 	&streampb.Span{
 		Name:     "childSpan",
 		Duration: 100,
@@ -145,6 +147,7 @@ var trace = []*streampb.Span{
 			Message: "status",
 		},
 	},
+	// 2
 	&streampb.Span{
 		Name:     "child2",
 		Duration: 100,
@@ -170,6 +173,7 @@ var trace = []*streampb.Span{
 			Message: "status",
 		},
 	},
+	// 3
 	&streampb.Span{
 		Name:         "noparent",
 		Duration:     100,
@@ -180,6 +184,7 @@ var trace = []*streampb.Span{
 		Process:      &streampb.Process{},
 		Status:       &streampb.Status{},
 	},
+	// 4
 	&streampb.Span{
 		Name:         "noparent2",
 		Duration:     3,

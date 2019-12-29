@@ -5,10 +5,12 @@ package traceql
 %}
 
 %union{
-  Selector  []ValueMatcher
-  Matchers  []ValueMatcher
-  Matcher   ValueMatcher
-  Field     complexField
+  Selector  []matcher
+  Matchers  []matcher
+  Matcher   matcher
+  TempField field
+  LHSField  field
+  RHSField  field
   Operator  int
 
   str       string
@@ -22,9 +24,11 @@ package traceql
 %type <Matchers>              matchers
 %type <Matcher>               matcher
 
-%type <Field>                 field
-%type <Field>                 processField
-%type <Field>                 statusField
+%type <LHSField>              rhsField
+%type <RHSField>              lhsField
+%type <TempField>             field
+%type <TempField>             processField
+%type <TempField>             statusField
 
 %type <Operator>              operator
 
@@ -48,35 +52,44 @@ selector:
     ;
 
 matchers:
-      matcher                          { $$ = []ValueMatcher{ $1 } }
+      matcher                          { $$ = []matcher{ $1 } }
     | matchers COMMA matcher           { $$ = append($1, $3)       }
     ;
 
 matcher:
-      field operator STRING            { $$ = newStringMatcher($3, $2, $1) }
-    | field operator INTEGER           { $$ = newIntMatcher($3, $2,  $1) }
-    | field operator FLOAT             { $$ = newFloatMatcher($3, $2, $1) }
+      lhsField operator rhsField          { $$ = newMatcher($1, $2, $3)  }
+    ;
+
+lhsField:
+      field                               { $$ = $1 }
+    ;
+
+rhsField:
+      field                               { $$ = $1 }
     ;
 
 field:
-      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
-    | FIELD_IS_ROOT                       { $$ = newComplexField(FIELD_IS_ROOT, "")     }
-    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
-    | FIELD_DESCENDANT DOT field          { $$ = wrapComplexField(FIELD_DESCENDANT, $3) }  
-    | FIELD_PARENT DOT field              { $$ = wrapComplexField(FIELD_PARENT, $3)     }
-    | FIELD_PROCESS DOT processField      { $$ = wrapComplexField(FIELD_PROCESS, $3)    }
-    | FIELD_STATUS DOT statusField        { $$ = wrapComplexField(FIELD_STATUS, $3)     }
-    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
-    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
+      STRING                              { $$ = newStringField($1)                     }
+    | INTEGER                             { $$ = newIntField($1)                        }
+    | FLOAT                               { $$ = newFloatField($1)                      }
+    | FIELD_DURATION                      { $$ = newDynamicField(FIELD_DURATION, "")    }
+    | FIELD_IS_ROOT                       { $$ = newDynamicField(FIELD_IS_ROOT, "")     }
+    | FIELD_NAME                          { $$ = newDynamicField(FIELD_NAME, "")        }
+    | FIELD_DESCENDANT DOT field          { $$ = wrapRelationshipField(FIELD_DESCENDANT, $3) }  
+    | FIELD_PARENT DOT field              { $$ = wrapRelationshipField(FIELD_PARENT, $3)     }
+    | FIELD_PROCESS DOT processField      { $$ = wrapDynamicField(FIELD_PROCESS, $3)    }
+    | FIELD_STATUS DOT statusField        { $$ = wrapDynamicField(FIELD_STATUS, $3)     }
+    | FIELD_ATTS DOT IDENTIFIER           { $$ = newDynamicField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newDynamicField(FIELD_EVENTS, $3)      }
     ;
 
 processField:
-      FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")       }
+      FIELD_NAME                          { $$ = newDynamicField(FIELD_NAME, "")  }
     ;
 
 statusField:
-      FIELD_CODE                          { $$ = newComplexField(FIELD_CODE, "")  }
-    | FIELD_MSG                           { $$ = newComplexField(FIELD_MSG, "")   }
+      FIELD_CODE                          { $$ = newDynamicField(FIELD_CODE, "")  }
+    | FIELD_MSG                           { $$ = newDynamicField(FIELD_MSG, "")   }
     ;
 
 operator:
