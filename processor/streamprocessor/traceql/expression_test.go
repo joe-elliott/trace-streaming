@@ -207,6 +207,14 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{0, 1, 2, 3, 4},
 		},
 		{
+			in:           `spans{name = name}`,
+			matchesSpans: []int{0, 1, 2, 3, 4},
+		},
+		{
+			in:           `spans{name != name}`,
+			matchesSpans: []int{},
+		},
+		{
 			in:           `spans{duration=3}`,
 			matchesSpans: []int{4},
 		},
