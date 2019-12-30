@@ -1,8 +1,6 @@
 package traceql
 
 import (
-	"strconv"
-
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 )
 
@@ -35,11 +33,11 @@ func (n intField) getIntValue(span *streampb.Span) int {
 }
 
 func (n intField) getFloatValue(span *streampb.Span) float64 {
-	return float64(n)
+	return 0.0
 }
 
 func (n intField) getStringValue(span *streampb.Span) string {
-	return strconv.Itoa(int(n))
+	return ""
 }
 
 func (n intField) getNativeType(span *streampb.Span) int {
@@ -47,7 +45,7 @@ func (n intField) getNativeType(span *streampb.Span) int {
 }
 
 func (n intField) getRelationshipID() fieldID {
-	return fieldID{}
+	return fieldID(nil)
 }
 
 type floatField float64
@@ -57,7 +55,7 @@ func newFloatField(val float64) field {
 }
 
 func (f floatField) getIntValue(span *streampb.Span) int {
-	return int(f)
+	return 0
 }
 
 func (f floatField) getFloatValue(span *streampb.Span) float64 {
@@ -65,7 +63,7 @@ func (f floatField) getFloatValue(span *streampb.Span) float64 {
 }
 
 func (f floatField) getStringValue(span *streampb.Span) string {
-	return strconv.FormatFloat(float64(f), 'E', 1, 64)
+	return ""
 }
 
 func (f floatField) getNativeType(span *streampb.Span) int {
@@ -73,7 +71,7 @@ func (f floatField) getNativeType(span *streampb.Span) int {
 }
 
 func (f floatField) getRelationshipID() fieldID {
-	return fieldID{}
+	return fieldID(nil)
 }
 
 type stringField string
@@ -99,7 +97,7 @@ func (s stringField) getNativeType(span *streampb.Span) int {
 }
 
 func (s stringField) getRelationshipID() fieldID {
-	return fieldID{}
+	return fieldID(nil)
 }
 
 // dynamicField

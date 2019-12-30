@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// jpe - add RHS tests
 func TestLex(t *testing.T) {
 	for _, tc := range []struct {
 		input    string

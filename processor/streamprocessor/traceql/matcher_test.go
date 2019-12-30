@@ -19,7 +19,6 @@ type stringTest struct {
 	expected bool
 }
 
-// jpe - add field tests
 // jpe - add dynamic field matcher tests
 func TestMatcher(t *testing.T) {
 	for _, tc := range []struct {

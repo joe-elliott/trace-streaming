@@ -215,10 +215,6 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{process.name != parent.process.name}`,
-			matchesSpans: []int{2},
-		},
-		{
 			in:           `spans{duration=3}`,
 			matchesSpans: []int{4},
 		},
@@ -309,6 +305,14 @@ func TestMatchesSpan(t *testing.T) {
 		{
 			in:           `spans{process.name = "proc1"}`,
 			matchesSpans: []int{0, 1},
+		},
+		{
+			in:           `spans{process.name != parent.process.name}`,
+			matchesSpans: []int{2},
+		},
+		{
+			in:           `spans{parent*.status.code < duration}`,
+			matchesSpans: []int{1, 2},
 		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
