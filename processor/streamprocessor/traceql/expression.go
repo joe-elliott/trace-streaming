@@ -4,6 +4,7 @@ import "github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamp
 
 type Query interface {
 	MatchesSpan(*streampb.Span) bool
+	MatchesSpanBatched(*streampb.Span, []*streampb.Span) bool
 	MatchesTrace([]*streampb.Span) bool
 	RequiresTraceBatching() bool
 }
@@ -25,6 +26,16 @@ func newExpr(stream int, m []matcher) *Expr {
 func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 	for _, m := range e.matchers {
 		if !m.compare(s, s) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (e *Expr) MatchesSpanBatched(s *streampb.Span, t []*streampb.Span) bool {
+	for _, m := range e.matchers {
+		if !matchesTraceField(m, s, t) {
 			return false
 		}
 	}

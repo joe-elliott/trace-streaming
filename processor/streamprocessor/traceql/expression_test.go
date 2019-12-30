@@ -215,6 +215,10 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
+			in:           `spans{process.name != parent.process.name}`,
+			matchesSpans: []int{2},
+		},
+		{
 			in:           `spans{duration=3}`,
 			matchesSpans: []int{4},
 		},
@@ -315,8 +319,14 @@ func TestMatchesSpan(t *testing.T) {
 				assert.FailNow(t, "expr is unexpectedly nil.")
 			}
 
+			traceBatching := expr.RequiresTraceBatching()
+
 			for i, span := range trace {
-				assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpan(span), "failed for span %d", i)
+				if traceBatching {
+					assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpanBatched(span, trace), "failed for span %d", i)
+				} else {
+					assert.Equalf(t, contains(tc.matchesSpans, i), expr.MatchesSpan(span), "failed for span %d", i)
+				}
 			}
 		})
 	}
