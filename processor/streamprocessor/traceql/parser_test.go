@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// jpe - add rhs tests
-// jpe - add static field tests
 func TestParse(t *testing.T) {
 	for _, tc := range []struct {
 		in            string
@@ -49,6 +47,14 @@ func TestParse(t *testing.T) {
 			lhsFieldNames: []string{"", "test", "", ""},
 			rhsFieldIds:   []fieldID{[]int{}, []int{}, []int{}, []int{}},
 			rhsFieldNames: []string{"", "", "", ""},
+		},
+		{
+			in:            `spans{duration=atts.test, status.message=~".*blerg", 400=400, 300=status.code}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_STATUS, FIELD_MSG}, []int{}, []int{}},
+			lhsFieldNames: []string{"", "", "", ""},
+			rhsFieldIds:   []fieldID{[]int{FIELD_ATTS}, []int{}, []int{}, []int{FIELD_STATUS, FIELD_CODE}},
+			rhsFieldNames: []string{"test", "", "", ""},
 		},
 		{
 			in:            `spans{parent*.duration=3}`,
@@ -96,6 +102,14 @@ func TestParse(t *testing.T) {
 			lhsFieldIds:   []fieldID{[]int{FIELD_IS_ROOT}},
 			lhsFieldNames: []string{""},
 			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
+		},
+		{
+			in:            `traces{1 = isRoot}`,
+			stream:        STREAM_TYPE_TRACES,
+			lhsFieldIds:   []fieldID{},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{FIELD_IS_ROOT}},
 			rhsFieldNames: []string{""},
 		},
 		{
