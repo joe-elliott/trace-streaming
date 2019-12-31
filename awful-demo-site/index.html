@@ -59,20 +59,12 @@
           </div>
           <hr/>
           <div class="header clearfix">
-            <div class="pull-right">
-              <form class="form-inline" id="form2">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="spanMinDuration" placeholder="Min Duration (ms)">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control" id="spanProcessName" placeholder="Process">
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" id="spanOperationName" placeholder="Operation">
-                  </div>
+            <div class="input-group">
+              <input type="text" class="form-control" width="100%" id="query" placeholder="query">
+              <span class="input-group-btn">
                 <a class="btn btn-danger" id="stopSpanSocket" href="javascript: stopSpanSocket();" style="display: none"><i class="fa fa-pause"></i></a>
                 <a class="btn btn-success" id="startSpanSocket" href="javascript: startSpanSocket();"><i class="fa fa-play"></i></a>
-              </form>
+              </span>
             </div>
           </div>
           <hr/>
@@ -164,18 +156,12 @@
           d3.select("#stopSpanSocket").style("display", "inline");
           d3.select("#startSpanSocket").style("display", "none");
 
-          var processName = document.getElementById("spanProcessName").value;
-          var operationName = document.getElementById("spanOperationName").value;
-          var minDuration = document.getElementById("spanMinDuration").value;
+          var query = document.getElementById("query").value;
 
           spans = []         
           displaySpans(spans)
 
-          uri = "ws://127.0.0.1:31235/v1/stream/spans?rate=10"
-
-          if (processName) uri += "&processName=" + encodeURI(processName)
-          if (operationName) uri += "&operationName=" + encodeURI(operationName)
-          if (minDuration) uri += "&minDuration=" + encodeURI(minDuration)
+          uri = "ws://127.0.0.1:31235/v1/stream?rate=10&q=" + encodeURI(query)
 
           spanSocket = new WebSocket(uri);
           spanSocket.onopen = () => {
@@ -335,8 +321,8 @@
           id = base64toHEX(s.traceID)
           
           row.append("td").append("a").text(id).html(`<a href="https://admin-ops-tools1.grafana.net/jaeger/trace/${id}">${id}</a>`)
-          row.append("td").text(s.processName)
-          row.append("td").text(s.operationName)
+          row.append("td").text(s.process.name)
+          row.append("td").text(s.name)
           row.append("td").text(new Date(s.startTime * 1000).toLocaleString())
           row.append("td").text(s.duration)
         })
