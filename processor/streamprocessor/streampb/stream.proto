@@ -5,25 +5,13 @@ syntax="proto3";
 package streampb;
 
 service SpanStream {
-  rpc QuerySpans(SpanRequest) returns (stream SpanResponse) {};
-  rpc QueryTraces(TraceRequest) returns (stream SpanResponse) {};
+  rpc Query(StreamRequest) returns (stream SpanResponse) {};
 }
 
 message StreamRequest {
     int32 requestedBatchSize = 1;
     int32 requestedRate = 2;
-}
-
-message TraceRequest {
-  StreamRequest params = 1;
-  string ProcessName = 2;
-}
-
-message SpanRequest {
-  StreamRequest params = 1;
-  string OperationName = 2;
-  string ProcessName = 3;
-  int32 MinDuration = 4;
+    string Query = 3;
 }
 
 message SpanResponse {  

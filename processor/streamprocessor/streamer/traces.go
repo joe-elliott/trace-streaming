@@ -4,24 +4,21 @@ import (
 	"fmt"
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/traceql"
 	"go.uber.org/ratelimit"
 )
 
 type Traces struct {
-	req     *streampb.TraceRequest
+	query   traceql.Query
 	stream  ClientStream
 	traces  chan []*streampb.Span
 	limiter ratelimit.Limiter
 }
 
-func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
-	rate := 10
-	if req.Params != nil && req.Params.RequestedRate != 0 {
-		rate = int(req.Params.RequestedRate)
-	}
+func NewTraces(q traceql.Query, rate int, stream ClientStream) *Traces {
 
 	return &Traces{
-		req:     req,
+		query:   q,
 		stream:  stream,
 		traces:  make(chan []*streampb.Span),
 		limiter: ratelimit.New(rate),
@@ -30,6 +27,12 @@ func NewTraces(req *streampb.TraceRequest, stream ClientStream) *Traces {
 
 func (s *Traces) Do() error {
 	for trace := range s.traces {
+		trace = s.filterSpan(trace)
+
+		if len(trace) == 0 {
+			continue
+		}
+
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
 			Spans:   trace,
@@ -42,10 +45,6 @@ func (s *Traces) Do() error {
 }
 
 func (s *Traces) ProcessBatch(trace []*streampb.Span) {
-	if !s.sendTrace(trace) {
-		return
-	}
-
 	select {
 	case s.traces <- trace:
 	default:
@@ -57,17 +56,22 @@ func (s *Traces) Shutdown() {
 	close(s.traces)
 }
 
-func (s *Traces) sendTrace(trace []*streampb.Span) bool {
-	if len(s.req.ProcessName) > 0 {
+func (s *Traces) filterSpan(trace []*streampb.Span) []*streampb.Span {
+	if s.query.WantsSpans() {
+		filtered := make([]*streampb.Span, 0)
+
 		for _, span := range trace {
-			if span.ProcessName == s.req.ProcessName {
-				return true
+			if s.query.MatchesSpanBatched(span, trace) {
+				filtered = append(filtered, span)
 			}
 		}
 
-		return false
+		return filtered
 	}
 
-	// unfiltered
-	return true
+	if s.query.MatchesTrace(trace) {
+		return trace
+	}
+
+	return nil
 }

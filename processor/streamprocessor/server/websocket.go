@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/traceql"
 )
 
 type WebsocketConfig struct {
@@ -44,8 +45,7 @@ func (w *websocketServer) Do() error {
 		return nil
 	}
 
-	http.HandleFunc("/v1/stream/traces", w.streamTraces)
-	http.HandleFunc("/v1/stream/spans", w.streamSpans)
+	http.HandleFunc("/v1/stream", w.stream)
 
 	w.server = &http.Server{Addr: fmt.Sprintf(":%d", w.cfg.Port)}
 
@@ -64,32 +64,25 @@ func (w *websocketServer) Shutdown() {
 	}
 }
 
-func (s *websocketServer) streamTraces(w http.ResponseWriter, r *http.Request) {
+func (s *websocketServer) stream(w http.ResponseWriter, r *http.Request) {
 	socket := setupWebsocket(w, r)
 
 	query := r.URL.Query()
+	req := getStreamRequest(query)
 
-	tailer := streamer.NewTraces(&streampb.TraceRequest{
-		Params:      getStreamRequest(query),
-		ProcessName: getQueryParam(query, "processName"),
-	}, socket)
+	q, err := traceql.ParseExpr(req.Query)
+	if err != nil {
+		// todo: log or return error
+		return
+	}
 
-	s.s.AddTraceStreamer(tailer)
-}
-
-func (s *websocketServer) streamSpans(w http.ResponseWriter, r *http.Request) {
-	socket := setupWebsocket(w, r)
-
-	query := r.URL.Query()
-
-	tailer := streamer.NewSpans(&streampb.SpanRequest{
-		Params:        getStreamRequest(query),
-		ProcessName:   getQueryParam(query, "processName"),
-		OperationName: getQueryParam(query, "operationName"),
-		MinDuration:   int32(getQueryParamInt(query, "minDuration")),
-	}, socket)
-
-	s.s.AddSpanStreamer(tailer)
+	if q.RequiresTraceBatching() {
+		tailer := streamer.NewTraces(q, int(req.RequestedRate), socket)
+		s.s.AddTraceStreamer(tailer)
+	} else {
+		tailer := streamer.NewSpans(q, int(req.RequestedRate), socket)
+		s.s.AddSpanStreamer(tailer)
+	}
 }
 
 // utility
@@ -117,9 +110,11 @@ func getQueryParamInt(v url.Values, name string) int {
 
 func getStreamRequest(v url.Values) *streampb.StreamRequest {
 	rate := getQueryParamInt(v, "rate")
+	query := getQueryParam(v, "q")
 
 	return &streampb.StreamRequest{
 		RequestedRate: int32(rate),
+		Query:         query,
 	}
 }
 

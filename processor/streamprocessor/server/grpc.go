@@ -9,6 +9,7 @@ import (
 
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streamer"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/traceql"
 )
 
 type GRPCConfig struct {
@@ -58,18 +59,19 @@ func (g *grpcServer) Shutdown() {
 	}
 }
 
-func (g *grpcServer) QuerySpans(req *streampb.SpanRequest, stream streampb.SpanStream_QuerySpansServer) error {
-	tailer := streamer.NewSpans(req, stream)
+func (g *grpcServer) Query(req *streampb.StreamRequest, stream streampb.SpanStream_QueryServer) error {
+	q, err := traceql.ParseExpr(req.Query)
+	if err != nil {
+		return err
+	}
 
-	g.s.AddSpanStreamer(tailer)
-
-	return nil
-}
-
-func (g *grpcServer) QueryTraces(req *streampb.TraceRequest, stream streampb.SpanStream_QueryTracesServer) error {
-	tailer := streamer.NewTraces(req, stream)
-
-	g.s.AddTraceStreamer(tailer)
+	if q.RequiresTraceBatching() {
+		tailer := streamer.NewTraces(q, int(req.RequestedRate), stream)
+		g.s.AddTraceStreamer(tailer)
+	} else {
+		tailer := streamer.NewSpans(q, int(req.RequestedRate), stream)
+		g.s.AddSpanStreamer(tailer)
+	}
 
 	return nil
 }

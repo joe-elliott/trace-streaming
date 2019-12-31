@@ -23,8 +23,8 @@ type streamProcessor struct {
 	nextConsumer consumer.TraceConsumer
 	config       Config
 
-	spanStreamers  []*streamer.Spans
-	traceStreamers []*streamer.Traces
+	spanStreamers  []streamer.Streamer
+	traceStreamers []streamer.Streamer
 
 	traceBatcher *batcher
 
@@ -74,8 +74,7 @@ func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata
 	}
 
 	if i > 0 {
-		blergSpans = blergSpans[:i-1]
-
+		blergSpans = blergSpans[:i]
 		for _, s := range sp.spanStreamers {
 			s.ProcessBatch(blergSpans)
 		}
@@ -106,13 +105,13 @@ func (sp *streamProcessor) Shutdown() error {
 	return nil
 }
 
-func (sp *streamProcessor) AddSpanStreamer(s *streamer.Spans) {
+func (sp *streamProcessor) AddSpanStreamer(s streamer.Streamer) {
 	sp.spanStreamers = append(sp.spanStreamers, s)
 
 	s.Do()
 }
 
-func (sp *streamProcessor) AddTraceStreamer(s *streamer.Traces) {
+func (sp *streamProcessor) AddTraceStreamer(s streamer.Streamer) {
 	sp.traceStreamers = append(sp.traceStreamers, s)
 
 	s.Do()
@@ -162,15 +161,62 @@ func spanToSpan(in *tracepb.Span, node *commonpb.Node) *streampb.Span {
 		}
 	}
 
-	return &streampb.Span{
-		TraceID:       in.TraceId,
-		SpanID:        in.SpanId,
-		ParentSpanID:  in.ParentSpanId,
-		ProcessName:   processName,
-		OperationName: name,
-		StartTime:     startTime,
-		Duration:      duration,
+	var status *streampb.Status
+	if in.Status != nil {
+		status = &streampb.Status{
+			Code:    streampb.Status_StatusCode(in.Status.Code),
+			Message: in.Status.Message,
+		}
 	}
+
+	return &streampb.Span{
+		Name:         name,
+		TraceID:      in.TraceId,
+		SpanID:       in.SpanId,
+		ParentSpanID: in.ParentSpanId,
+		Process: &streampb.Process{
+			Name: processName,
+		},
+		Status:      status,
+		Events:      nil, //todo: support events
+		Attributes:  attributesToKVP(in.Attributes),
+		StartTime:   startTime,
+		Duration:    duration,
+		ParentIndex: -1,
+	}
+}
+
+func attributesToKVP(atts *tracepb.Span_Attributes) map[string]*streampb.KeyValuePair {
+	if atts == nil {
+		return nil
+	}
+
+	ret := make(map[string]*streampb.KeyValuePair)
+
+	for k, v := range atts.AttributeMap {
+		kvp := &streampb.KeyValuePair{
+			Key: k,
+		}
+
+		switch val := v.Value.(type) {
+		case *tracepb.AttributeValue_StringValue:
+			kvp.StringValue = val.StringValue.Value
+			kvp.Type = streampb.KeyValuePair_STRING
+		case *tracepb.AttributeValue_IntValue:
+			kvp.IntValue = val.IntValue
+			kvp.Type = streampb.KeyValuePair_INT
+		case *tracepb.AttributeValue_BoolValue:
+			kvp.BoolValue = val.BoolValue
+			kvp.Type = streampb.KeyValuePair_BOOL
+		case *tracepb.AttributeValue_DoubleValue:
+			kvp.DoubleValue = val.DoubleValue
+			kvp.Type = streampb.KeyValuePair_DOUBLE
+		}
+
+		ret[k] = kvp
+	}
+
+	return ret
 }
 
 // todo: make root span at position 0
@@ -181,20 +227,16 @@ func buildSpanTree(trace []*streampb.Span) []*streampb.Span {
 	for _, child := range trace {
 
 		found := false
-		for _, parent := range trace {
+		for i, parent := range trace {
 
 			if bytes.Equal(child.ParentSpanID, parent.SpanID) {
 				found = true
 
-				child.Parent = &streampb.ParentSpan{
-					OperationName: parent.OperationName,
-					ProcessName:   parent.ProcessName,
-					StartTime:     parent.StartTime,
-					Duration:      parent.Duration,
-				}
+				child.ParentIndex = int32(i)
 			}
 		}
 
+		// todo: remove this kludge
 		if !found && len(child.ParentSpanID) > 0 {
 			log.Printf("Unable to find parent id %v. Dropping.", child.ParentSpanID)
 			continue

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -11,17 +13,34 @@ import (
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 )
 
+var query string
+
+func init() {
+	flag.StringVar(&query, "query", "spans{}", "TraceQL query")
+}
+
 func main() {
+	flag.Parse()
+
 	conn, err := grpc.Dial(fmt.Sprintf(":%d", 31234), grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Failed to listen", err)
 	}
 	defer conn.Close()
 
-	traceReq := &streampb.TraceRequest{}
+	req := &streampb.StreamRequest{
+		RequestedRate: 10,
+		Query:         query,
+	}
 
 	client := streampb.NewSpanStreamClient(conn)
-	stream, err := client.QueryTraces(context.Background(), traceReq)
+	stream, err := client.Query(context.Background(), req)
+
+	if err != nil {
+		log.Fatal("Failed to query", err)
+	}
+
+	log.Println("connected")
 
 	for {
 		resp, err := stream.Recv()
@@ -31,8 +50,9 @@ func main() {
 		if err != nil {
 			log.Fatal("stream fail", err)
 		}
-		log.Println("----received thing----")
-		log.Println(resp)
+		fmt.Println("-----")
+		b, _ := json.MarshalIndent(resp, "", "\t")
+		fmt.Println(string(b))
 	}
 
 	log.Println("success!")

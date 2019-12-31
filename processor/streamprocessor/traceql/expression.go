@@ -6,7 +6,9 @@ type Query interface {
 	MatchesSpan(*streampb.Span) bool
 	MatchesSpanBatched(*streampb.Span, []*streampb.Span) bool
 	MatchesTrace([]*streampb.Span) bool
+
 	RequiresTraceBatching() bool
+	WantsSpans() bool
 }
 
 //
@@ -84,6 +86,10 @@ func (e *Expr) RequiresTraceBatching() bool {
 	}
 
 	return false
+}
+
+func (e *Expr) WantsSpans() bool {
+	return e.stream == STREAM_TYPE_SPANS
 }
 
 func matchesTraceField(m matcher, s *streampb.Span, t []*streampb.Span) bool {

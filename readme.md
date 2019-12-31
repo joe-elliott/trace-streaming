@@ -33,3 +33,9 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
 - status code int matching instead of string?
 - order matchers by cost.  i.e. int comparisons are fast, descendant/regex expressions are slow
 - make root span first in trace slice for efficiency?
+- switch to use opencensus/opentel protos
+- flesh out query language
+    - add support for metrics methods rate(), increase()
+    - add support for selecting fields as a type
+      - {}.duration as histogram
+- configurable workers per query?
