@@ -3,7 +3,6 @@ package streamprocessor
 import (
 	"bytes"
 	"context"
-	"log"
 	"time"
 
 	"github.com/open-telemetry/opentelemetry-collector/consumer"
@@ -225,21 +224,11 @@ func buildSpanTree(trace []*streampb.Span) []*streampb.Span {
 
 	// O(n^2)! yay!
 	for _, child := range trace {
-
-		found := false
 		for i, parent := range trace {
-
 			if bytes.Equal(child.ParentSpanID, parent.SpanID) {
-				found = true
-
 				child.ParentIndex = int32(i)
+				break
 			}
-		}
-
-		// todo: remove this kludge
-		if !found && len(child.ParentSpanID) > 0 {
-			log.Printf("Unable to find parent id %v. Dropping.", child.ParentSpanID)
-			continue
 		}
 
 		tree = append(tree, child)

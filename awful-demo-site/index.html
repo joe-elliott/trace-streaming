@@ -75,6 +75,8 @@
         let spans = []
         let socket
 
+        traceQuery = false
+
        function stopSocket() {
         d3.select("#stopSocket").style("display", "none");
         d3.select("#startSocket").style("display", "inline");
@@ -91,8 +93,11 @@
           d3.select("#startSocket").style("display", "none");
 
           var query = document.getElementById("query").value;
+          traceQuery = query.startsWith("traces")
 
-          if (query.startsWith("spans")) {
+          if (traceQuery) {
+            d3.select("#chart").style("display", "inline");
+          } else {
             d3.select("#table").style("display", "inline");
           }
 
@@ -117,26 +122,25 @@
           };
 
           socket.onmessage = msg => {
-              //console.log("Message: ", msg)
+            //console.log("Message: ", msg)
 
-              if (msg.data.trim() != "{}") {
+            if (msg.data.trim() != "{}") {
+              if (traceQuery) {
+                traces.push(JSON.parse(msg.data).spans)
+                  if (traces.length > maxTraces) traces.shift()
+                  
+                  worked = makeTree(traces)
+
+                  if(!worked) {
+                    traces.pop()
+                  }
+              } else {
                 spans.push(...JSON.parse(msg.data).spans)
                 while (spans.length > maxSpans) spans.shift()
                 
                 displaySpans(spans)
               }
-
-              /*
-                 if (msg.data.trim() != "{}") {
-              traces.push(JSON.parse(msg.data).spans)
-              if (traces.length > maxTraces) traces.shift()
-              
-              worked = makeTree(traces)
-
-              if(!worked) {
-                traces.pop()
-              }
-            }*/
+            }
           }
         }
     </script>
@@ -148,8 +152,8 @@
 
         rootSpan = {
           spanID : "root",
-          processName : "root",
-          operationName : "root",
+          process : { name: "root" },
+          name : "root",
           parentSpanID : "",
           duration: 0,
         }
@@ -169,7 +173,7 @@
 
         var root = d3.hierarchy(data)
              .sum(d => d.value)
-        root.each(d => d.name = d.data.data.processName + "-" + d.data.data.operationName)
+        root.each(d => d.name = d.data.data.process.name + "-" + d.data.data.name)
 
         if (flamegraph) {
           flamegraph.update(root)
@@ -185,12 +189,11 @@
                            .minFrameSize(5)
                            .sort(true)
                            .title("")
-                           .onClick(onClick)
                            .differential(false)
                            .selfValue(false)
 
         flamegraph.setColorMapper(function(d, originalColor) {
-          return d.highlight ? "#E600E6" : color(d.data.data.data.processName);
+          return d.highlight ? "#E600E6" : color(d.data.data.data.process.name);
         });
 
         flamegraph.label(d => d.data.name);
@@ -205,11 +208,6 @@
             .datum(root)
             .call(flamegraph);
 
-        document.getElementById("form").addEventListener("submit", function(event){
-          event.preventDefault();
-          search();
-        });
-
         return true
       }
 
@@ -221,7 +219,7 @@
         agg = new Map()
 
         node.children.forEach( c => {
-            name = c.data.processName + "-" + c.data.operationName
+            name = c.data.process.name + "-" + c.data.name
 
             if (agg.has(name)) {
               merge(agg.get(name), c)
