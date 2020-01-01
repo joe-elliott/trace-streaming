@@ -10,6 +10,8 @@ var tokens = map[string]int{
 	".":        DOT,
 	"{":        OPEN_BRACE,
 	"}":        CLOSE_BRACE,
+	"[":        OPEN_BRACKET,
+	"]":        CLOSE_BRACKET,
 	"=":        EQ,
 	"!=":       NEQ,
 	"=~":       RE,

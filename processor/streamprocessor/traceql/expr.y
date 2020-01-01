@@ -35,7 +35,7 @@ package traceql
 %token <str>      IDENTIFIER STRING
 %token <integer>  INTEGER
 %token <float>    FLOAT
-%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
+%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS STREAM_TYPE_TRACES
                   FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_IS_ROOT
 
@@ -79,8 +79,8 @@ field:
     | FIELD_PARENT DOT field              { $$ = wrapRelationshipField(FIELD_PARENT, $3)     }
     | FIELD_PROCESS DOT processField      { $$ = wrapDynamicField(FIELD_PROCESS, $3)    }
     | FIELD_STATUS DOT statusField        { $$ = wrapDynamicField(FIELD_STATUS, $3)     }
-    | FIELD_ATTS DOT IDENTIFIER           { $$ = newDynamicField(FIELD_ATTS, $3)        }
-    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newDynamicField(FIELD_EVENTS, $3)      }
+    | FIELD_ATTS OPEN_BRACKET STRING CLOSE_BRACKET   { $$ = newDynamicField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS OPEN_BRACKET STRING CLOSE_BRACKET { $$ = newDynamicField(FIELD_EVENTS, $3)      }
     ;
 
 processField:

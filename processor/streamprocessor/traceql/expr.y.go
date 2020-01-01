@@ -26,27 +26,29 @@ const COMMA = 57350
 const DOT = 57351
 const OPEN_BRACE = 57352
 const CLOSE_BRACE = 57353
-const EQ = 57354
-const NEQ = 57355
-const RE = 57356
-const NRE = 57357
-const GT = 57358
-const GTE = 57359
-const LT = 57360
-const LTE = 57361
-const STREAM_TYPE_SPANS = 57362
-const STREAM_TYPE_TRACES = 57363
-const FIELD_DURATION = 57364
-const FIELD_NAME = 57365
-const FIELD_ATTS = 57366
-const FIELD_EVENTS = 57367
-const FIELD_STATUS = 57368
-const FIELD_CODE = 57369
-const FIELD_MSG = 57370
-const FIELD_PROCESS = 57371
-const FIELD_PARENT = 57372
-const FIELD_DESCENDANT = 57373
-const FIELD_IS_ROOT = 57374
+const OPEN_BRACKET = 57354
+const CLOSE_BRACKET = 57355
+const EQ = 57356
+const NEQ = 57357
+const RE = 57358
+const NRE = 57359
+const GT = 57360
+const GTE = 57361
+const LT = 57362
+const LTE = 57363
+const STREAM_TYPE_SPANS = 57364
+const STREAM_TYPE_TRACES = 57365
+const FIELD_DURATION = 57366
+const FIELD_NAME = 57367
+const FIELD_ATTS = 57368
+const FIELD_EVENTS = 57369
+const FIELD_STATUS = 57370
+const FIELD_CODE = 57371
+const FIELD_MSG = 57372
+const FIELD_PROCESS = 57373
+const FIELD_PARENT = 57374
+const FIELD_DESCENDANT = 57375
+const FIELD_IS_ROOT = 57376
 
 var yyToknames = [...]string{
 	"$end",
@@ -60,6 +62,8 @@ var yyToknames = [...]string{
 	"DOT",
 	"OPEN_BRACE",
 	"CLOSE_BRACE",
+	"OPEN_BRACKET",
+	"CLOSE_BRACKET",
 	"EQ",
 	"NEQ",
 	"RE",
@@ -96,31 +100,31 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 64
+const yyLast = 66
 
 var yyAct = [...]int{
 
-	12, 13, 14, 49, 50, 47, 7, 11, 2, 3,
-	5, 12, 13, 14, 9, 52, 40, 15, 17, 22,
-	23, 21, 39, 38, 20, 19, 18, 16, 15, 17,
-	22, 23, 21, 37, 43, 20, 19, 18, 16, 25,
-	41, 36, 24, 44, 45, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 51, 4, 26, 48, 46, 6,
-	10, 42, 8, 1,
+	12, 13, 14, 49, 50, 47, 7, 54, 11, 53,
+	9, 12, 13, 14, 2, 3, 40, 39, 5, 15,
+	17, 22, 23, 21, 38, 37, 20, 19, 18, 16,
+	15, 17, 22, 23, 21, 43, 41, 20, 19, 18,
+	16, 52, 36, 35, 44, 45, 27, 28, 29, 30,
+	31, 32, 33, 34, 25, 51, 4, 24, 26, 48,
+	6, 46, 10, 42, 8, 1,
 }
 var yyPact = [...]int{
 
-	-12, -1000, 0, 0, -1000, -5, -1000, -1000, 31, -1000,
-	33, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 44, 32,
-	24, 14, 13, 7, -1000, 6, 6, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 6, 6, -18, -24, 50,
-	11, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000,
+	-8, -1000, 8, 8, -1000, -5, -1000, -1000, 46, -1000,
+	32, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 34, 33,
+	16, 15, 5, 4, -1000, 6, 6, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 6, 6, -20, -26, 50,
+	36, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -4, -6, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 63, 55, 62, 14, 61, 60, 7, 58, 57,
-	56,
+	0, 65, 56, 64, 10, 63, 62, 8, 61, 59,
+	58,
 }
 var yyR1 = [...]int{
 
@@ -133,17 +137,17 @@ var yyR2 = [...]int{
 
 	0, 2, 2, 2, 3, 1, 3, 3, 1, 1,
 	1, 1, 1, 1, 1, 1, 3, 3, 3, 3,
-	3, 3, 1, 1, 1, 1, 1, 1, 1, 1,
+	4, 4, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1,
 }
 var yyChk = [...]int{
 
-	-1000, -1, 20, 21, -2, 10, -2, 11, -3, -4,
-	-6, -7, 5, 6, 7, 22, 32, 23, 31, 30,
-	29, 26, 24, 25, 11, 8, -10, 12, 13, 14,
-	15, 16, 17, 18, 19, 9, 9, 9, 9, 9,
-	9, -4, -5, -7, -7, -7, -8, 23, -9, 27,
-	28, 4, 4,
+	-1000, -1, 22, 23, -2, 10, -2, 11, -3, -4,
+	-6, -7, 5, 6, 7, 24, 34, 25, 33, 32,
+	31, 28, 26, 27, 11, 8, -10, 14, 15, 16,
+	17, 18, 19, 20, 21, 9, 9, 9, 9, 12,
+	12, -4, -5, -7, -7, -7, -8, 25, -9, 29,
+	30, 5, 5, 13, 13,
 }
 var yyDef = [...]int{
 
@@ -152,7 +156,7 @@ var yyDef = [...]int{
 	0, 0, 0, 0, 4, 0, 0, 25, 26, 27,
 	28, 29, 30, 31, 32, 0, 0, 0, 0, 0,
 	0, 6, 7, 9, 16, 17, 18, 22, 19, 23,
-	24, 20, 21,
+	24, 0, 0, 20, 21,
 }
 var yyTok1 = [...]int{
 
@@ -163,7 +167,7 @@ var yyTok2 = [...]int{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	32,
+	32, 33, 34,
 }
 var yyTok3 = [...]int{
 	0,
@@ -599,12 +603,12 @@ yydefault:
 			yyVAL.TempField = wrapDynamicField(FIELD_STATUS, yyDollar[3].TempField)
 		}
 	case 20:
-		yyDollar = yyS[yypt-3 : yypt+1]
+		yyDollar = yyS[yypt-4 : yypt+1]
 		{
 			yyVAL.TempField = newDynamicField(FIELD_ATTS, yyDollar[3].str)
 		}
 	case 21:
-		yyDollar = yyS[yypt-3 : yypt+1]
+		yyDollar = yyS[yypt-4 : yypt+1]
 		{
 			yyVAL.TempField = newDynamicField(FIELD_EVENTS, yyDollar[3].str)
 		}

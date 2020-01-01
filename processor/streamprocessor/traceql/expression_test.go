@@ -21,11 +21,11 @@ func TestRequiresTraceBatching(t *testing.T) {
 			expected: false,
 		},
 		{
-			in:       `spans{duration=3, atts.test="blerg"}`,
+			in:       `spans{duration=3, atts["test"]="blerg"}`,
 			expected: false,
 		},
 		{
-			in:       `spans{duration=3, atts.test="blerg", status.message=~".*blerg", status.code=400}`,
+			in:       `spans{duration=3, atts["test"]="blerg", status.message=~".*blerg", status.code=400}`,
 			expected: false,
 		},
 		{
@@ -37,7 +37,7 @@ func TestRequiresTraceBatching(t *testing.T) {
 			expected: true,
 		},
 		{
-			in:       `spans{parent.atts.test=3}`,
+			in:       `spans{parent.atts["test"]=3}`,
 			expected: true,
 		},
 		{
@@ -247,47 +247,47 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{2, 3, 4},
 		},
 		{
-			in:           `spans{atts.testString = "test2"}`,
+			in:           `spans{atts["testString"] = "test2"}`,
 			matchesSpans: []int{0, 1, 2},
 		},
 		{
-			in:           `spans{atts.testString = 0}`,
+			in:           `spans{atts["testString"] = 0}`,
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{atts.testFloat = 3.14}`,
+			in:           `spans{atts["testFloat"] = 3.14}`,
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{atts.testBool = 1}`,
+			in:           `spans{atts["testBool"] = 1}`,
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{atts.testInt = 1}`,
+			in:           `spans{atts["testInt"] = 1}`,
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{atts.blerg = 0}`,
+			in:           `spans{atts["blerg"] = 0}`,
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{events.testString > "abc"}`,
+			in:           `spans{events["testString"] > "abc"}`,
 			matchesSpans: []int{0, 1, 2},
 		},
 		{
-			in:           `spans{events.testFloat = 3.14}`,
+			in:           `spans{events["testFloat"] = 3.14}`,
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{events.testBool = 1}`,
+			in:           `spans{events["testBool"] = 1}`,
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{events.testInt = "1"}`,
+			in:           `spans{events["testInt"] = "1"}`,
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{events.blerg = 0}`,
+			in:           `spans{events["blerg"] = 0}`,
 			matchesSpans: []int{},
 		},
 		{
@@ -370,19 +370,19 @@ func TestMatchesTrace(t *testing.T) {
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{parent*.atts.testInt = 3, name="child2"}`,
+			in:           `traces{parent*.atts["testInt"] = 3, name="child2"}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{parent*.atts.testInt = 4, name="child2"}`,
+			in:           `traces{parent*.atts["testInt"] = 4, name="child2"}`,
 			matchesTrace: false,
 		},
 		{
-			in:           `traces{parent.atts.testInt = 3, name="childSpan"}`,
+			in:           `traces{parent.atts["testInt"] = 3, name="childSpan"}`,
 			matchesTrace: true,
 		},
 		{
-			in:           `traces{parent.atts.testInt = 4, name="childSpan"}`,
+			in:           `traces{parent.atts["testInt"] = 4, name="childSpan"}`,
 			matchesTrace: false,
 		},
 	} {

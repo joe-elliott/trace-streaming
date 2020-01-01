@@ -25,6 +25,14 @@ func TestParse(t *testing.T) {
 			rhsFieldNames: []string{},
 		},
 		{
+			in:            `spans{atts["test"]=3, atts["http.url"]="asdf"}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_ATTS}, []int{FIELD_ATTS}},
+			lhsFieldNames: []string{"test", "http.url"},
+			rhsFieldIds:   []fieldID{[]int{}, []int{}},
+			rhsFieldNames: []string{"", ""},
+		},
+		{
 			in:            `spans{duration=3, name="asdf"}`,
 			stream:        STREAM_TYPE_SPANS,
 			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
@@ -33,7 +41,7 @@ func TestParse(t *testing.T) {
 			rhsFieldNames: []string{"", ""},
 		},
 		{
-			in:            `spans{duration=3, atts.test="blerg"}`,
+			in:            `spans{duration=3, atts["test"]="blerg"}`,
 			stream:        STREAM_TYPE_SPANS,
 			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}},
 			lhsFieldNames: []string{"", "test"},
@@ -41,7 +49,7 @@ func TestParse(t *testing.T) {
 			rhsFieldNames: []string{"", ""},
 		},
 		{
-			in:            `spans{duration=3, atts.test="blerg", status.message=~".*blerg", status.code=400}`,
+			in:            `spans{duration=3, atts["test"]="blerg", status.message=~".*blerg", status.code=400}`,
 			stream:        STREAM_TYPE_SPANS,
 			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}, []int{FIELD_STATUS, FIELD_MSG}, []int{FIELD_STATUS, FIELD_CODE}},
 			lhsFieldNames: []string{"", "test", "", ""},
@@ -49,7 +57,7 @@ func TestParse(t *testing.T) {
 			rhsFieldNames: []string{"", "", "", ""},
 		},
 		{
-			in:            `spans{duration=atts.test, status.message=~".*blerg", 400=400, 300=status.code}`,
+			in:            `spans{duration=atts["test"], status.message=~".*blerg", 400=400, 300=status.code}`,
 			stream:        STREAM_TYPE_SPANS,
 			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_STATUS, FIELD_MSG}, []int{}, []int{}},
 			lhsFieldNames: []string{"", "", "", ""},
@@ -73,7 +81,7 @@ func TestParse(t *testing.T) {
 			rhsFieldNames: []string{""},
 		},
 		{
-			in:            `spans{parent.parent.atts.test=3}`,
+			in:            `spans{parent.parent.atts["test"]=3}`,
 			stream:        STREAM_TYPE_SPANS,
 			lhsFieldIds:   []fieldID{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
 			lhsFieldNames: []string{"test"},
