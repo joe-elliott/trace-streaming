@@ -39,3 +39,4 @@ A fledgeling project built on top of the [otel-collector](https://github.com/ope
     - add support for selecting fields as a type
       - {}.duration as histogram
 - configurable workers per query?
+- add support for process tags
