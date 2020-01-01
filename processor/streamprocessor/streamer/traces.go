@@ -1,8 +1,6 @@
 package streamer
 
 import (
-	"fmt"
-
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/traceql"
 	"go.uber.org/ratelimit"
@@ -48,7 +46,7 @@ func (s *Traces) ProcessBatch(trace []*streampb.Span) {
 	select {
 	case s.traces <- trace:
 	default:
-		fmt.Println("rate limited!")
+		//todo: metric
 	}
 }
 
