@@ -94,8 +94,10 @@
 
           if (traceQuery) {
             d3.select("#chart").style("display", "inline");
+            d3.select("#table").style("display", "none");
           } else {
             d3.select("#table").style("display", "inline");
+            d3.select("#chart").style("display", "none");
           }
 
           spans = []         
