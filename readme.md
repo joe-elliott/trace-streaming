@@ -10,11 +10,11 @@ The trace streaming project supports a query language roughly inspired by [prome
 
 ### Types
 
-The only two currently supported types are `spans` or `traces`.  Both types support the same conditions and in both cases the conditions are evaluated against spans.  However, the `spans` type returns individual spans while `traces` will return full traces.
+The only two currently supported types are `spans` or `traces`.  Both types support the same conditions (operands and fields).  However, the `spans` type returns individual spans while `traces` will return full traces.
 
 ### Conditions
 
-Conditions support a set of standard binary operators and can be applied to static values or span fields in any combination.  If there are no conditions `{}` then all spans/traces are matched and returned.
+Conditions support a set of standard binary operators and can be applied to static values or span fields in any combination.  If there are no conditions then all spans/traces are matched and returned.  If there are multiple conditions then all conditions they are "AND"ed together and all must return true.
 
 Keep in mind that if the type differs between the two operands the operator will always return false.
 ```
