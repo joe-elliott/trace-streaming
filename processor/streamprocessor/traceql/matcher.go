@@ -2,188 +2,114 @@ package traceql
 
 import (
 	"regexp"
-	"strconv"
+
+	"github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 )
 
-type intCompareFunc func(int) bool
-type floatCompareFunc func(float64) bool
-type stringCompareFunc func(string) bool
-
-// complexField
-type complexField struct {
-	fieldID   []int
-	fieldName string // only valid if fieldID = FIELD_ATTS or FIELD_EVENTS
+type matcher struct {
+	lhs field
+	rhs field
+	op  int
 }
 
-func newComplexField(id int, name string) complexField {
-	return complexField{
-		fieldID:   []int{id},
-		fieldName: name,
+func newMatcher(lhs field, op int, rhs field) matcher {
+	return matcher{
+		lhs: lhs,
+		rhs: rhs,
+		op:  op,
 	}
 }
 
-func wrapComplexField(id int, c complexField) complexField {
-	return complexField{
-		fieldID:   append([]int{id}, c.fieldID...),
-		fieldName: c.fieldName,
-	}
-}
+func (m matcher) compare(lhsSpan *streampb.Span, rhsSpan *streampb.Span) bool {
+	t1 := m.lhs.getNativeType(lhsSpan)
+	t2 := m.rhs.getNativeType(rhsSpan)
 
-//
-type ValueMatcher interface {
-	compareInt(int) bool
-	compareFloat(float64) bool
-	compareString(string) bool
-}
-
-// int Matcher
-type intMatcher struct {
-	field   complexField
-	compare intCompareFunc
-}
-
-func newIntMatcher(val int, op int, field complexField) intMatcher {
-	var compare intCompareFunc
-
-	switch op {
-	case EQ:
-		compare = func(n int) bool { return n == val }
-	case NEQ:
-		compare = func(n int) bool { return n != val }
-	case GT:
-		compare = func(n int) bool { return n > val }
-	case GTE:
-		compare = func(n int) bool { return n >= val }
-	case LT:
-		compare = func(n int) bool { return n < val }
-	case LTE:
-		compare = func(n int) bool { return n <= val }
-	default:
-		compare = func(n int) bool { return false }
-	}
-
-	return intMatcher{
-		field:   field,
-		compare: compare,
-	}
-}
-
-func (o intMatcher) compareInt(n int) bool {
-	return o.compare(n)
-}
-
-func (o intMatcher) compareFloat(f float64) bool {
-	// comparing a float to an int is just going to floor the float
-	return o.compare(int(f))
-}
-
-func (o intMatcher) compareString(s string) bool {
-	n, err := strconv.Atoi(s)
-
-	if err != nil {
+	if t1 != t2 {
+		// todo: bubble this error up/metric
 		return false
 	}
 
-	return o.compare(n)
+	switch t1 {
+	case fieldTypeInt:
+		return m.compareInt(lhsSpan, rhsSpan)
+	case fieldTypeFloat:
+		return m.compareFloat(lhsSpan, rhsSpan)
+	case fieldTypeString:
+		return m.compareString(lhsSpan, rhsSpan)
+	}
+
+	return false
 }
 
-// float Matcher
-type floatMatcher struct {
-	field   complexField
-	compare floatCompareFunc
-}
+func (m matcher) compareInt(lhsSpan *streampb.Span, rhsSpan *streampb.Span) bool {
+	n1 := m.lhs.getIntValue(lhsSpan)
+	n2 := m.rhs.getIntValue(rhsSpan)
 
-func newFloatMatcher(val float64, op int, field complexField) floatMatcher {
-	var compare floatCompareFunc
-
-	switch op {
+	switch m.op {
 	case EQ:
-		compare = func(n float64) bool { return n == val }
+		return n1 == n2
 	case NEQ:
-		compare = func(n float64) bool { return n != val }
+		return n1 != n2
 	case GT:
-		compare = func(n float64) bool { return n > val }
+		return n1 > n2
 	case GTE:
-		compare = func(n float64) bool { return n >= val }
+		return n1 >= n2
 	case LT:
-		compare = func(n float64) bool { return n < val }
+		return n1 < n2
 	case LTE:
-		compare = func(n float64) bool { return n <= val }
+		return n1 <= n2
 	default:
-		compare = func(n float64) bool { return false }
-	}
-
-	return floatMatcher{
-		field:   field,
-		compare: compare,
-	}
-}
-
-func (o floatMatcher) compareInt(n int) bool {
-	return o.compare(float64(n))
-}
-
-func (o floatMatcher) compareFloat(f float64) bool {
-	return o.compare(f)
-}
-
-func (o floatMatcher) compareString(s string) bool {
-	f, err := strconv.ParseFloat(s, 64)
-
-	if err != nil {
 		return false
 	}
-
-	return o.compare(f)
 }
 
-// string Matcher
-type stringMatcher struct {
-	field   complexField
-	compare stringCompareFunc
-}
+func (m matcher) compareFloat(lhsSpan *streampb.Span, rhsSpan *streampb.Span) bool {
+	f1 := m.lhs.getFloatValue(lhsSpan)
+	f2 := m.rhs.getFloatValue(rhsSpan)
 
-func newStringMatcher(val string, op int, field complexField) stringMatcher {
-	var compare stringCompareFunc
-	// if op is a regex, let's build the regex now
-
-	switch op {
+	switch m.op {
 	case EQ:
-		compare = func(n string) bool { return n == val }
+		return f1 == f2
 	case NEQ:
-		compare = func(n string) bool { return n != val }
+		return f1 != f2
+	case GT:
+		return f1 > f2
+	case GTE:
+		return f1 >= f2
+	case LT:
+		return f1 < f2
+	case LTE:
+		return f1 <= f2
+	default:
+		return false
+	}
+}
+
+func (m matcher) compareString(lhsSpan *streampb.Span, rhsSpan *streampb.Span) bool {
+	s1 := m.lhs.getStringValue(lhsSpan)
+	s2 := m.rhs.getStringValue(rhsSpan)
+
+	switch m.op {
+	case EQ:
+		return s1 == s2
+	case NEQ:
+		return s1 != s2
 	case RE:
-		regex := regexp.MustCompile(val)
-		compare = func(n string) bool { return regex.Match([]byte(n)) } // jpe - consider performance.  should we use strings at all or only []byte?
+		// todo: fix serious performance issues here.  compiling regex everytime. string -> byte conversion
+		regex := regexp.MustCompile(s2)
+		return regex.Match([]byte(s1))
 	case NRE:
-		regex := regexp.MustCompile(val)
-		compare = func(n string) bool { return !regex.Match([]byte(n)) }
+		regex := regexp.MustCompile(s2)
+		return !regex.Match([]byte(s1))
 	case GT:
-		compare = func(n string) bool { return n > val }
+		return s1 > s2
 	case GTE:
-		compare = func(n string) bool { return n >= val }
+		return s1 >= s2
 	case LT:
-		compare = func(n string) bool { return n < val }
+		return s1 < s2
 	case LTE:
-		compare = func(n string) bool { return n <= val }
+		return s1 <= s2
 	default:
-		compare = func(n string) bool { return false }
+		return false
 	}
-
-	return stringMatcher{
-		field:   field,
-		compare: compare,
-	}
-}
-
-func (o stringMatcher) compareInt(n int) bool {
-	return o.compare(strconv.FormatInt(int64(n), 10))
-}
-
-func (o stringMatcher) compareFloat(f float64) bool {
-	return o.compare(strconv.FormatFloat(f, 'E', 1, 64))
-}
-
-func (o stringMatcher) compareString(s string) bool {
-	return o.compare(s)
 }

@@ -9,11 +9,11 @@ It is generated from these files:
 
 It has these top-level messages:
 	StreamRequest
-	TraceRequest
-	SpanRequest
 	SpanResponse
 	Span
-	ParentSpan
+	Process
+	KeyValuePair
+	Status
 */
 package streampb
 
@@ -37,9 +37,103 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type KeyValuePair_ValueType int32
+
+const (
+	KeyValuePair_STRING KeyValuePair_ValueType = 0
+	KeyValuePair_INT    KeyValuePair_ValueType = 1
+	KeyValuePair_DOUBLE KeyValuePair_ValueType = 2
+	KeyValuePair_BOOL   KeyValuePair_ValueType = 3
+)
+
+var KeyValuePair_ValueType_name = map[int32]string{
+	0: "STRING",
+	1: "INT",
+	2: "DOUBLE",
+	3: "BOOL",
+}
+var KeyValuePair_ValueType_value = map[string]int32{
+	"STRING": 0,
+	"INT":    1,
+	"DOUBLE": 2,
+	"BOOL":   3,
+}
+
+func (x KeyValuePair_ValueType) String() string {
+	return proto.EnumName(KeyValuePair_ValueType_name, int32(x))
+}
+func (KeyValuePair_ValueType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{4, 0} }
+
+type Status_StatusCode int32
+
+const (
+	Status_Ok                 Status_StatusCode = 0
+	Status_Cancelled          Status_StatusCode = 1
+	Status_UnknownError       Status_StatusCode = 2
+	Status_InvalidArgument    Status_StatusCode = 3
+	Status_DeadlineExceeded   Status_StatusCode = 4
+	Status_NotFound           Status_StatusCode = 5
+	Status_AlreadyExists      Status_StatusCode = 6
+	Status_PermissionDenied   Status_StatusCode = 7
+	Status_ResourceExhausted  Status_StatusCode = 8
+	Status_FailedPrecondition Status_StatusCode = 9
+	Status_Aborted            Status_StatusCode = 10
+	Status_OutOfRange         Status_StatusCode = 11
+	Status_Unimplemented      Status_StatusCode = 12
+	Status_InternalError      Status_StatusCode = 13
+	Status_Unavailable        Status_StatusCode = 14
+	Status_DataLoss           Status_StatusCode = 15
+	Status_Unauthenticated    Status_StatusCode = 16
+)
+
+var Status_StatusCode_name = map[int32]string{
+	0:  "Ok",
+	1:  "Cancelled",
+	2:  "UnknownError",
+	3:  "InvalidArgument",
+	4:  "DeadlineExceeded",
+	5:  "NotFound",
+	6:  "AlreadyExists",
+	7:  "PermissionDenied",
+	8:  "ResourceExhausted",
+	9:  "FailedPrecondition",
+	10: "Aborted",
+	11: "OutOfRange",
+	12: "Unimplemented",
+	13: "InternalError",
+	14: "Unavailable",
+	15: "DataLoss",
+	16: "Unauthenticated",
+}
+var Status_StatusCode_value = map[string]int32{
+	"Ok":                 0,
+	"Cancelled":          1,
+	"UnknownError":       2,
+	"InvalidArgument":    3,
+	"DeadlineExceeded":   4,
+	"NotFound":           5,
+	"AlreadyExists":      6,
+	"PermissionDenied":   7,
+	"ResourceExhausted":  8,
+	"FailedPrecondition": 9,
+	"Aborted":            10,
+	"OutOfRange":         11,
+	"Unimplemented":      12,
+	"InternalError":      13,
+	"Unavailable":        14,
+	"DataLoss":           15,
+	"Unauthenticated":    16,
+}
+
+func (x Status_StatusCode) String() string {
+	return proto.EnumName(Status_StatusCode_name, int32(x))
+}
+func (Status_StatusCode) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{5, 0} }
+
 type StreamRequest struct {
-	RequestedBatchSize int32 `protobuf:"varint,1,opt,name=requestedBatchSize" json:"requestedBatchSize,omitempty"`
-	RequestedRate      int32 `protobuf:"varint,2,opt,name=requestedRate" json:"requestedRate,omitempty"`
+	RequestedBatchSize int32  `protobuf:"varint,1,opt,name=requestedBatchSize" json:"requestedBatchSize,omitempty"`
+	RequestedRate      int32  `protobuf:"varint,2,opt,name=requestedRate" json:"requestedRate,omitempty"`
+	Query              string `protobuf:"bytes,3,opt,name=Query,json=query" json:"Query,omitempty"`
 }
 
 func (m *StreamRequest) Reset()                    { *m = StreamRequest{} }
@@ -61,68 +155,11 @@ func (m *StreamRequest) GetRequestedRate() int32 {
 	return 0
 }
 
-type TraceRequest struct {
-	Params      *StreamRequest `protobuf:"bytes,1,opt,name=params" json:"params,omitempty"`
-	ProcessName string         `protobuf:"bytes,2,opt,name=ProcessName,json=processName" json:"ProcessName,omitempty"`
-}
-
-func (m *TraceRequest) Reset()                    { *m = TraceRequest{} }
-func (m *TraceRequest) String() string            { return proto.CompactTextString(m) }
-func (*TraceRequest) ProtoMessage()               {}
-func (*TraceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *TraceRequest) GetParams() *StreamRequest {
+func (m *StreamRequest) GetQuery() string {
 	if m != nil {
-		return m.Params
-	}
-	return nil
-}
-
-func (m *TraceRequest) GetProcessName() string {
-	if m != nil {
-		return m.ProcessName
+		return m.Query
 	}
 	return ""
-}
-
-type SpanRequest struct {
-	Params        *StreamRequest `protobuf:"bytes,1,opt,name=params" json:"params,omitempty"`
-	OperationName string         `protobuf:"bytes,2,opt,name=OperationName,json=operationName" json:"OperationName,omitempty"`
-	ProcessName   string         `protobuf:"bytes,3,opt,name=ProcessName,json=processName" json:"ProcessName,omitempty"`
-	MinDuration   int32          `protobuf:"varint,4,opt,name=MinDuration,json=minDuration" json:"MinDuration,omitempty"`
-}
-
-func (m *SpanRequest) Reset()                    { *m = SpanRequest{} }
-func (m *SpanRequest) String() string            { return proto.CompactTextString(m) }
-func (*SpanRequest) ProtoMessage()               {}
-func (*SpanRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *SpanRequest) GetParams() *StreamRequest {
-	if m != nil {
-		return m.Params
-	}
-	return nil
-}
-
-func (m *SpanRequest) GetOperationName() string {
-	if m != nil {
-		return m.OperationName
-	}
-	return ""
-}
-
-func (m *SpanRequest) GetProcessName() string {
-	if m != nil {
-		return m.ProcessName
-	}
-	return ""
-}
-
-func (m *SpanRequest) GetMinDuration() int32 {
-	if m != nil {
-		return m.MinDuration
-	}
-	return 0
 }
 
 type SpanResponse struct {
@@ -133,7 +170,7 @@ type SpanResponse struct {
 func (m *SpanResponse) Reset()                    { *m = SpanResponse{} }
 func (m *SpanResponse) String() string            { return proto.CompactTextString(m) }
 func (*SpanResponse) ProtoMessage()               {}
-func (*SpanResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*SpanResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *SpanResponse) GetDropped() int32 {
 	if m != nil {
@@ -150,20 +187,23 @@ func (m *SpanResponse) GetSpans() []*Span {
 }
 
 type Span struct {
-	TraceID       []byte      `protobuf:"bytes,1,opt,name=traceID,proto3" json:"traceID,omitempty"`
-	SpanID        []byte      `protobuf:"bytes,2,opt,name=spanID,proto3" json:"spanID,omitempty"`
-	ParentSpanID  []byte      `protobuf:"bytes,3,opt,name=parentSpanID,proto3" json:"parentSpanID,omitempty"`
-	ProcessName   string      `protobuf:"bytes,4,opt,name=processName" json:"processName,omitempty"`
-	OperationName string      `protobuf:"bytes,5,opt,name=operationName" json:"operationName,omitempty"`
-	StartTime     int64       `protobuf:"varint,6,opt,name=startTime" json:"startTime,omitempty"`
-	Duration      int32       `protobuf:"varint,7,opt,name=duration" json:"duration,omitempty"`
-	Parent        *ParentSpan `protobuf:"bytes,8,opt,name=parent" json:"parent,omitempty"`
+	TraceID      []byte                   `protobuf:"bytes,1,opt,name=traceID,proto3" json:"traceID,omitempty"`
+	SpanID       []byte                   `protobuf:"bytes,2,opt,name=spanID,proto3" json:"spanID,omitempty"`
+	ParentSpanID []byte                   `protobuf:"bytes,3,opt,name=parentSpanID,proto3" json:"parentSpanID,omitempty"`
+	Name         string                   `protobuf:"bytes,5,opt,name=name" json:"name,omitempty"`
+	StartTime    int64                    `protobuf:"varint,6,opt,name=startTime" json:"startTime,omitempty"`
+	Duration     int32                    `protobuf:"varint,7,opt,name=duration" json:"duration,omitempty"`
+	Status       *Status                  `protobuf:"bytes,8,opt,name=status" json:"status,omitempty"`
+	Events       map[string]*KeyValuePair `protobuf:"bytes,9,rep,name=events" json:"events,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Attributes   map[string]*KeyValuePair `protobuf:"bytes,10,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Process      *Process                 `protobuf:"bytes,11,opt,name=process" json:"process,omitempty"`
+	ParentIndex  int32                    `protobuf:"varint,12,opt,name=parentIndex" json:"parentIndex,omitempty"`
 }
 
 func (m *Span) Reset()                    { *m = Span{} }
 func (m *Span) String() string            { return proto.CompactTextString(m) }
 func (*Span) ProtoMessage()               {}
-func (*Span) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*Span) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *Span) GetTraceID() []byte {
 	if m != nil {
@@ -186,16 +226,9 @@ func (m *Span) GetParentSpanID() []byte {
 	return nil
 }
 
-func (m *Span) GetProcessName() string {
+func (m *Span) GetName() string {
 	if m != nil {
-		return m.ProcessName
-	}
-	return ""
-}
-
-func (m *Span) GetOperationName() string {
-	if m != nil {
-		return m.OperationName
+		return m.Name
 	}
 	return ""
 }
@@ -214,60 +247,150 @@ func (m *Span) GetDuration() int32 {
 	return 0
 }
 
-func (m *Span) GetParent() *ParentSpan {
+func (m *Span) GetStatus() *Status {
 	if m != nil {
-		return m.Parent
+		return m.Status
 	}
 	return nil
 }
 
-type ParentSpan struct {
-	ProcessName   string `protobuf:"bytes,1,opt,name=processName" json:"processName,omitempty"`
-	OperationName string `protobuf:"bytes,2,opt,name=operationName" json:"operationName,omitempty"`
-	StartTime     int64  `protobuf:"varint,3,opt,name=startTime" json:"startTime,omitempty"`
-	Duration      int32  `protobuf:"varint,4,opt,name=duration" json:"duration,omitempty"`
-}
-
-func (m *ParentSpan) Reset()                    { *m = ParentSpan{} }
-func (m *ParentSpan) String() string            { return proto.CompactTextString(m) }
-func (*ParentSpan) ProtoMessage()               {}
-func (*ParentSpan) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
-
-func (m *ParentSpan) GetProcessName() string {
+func (m *Span) GetEvents() map[string]*KeyValuePair {
 	if m != nil {
-		return m.ProcessName
+		return m.Events
 	}
-	return ""
+	return nil
 }
 
-func (m *ParentSpan) GetOperationName() string {
+func (m *Span) GetAttributes() map[string]*KeyValuePair {
 	if m != nil {
-		return m.OperationName
+		return m.Attributes
 	}
-	return ""
+	return nil
 }
 
-func (m *ParentSpan) GetStartTime() int64 {
+func (m *Span) GetProcess() *Process {
 	if m != nil {
-		return m.StartTime
+		return m.Process
+	}
+	return nil
+}
+
+func (m *Span) GetParentIndex() int32 {
+	if m != nil {
+		return m.ParentIndex
 	}
 	return 0
 }
 
-func (m *ParentSpan) GetDuration() int32 {
+type Process struct {
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *Process) Reset()                    { *m = Process{} }
+func (m *Process) String() string            { return proto.CompactTextString(m) }
+func (*Process) ProtoMessage()               {}
+func (*Process) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *Process) GetName() string {
 	if m != nil {
-		return m.Duration
+		return m.Name
+	}
+	return ""
+}
+
+type KeyValuePair struct {
+	Key  string                 `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Type KeyValuePair_ValueType `protobuf:"varint,2,opt,name=type,enum=streampb.KeyValuePair_ValueType" json:"type,omitempty"`
+	// Only one of the following fields is supposed to contain data (determined by `type` field).
+	// This is deliberately not using Protobuf `oneof` for performance reasons (verified by benchmarks).
+	StringValue string  `protobuf:"bytes,3,opt,name=string_value,json=stringValue" json:"string_value,omitempty"`
+	IntValue    int64   `protobuf:"varint,4,opt,name=int_value,json=intValue" json:"int_value,omitempty"`
+	DoubleValue float64 `protobuf:"fixed64,5,opt,name=double_value,json=doubleValue" json:"double_value,omitempty"`
+	BoolValue   bool    `protobuf:"varint,6,opt,name=bool_value,json=boolValue" json:"bool_value,omitempty"`
+}
+
+func (m *KeyValuePair) Reset()                    { *m = KeyValuePair{} }
+func (m *KeyValuePair) String() string            { return proto.CompactTextString(m) }
+func (*KeyValuePair) ProtoMessage()               {}
+func (*KeyValuePair) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *KeyValuePair) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *KeyValuePair) GetType() KeyValuePair_ValueType {
+	if m != nil {
+		return m.Type
+	}
+	return KeyValuePair_STRING
+}
+
+func (m *KeyValuePair) GetStringValue() string {
+	if m != nil {
+		return m.StringValue
+	}
+	return ""
+}
+
+func (m *KeyValuePair) GetIntValue() int64 {
+	if m != nil {
+		return m.IntValue
 	}
 	return 0
+}
+
+func (m *KeyValuePair) GetDoubleValue() float64 {
+	if m != nil {
+		return m.DoubleValue
+	}
+	return 0
+}
+
+func (m *KeyValuePair) GetBoolValue() bool {
+	if m != nil {
+		return m.BoolValue
+	}
+	return false
+}
+
+// The Status type defines a logical error model that is suitable for different
+// programming environments, including REST APIs and RPC APIs.
+type Status struct {
+	Code    Status_StatusCode `protobuf:"varint,1,opt,name=code,enum=streampb.Status_StatusCode" json:"code,omitempty"`
+	Message string            `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
+}
+
+func (m *Status) Reset()                    { *m = Status{} }
+func (m *Status) String() string            { return proto.CompactTextString(m) }
+func (*Status) ProtoMessage()               {}
+func (*Status) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *Status) GetCode() Status_StatusCode {
+	if m != nil {
+		return m.Code
+	}
+	return Status_Ok
+}
+
+func (m *Status) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
 }
 
 func init() {
 	proto.RegisterType((*StreamRequest)(nil), "streampb.StreamRequest")
-	proto.RegisterType((*TraceRequest)(nil), "streampb.TraceRequest")
-	proto.RegisterType((*SpanRequest)(nil), "streampb.SpanRequest")
 	proto.RegisterType((*SpanResponse)(nil), "streampb.SpanResponse")
 	proto.RegisterType((*Span)(nil), "streampb.Span")
-	proto.RegisterType((*ParentSpan)(nil), "streampb.ParentSpan")
+	proto.RegisterType((*Process)(nil), "streampb.Process")
+	proto.RegisterType((*KeyValuePair)(nil), "streampb.KeyValuePair")
+	proto.RegisterType((*Status)(nil), "streampb.Status")
+	proto.RegisterEnum("streampb.KeyValuePair_ValueType", KeyValuePair_ValueType_name, KeyValuePair_ValueType_value)
+	proto.RegisterEnum("streampb.Status_StatusCode", Status_StatusCode_name, Status_StatusCode_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -281,8 +404,7 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for SpanStream service
 
 type SpanStreamClient interface {
-	QuerySpans(ctx context.Context, in *SpanRequest, opts ...grpc.CallOption) (SpanStream_QuerySpansClient, error)
-	QueryTraces(ctx context.Context, in *TraceRequest, opts ...grpc.CallOption) (SpanStream_QueryTracesClient, error)
+	Query(ctx context.Context, in *StreamRequest, opts ...grpc.CallOption) (SpanStream_QueryClient, error)
 }
 
 type spanStreamClient struct {
@@ -293,12 +415,12 @@ func NewSpanStreamClient(cc *grpc.ClientConn) SpanStreamClient {
 	return &spanStreamClient{cc}
 }
 
-func (c *spanStreamClient) QuerySpans(ctx context.Context, in *SpanRequest, opts ...grpc.CallOption) (SpanStream_QuerySpansClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_SpanStream_serviceDesc.Streams[0], c.cc, "/streampb.SpanStream/QuerySpans", opts...)
+func (c *spanStreamClient) Query(ctx context.Context, in *StreamRequest, opts ...grpc.CallOption) (SpanStream_QueryClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_SpanStream_serviceDesc.Streams[0], c.cc, "/streampb.SpanStream/Query", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &spanStreamQuerySpansClient{stream}
+	x := &spanStreamQueryClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -308,48 +430,16 @@ func (c *spanStreamClient) QuerySpans(ctx context.Context, in *SpanRequest, opts
 	return x, nil
 }
 
-type SpanStream_QuerySpansClient interface {
+type SpanStream_QueryClient interface {
 	Recv() (*SpanResponse, error)
 	grpc.ClientStream
 }
 
-type spanStreamQuerySpansClient struct {
+type spanStreamQueryClient struct {
 	grpc.ClientStream
 }
 
-func (x *spanStreamQuerySpansClient) Recv() (*SpanResponse, error) {
-	m := new(SpanResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *spanStreamClient) QueryTraces(ctx context.Context, in *TraceRequest, opts ...grpc.CallOption) (SpanStream_QueryTracesClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_SpanStream_serviceDesc.Streams[1], c.cc, "/streampb.SpanStream/QueryTraces", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &spanStreamQueryTracesClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type SpanStream_QueryTracesClient interface {
-	Recv() (*SpanResponse, error)
-	grpc.ClientStream
-}
-
-type spanStreamQueryTracesClient struct {
-	grpc.ClientStream
-}
-
-func (x *spanStreamQueryTracesClient) Recv() (*SpanResponse, error) {
+func (x *spanStreamQueryClient) Recv() (*SpanResponse, error) {
 	m := new(SpanResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -360,53 +450,31 @@ func (x *spanStreamQueryTracesClient) Recv() (*SpanResponse, error) {
 // Server API for SpanStream service
 
 type SpanStreamServer interface {
-	QuerySpans(*SpanRequest, SpanStream_QuerySpansServer) error
-	QueryTraces(*TraceRequest, SpanStream_QueryTracesServer) error
+	Query(*StreamRequest, SpanStream_QueryServer) error
 }
 
 func RegisterSpanStreamServer(s *grpc.Server, srv SpanStreamServer) {
 	s.RegisterService(&_SpanStream_serviceDesc, srv)
 }
 
-func _SpanStream_QuerySpans_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(SpanRequest)
+func _SpanStream_Query_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(SpanStreamServer).QuerySpans(m, &spanStreamQuerySpansServer{stream})
+	return srv.(SpanStreamServer).Query(m, &spanStreamQueryServer{stream})
 }
 
-type SpanStream_QuerySpansServer interface {
+type SpanStream_QueryServer interface {
 	Send(*SpanResponse) error
 	grpc.ServerStream
 }
 
-type spanStreamQuerySpansServer struct {
+type spanStreamQueryServer struct {
 	grpc.ServerStream
 }
 
-func (x *spanStreamQuerySpansServer) Send(m *SpanResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _SpanStream_QueryTraces_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(TraceRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(SpanStreamServer).QueryTraces(m, &spanStreamQueryTracesServer{stream})
-}
-
-type SpanStream_QueryTracesServer interface {
-	Send(*SpanResponse) error
-	grpc.ServerStream
-}
-
-type spanStreamQueryTracesServer struct {
-	grpc.ServerStream
-}
-
-func (x *spanStreamQueryTracesServer) Send(m *SpanResponse) error {
+func (x *spanStreamQueryServer) Send(m *SpanResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -416,13 +484,8 @@ var _SpanStream_serviceDesc = grpc.ServiceDesc{
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "QuerySpans",
-			Handler:       _SpanStream_QuerySpans_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "QueryTraces",
-			Handler:       _SpanStream_QueryTraces_Handler,
+			StreamName:    "Query",
+			Handler:       _SpanStream_Query_Handler,
 			ServerStreams: true,
 		},
 	},
@@ -432,33 +495,60 @@ var _SpanStream_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("stream.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 438 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0xcd, 0x8e, 0xd3, 0x30,
-	0x10, 0xc6, 0x4d, 0xdb, 0xed, 0x4e, 0x52, 0x0e, 0x16, 0x2c, 0xd6, 0x8a, 0x43, 0x65, 0xe5, 0xd0,
-	0x03, 0x0a, 0xa8, 0x3c, 0x00, 0x02, 0xf5, 0xb2, 0x07, 0x96, 0xc5, 0xd9, 0x17, 0xf0, 0x36, 0x23,
-	0x91, 0x43, 0x12, 0x63, 0xbb, 0x07, 0x78, 0x06, 0x84, 0x78, 0x0c, 0x1e, 0x13, 0xd9, 0x4e, 0x9a,
-	0x1f, 0x56, 0x0b, 0xda, 0x9b, 0xe7, 0x9b, 0xc9, 0xcc, 0xf7, 0x7d, 0x1e, 0x07, 0x12, 0x63, 0x35,
-	0xca, 0x2a, 0x53, 0xba, 0xb1, 0x0d, 0x5d, 0x85, 0x48, 0xdd, 0x71, 0x84, 0x75, 0xee, 0xcf, 0x02,
-	0xbf, 0x1e, 0xd1, 0x58, 0x9a, 0x01, 0xd5, 0xe1, 0x88, 0xc5, 0x07, 0x69, 0x0f, 0x5f, 0xf2, 0xf2,
-	0x3b, 0x32, 0xb2, 0x21, 0xdb, 0x85, 0xb8, 0x27, 0x43, 0x53, 0x58, 0x9f, 0x50, 0x21, 0x2d, 0xb2,
-	0x99, 0x2f, 0x1d, 0x83, 0x5c, 0x42, 0x72, 0xab, 0xe5, 0x01, 0xbb, 0x29, 0xaf, 0x61, 0xa9, 0xa4,
-	0x96, 0x95, 0xf1, 0x9d, 0xe3, 0xdd, 0x8b, 0xac, 0x63, 0x94, 0x8d, 0xe8, 0x88, 0xb6, 0x8c, 0x6e,
-	0x20, 0xbe, 0xd1, 0xcd, 0x01, 0x8d, 0xb9, 0x96, 0x55, 0x18, 0x72, 0x2e, 0x62, 0xd5, 0x43, 0xfc,
-	0x37, 0x81, 0x38, 0x57, 0xb2, 0x7e, 0xf4, 0x88, 0x14, 0xd6, 0x9f, 0x14, 0x6a, 0x69, 0xcb, 0xa6,
-	0x1e, 0x0c, 0x59, 0x37, 0x43, 0x70, 0x4a, 0x24, 0xfa, 0x8b, 0x88, 0xab, 0xf8, 0x58, 0xd6, 0xfb,
-	0x63, 0xf8, 0x88, 0xcd, 0xbd, 0x1f, 0x71, 0xd5, 0x43, 0xfc, 0x1a, 0x92, 0xc0, 0xd4, 0xa8, 0xa6,
-	0x36, 0x48, 0x19, 0x9c, 0x15, 0xba, 0x51, 0x0a, 0x8b, 0xd6, 0xe8, 0x2e, 0xa4, 0x29, 0x2c, 0x8c,
-	0x92, 0xb5, 0x61, 0xb3, 0x4d, 0xb4, 0x8d, 0x77, 0x4f, 0x07, 0x1a, 0x5c, 0x83, 0x90, 0xe4, 0x3f,
-	0x66, 0x30, 0x77, 0xb1, 0x6b, 0x64, 0x9d, 0xcd, 0x57, 0x7b, 0xdf, 0x28, 0x11, 0x5d, 0x48, 0x2f,
-	0x60, 0xe9, 0x6a, 0xaf, 0xf6, 0x5e, 0x55, 0x22, 0xda, 0x88, 0x72, 0x48, 0x94, 0xd4, 0x58, 0xdb,
-	0x3c, 0x64, 0x23, 0x9f, 0x1d, 0x61, 0x4e, 0xd0, 0x40, 0x9f, 0x17, 0x34, 0x91, 0x9c, 0xc2, 0xd8,
-	0x25, 0xb6, 0xb8, 0xcf, 0xba, 0x97, 0x70, 0x6e, 0xac, 0xd4, 0xf6, 0xb6, 0xac, 0x90, 0x2d, 0x37,
-	0x64, 0x1b, 0x89, 0x1e, 0xa0, 0x97, 0xb0, 0x2a, 0x3a, 0xcf, 0xce, 0xbc, 0x0b, 0xa7, 0x98, 0xbe,
-	0xf2, 0x77, 0x89, 0xb5, 0x65, 0x2b, 0x7f, 0x97, 0xcf, 0x7a, 0x1f, 0x6e, 0x4e, 0x4c, 0x45, 0x5b,
-	0xc3, 0x7f, 0x12, 0x80, 0x1e, 0x9e, 0xd2, 0x27, 0xff, 0x41, 0x7f, 0xf6, 0x4f, 0xfa, 0xd1, 0x43,
-	0xf4, 0xe7, 0x63, 0xfa, 0xbb, 0x5f, 0x04, 0xc0, 0x51, 0x09, 0x7b, 0x47, 0xdf, 0x01, 0x7c, 0x3e,
-	0xa2, 0xfe, 0xe6, 0x20, 0x43, 0x9f, 0x4f, 0xee, 0x34, 0x6c, 0xe5, 0xe5, 0xc5, 0x14, 0x0e, 0xbb,
-	0xc2, 0x9f, 0xbc, 0x21, 0xf4, 0x3d, 0xc4, 0xbe, 0x81, 0x7f, 0x52, 0x86, 0x0e, 0x4a, 0x87, 0x8f,
-	0xec, 0xa1, 0x16, 0x77, 0x4b, 0xff, 0x23, 0x78, 0xfb, 0x27, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x94,
-	0x3e, 0x8e, 0x18, 0x04, 0x00, 0x00,
+	// 870 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x5f, 0x6f, 0x23, 0xb5,
+	0x17, 0xed, 0xe4, 0x7f, 0xee, 0x4c, 0x5b, 0xf7, 0xfe, 0xf6, 0x57, 0x46, 0x5d, 0x16, 0x65, 0xa3,
+	0x7d, 0x88, 0x04, 0x0a, 0x28, 0x20, 0x84, 0x10, 0x42, 0x6a, 0x37, 0x59, 0x14, 0xa8, 0x9a, 0xae,
+	0xdb, 0xf0, 0x8a, 0x9c, 0xcc, 0xa5, 0x1d, 0x75, 0xe2, 0x99, 0xb5, 0x3d, 0xa5, 0x81, 0x2f, 0x81,
+	0xc4, 0xe7, 0xe1, 0x81, 0x6f, 0x86, 0x6c, 0x4f, 0x9b, 0xb4, 0xea, 0x23, 0x4f, 0xf1, 0x3d, 0xe7,
+	0x5c, 0xfb, 0x9e, 0xf1, 0xf5, 0x0d, 0x44, 0xda, 0x28, 0x12, 0xab, 0x61, 0xa1, 0x72, 0x93, 0x63,
+	0xc7, 0x47, 0xc5, 0xa2, 0xff, 0x07, 0xec, 0x5e, 0xb8, 0x35, 0xa7, 0x0f, 0x25, 0x69, 0x83, 0x43,
+	0x40, 0xe5, 0x97, 0x94, 0x9c, 0x08, 0xb3, 0xbc, 0xbe, 0x48, 0x7f, 0xa7, 0x38, 0xe8, 0x05, 0x83,
+	0x26, 0x7f, 0x86, 0xc1, 0x37, 0xb0, 0xfb, 0x80, 0x72, 0x61, 0x28, 0xae, 0x39, 0xe9, 0x63, 0x10,
+	0x5f, 0x40, 0xf3, 0x7d, 0x49, 0x6a, 0x1d, 0xd7, 0x7b, 0xc1, 0xa0, 0xcb, 0x9b, 0x1f, 0x6c, 0xd0,
+	0x3f, 0x83, 0xe8, 0xa2, 0x10, 0x92, 0x93, 0x2e, 0x72, 0xa9, 0x09, 0x63, 0x68, 0x27, 0x2a, 0x2f,
+	0x0a, 0x4a, 0xaa, 0x03, 0xef, 0x43, 0x7c, 0x03, 0x4d, 0x5d, 0x08, 0xa9, 0xe3, 0x5a, 0xaf, 0x3e,
+	0x08, 0x47, 0x7b, 0xc3, 0x7b, 0x03, 0x43, 0xb7, 0x81, 0x27, 0xfb, 0xff, 0x34, 0xa0, 0x61, 0x63,
+	0xbb, 0x91, 0x51, 0x62, 0x49, 0xd3, 0xb1, 0xdb, 0x28, 0xe2, 0xf7, 0x21, 0x1e, 0x42, 0xcb, 0x6a,
+	0xa7, 0x63, 0x57, 0x67, 0xc4, 0xab, 0x08, 0xfb, 0x10, 0x15, 0x42, 0x91, 0x34, 0x17, 0x9e, 0xad,
+	0x3b, 0xf6, 0x11, 0x86, 0x08, 0x0d, 0x29, 0x56, 0x14, 0x37, 0x9d, 0x07, 0xb7, 0xc6, 0x8f, 0xa1,
+	0xab, 0x8d, 0x50, 0xe6, 0x32, 0x5d, 0x51, 0xdc, 0xea, 0x05, 0x83, 0x3a, 0xdf, 0x00, 0x78, 0x04,
+	0x9d, 0xa4, 0x54, 0xc2, 0xa4, 0xb9, 0x8c, 0xdb, 0xce, 0xd1, 0x43, 0x8c, 0x03, 0x68, 0x69, 0x23,
+	0x4c, 0xa9, 0xe3, 0x4e, 0x2f, 0x18, 0x84, 0x23, 0xb6, 0xe5, 0xc9, 0xe1, 0xbc, 0xe2, 0x71, 0x04,
+	0x2d, 0xba, 0x25, 0x69, 0x74, 0xdc, 0x75, 0xee, 0x8f, 0x1e, 0xbb, 0x1f, 0x4e, 0x1c, 0x39, 0x91,
+	0x46, 0xad, 0x79, 0xa5, 0xc4, 0xef, 0x01, 0x84, 0x31, 0x2a, 0x5d, 0x94, 0x86, 0x74, 0x0c, 0x2e,
+	0xef, 0x93, 0x27, 0x79, 0xc7, 0x0f, 0x02, 0x9f, 0xbb, 0x95, 0x81, 0x9f, 0x42, 0xbb, 0x50, 0xf9,
+	0x92, 0xb4, 0x8e, 0x43, 0x57, 0xde, 0xc1, 0x26, 0xf9, 0xdc, 0x13, 0xfc, 0x5e, 0x81, 0x3d, 0x08,
+	0xfd, 0x87, 0x9a, 0xca, 0x84, 0xee, 0xe2, 0xc8, 0x39, 0xdd, 0x86, 0x8e, 0xde, 0x43, 0xb8, 0x55,
+	0x25, 0x32, 0xa8, 0xdf, 0xd0, 0xda, 0xdd, 0x4d, 0x97, 0xdb, 0x25, 0x7e, 0x06, 0xcd, 0x5b, 0x91,
+	0x95, 0xbe, 0x7d, 0xc2, 0xd1, 0xe1, 0xe6, 0xb4, 0x9f, 0x68, 0xfd, 0xb3, 0x65, 0xce, 0x45, 0xaa,
+	0xb8, 0x17, 0x7d, 0x5b, 0xfb, 0x26, 0x38, 0x9a, 0xc3, 0xfe, 0x13, 0x03, 0xff, 0xc5, 0xb6, 0xfd,
+	0x57, 0xd0, 0xae, 0xfc, 0x3d, 0xdc, 0x77, 0xb0, 0xb9, 0xef, 0xfe, 0x9f, 0x35, 0x88, 0xb6, 0x53,
+	0x9f, 0x39, 0xf3, 0x2b, 0x68, 0x98, 0x75, 0xe1, 0x8f, 0xdc, 0x1b, 0xf5, 0x9e, 0x3f, 0x72, 0xe8,
+	0x56, 0x97, 0xeb, 0x82, 0xb8, 0x53, 0xe3, 0x6b, 0xf7, 0x44, 0x53, 0x79, 0xf5, 0x8b, 0x2f, 0xd8,
+	0x3f, 0x94, 0xd0, 0x63, 0x4e, 0x8c, 0x2f, 0xa1, 0x9b, 0x4a, 0x53, 0xf1, 0x0d, 0xd7, 0x6b, 0x9d,
+	0x54, 0x1a, 0x4f, 0xbe, 0x86, 0x28, 0xc9, 0xcb, 0x45, 0x46, 0x15, 0x6f, 0x9b, 0x34, 0xe0, 0xa1,
+	0xc7, 0xbc, 0xe4, 0x15, 0xc0, 0x22, 0xcf, 0xb3, 0x4a, 0x60, 0x9b, 0xb5, 0xc3, 0xbb, 0x16, 0x71,
+	0x74, 0xff, 0x6b, 0xe8, 0x3e, 0x14, 0x85, 0x00, 0xad, 0x8b, 0x4b, 0x3e, 0x3d, 0xfb, 0x81, 0xed,
+	0x60, 0x1b, 0xea, 0xd3, 0xb3, 0x4b, 0x16, 0x58, 0x70, 0x3c, 0x9b, 0x9f, 0x9c, 0x4e, 0x58, 0x0d,
+	0x3b, 0xd0, 0x38, 0x99, 0xcd, 0x4e, 0x59, 0xbd, 0xff, 0x57, 0x1d, 0x5a, 0xbe, 0x63, 0xf1, 0x73,
+	0x68, 0x2c, 0xf3, 0xc4, 0x7f, 0xb1, 0xbd, 0xd1, 0xcb, 0xa7, 0x1d, 0x5d, 0xfd, 0xbc, 0xcd, 0x13,
+	0xe2, 0x4e, 0x68, 0x1f, 0xea, 0x8a, 0xb4, 0x16, 0x57, 0xfe, 0x73, 0x75, 0xf9, 0x7d, 0xd8, 0xff,
+	0xbb, 0x06, 0xb0, 0x91, 0x63, 0x0b, 0x6a, 0xb3, 0x1b, 0xb6, 0x83, 0xbb, 0xd0, 0x7d, 0x2b, 0xe4,
+	0x92, 0xb2, 0x8c, 0x12, 0x16, 0x20, 0x83, 0x68, 0x2e, 0x6f, 0x64, 0xfe, 0x9b, 0x9c, 0x28, 0x95,
+	0x2b, 0x56, 0xc3, 0xff, 0xc1, 0xfe, 0x54, 0xde, 0x8a, 0x2c, 0x4d, 0x8e, 0xd5, 0x55, 0xb9, 0x22,
+	0x69, 0x58, 0x1d, 0x5f, 0x00, 0x1b, 0x93, 0x48, 0xb2, 0x54, 0xd2, 0xe4, 0x6e, 0x49, 0x94, 0x50,
+	0xc2, 0x1a, 0x18, 0x41, 0xe7, 0x2c, 0x37, 0xef, 0xf2, 0x52, 0x26, 0xac, 0x89, 0x07, 0xb0, 0x7b,
+	0x9c, 0x29, 0x12, 0xc9, 0x7a, 0x72, 0x97, 0x6a, 0xa3, 0x59, 0xcb, 0xa6, 0x9d, 0x93, 0x5a, 0xa5,
+	0x5a, 0xa7, 0xb9, 0x1c, 0x93, 0x4c, 0x29, 0x61, 0x6d, 0xfc, 0x3f, 0x1c, 0x70, 0xd2, 0x79, 0xa9,
+	0x96, 0x34, 0xb9, 0xbb, 0x16, 0xa5, 0x1d, 0x72, 0xac, 0x83, 0x87, 0x80, 0xef, 0x44, 0x9a, 0x51,
+	0x72, 0xae, 0x68, 0x99, 0xcb, 0x24, 0xb5, 0xaf, 0x9c, 0x75, 0x31, 0x84, 0xf6, 0xf1, 0x22, 0x57,
+	0x56, 0x04, 0xb8, 0x07, 0x30, 0x2b, 0xcd, 0xec, 0x57, 0x2e, 0xe4, 0x15, 0xb1, 0xd0, 0x1e, 0x3a,
+	0x97, 0xe9, 0xaa, 0xc8, 0xc8, 0x56, 0x4a, 0x09, 0x8b, 0x2c, 0x34, 0x95, 0x86, 0x94, 0x14, 0x99,
+	0xf7, 0xb4, 0x8b, 0xfb, 0x10, 0xce, 0xa5, 0xb8, 0x15, 0x69, 0x26, 0x16, 0x19, 0xb1, 0x3d, 0x5b,
+	0xf9, 0x58, 0x18, 0x71, 0x9a, 0x6b, 0xcd, 0xf6, 0xad, 0xe5, 0xb9, 0x14, 0xa5, 0xb9, 0x26, 0x69,
+	0xd2, 0xa5, 0xb0, 0xdb, 0xb0, 0xd1, 0x8f, 0x00, 0xf6, 0x91, 0xfb, 0xe1, 0x8e, 0xdf, 0x55, 0xf3,
+	0x17, 0x3f, 0xda, 0xbe, 0x93, 0xad, 0xb9, 0x7f, 0x74, 0xf8, 0x64, 0xa4, 0x56, 0x33, 0xb9, 0xbf,
+	0xf3, 0x45, 0xb0, 0x68, 0xb9, 0x7f, 0x8d, 0x2f, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0xf2, 0x52,
+	0xda, 0x6e, 0x45, 0x06, 0x00, 0x00,
 }

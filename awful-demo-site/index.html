@@ -35,170 +35,111 @@
   </head>
   <body>
       <div class="container">
-          <div class="header clearfix">
-            <nav>
-              <div class="pull-right">
-                <form class="form-inline" id="form">
-                  <a class="btn" href="javascript: resetZoom();">Reset zoom</a>
-                  <a class="btn" href="javascript: clear();">Clear</a>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="term">
-                  </div>
-                  <a class="btn btn-primary" href="javascript: search();">Search</a>
-                  <div class="form-group">
-                      <input type="text" class="form-control" id="processName" placeholder="Process">
-                  </div>
-                  <a class="btn btn-danger" href="javascript: stop();" id="stopSocket" style="display: none"><i class="fa fa-pause"></i></a>
-                  <a class="btn btn-success" href="javascript: start();" id="startSocket"><i class="fa fa-play"></i></a>
-                </form>
-              </div>
-            </nav>
-            <h3 class="text-muted">trace streaming</h3>
-          </div>
-          <div id="chart">
-          </div>
-          <hr/>
-          <div class="header clearfix">
-            <div class="pull-right">
-              <form class="form-inline" id="form2">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="spanMinDuration" placeholder="Min Duration (ms)">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control" id="spanProcessName" placeholder="Process">
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" id="spanOperationName" placeholder="Operation">
-                  </div>
-                <a class="btn btn-danger" id="stopSpanSocket" href="javascript: stopSpanSocket();" style="display: none"><i class="fa fa-pause"></i></a>
-                <a class="btn btn-success" id="startSpanSocket" href="javascript: startSpanSocket();"><i class="fa fa-play"></i></a>
-              </form>
-            </div>
-          </div>
-          <hr/>
-          <div id="table" class="clearfix">
-              <table class="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">trace</th>
-                      <th scope="col">process name</th>
-                      <th scope="col">span name</th>
-                      <th scope="col">start</th>
-                      <th scope="col">duration (ms)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
+          <h3 class="text-muted">trace streaming</h3>
+        <hr/>
+        <div class="header clearfix">
+          <div class="input-group">
+            <input type="text" class="form-control" width="100%" id="query" placeholder="query">
+            <span class="input-group-btn">
+              <a class="btn btn-danger" id="stopSocket" href="javascript: stopSocket();" style="display: none"><i class="fa fa-pause"></i></a>
+              <a class="btn btn-success" id="startSocket" href="javascript: startSocket();"><i class="fa fa-play"></i></a>
+            </span>
           </div>
         </div>
+        <div id="chart" style="display: none"></div>
+        <div id="table" style="display: none">
+          <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">trace</th>
+                  <th scope="col">process name</th>
+                  <th scope="col">span name</th>
+                  <th scope="col">start</th>
+                  <th scope="col">duration (ms)</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js></script>
     <script type="text/javascript" src="flamegraph.js"></script>
-    <script>
+    <script>       
        const maxTraces = 100
        let traces = []
-       let socket
-
-      function stop() {
-        d3.select("#stopSocket").style("display", "none");
-        d3.select("#startSocket").style("display", "inline");
-        if (socket) socket.close()
-      }
-
-       function start() {
-         stop()
-        d3.select("#stopSocket").style("display", "inline");
-        d3.select("#startSocket").style("display", "none");    
-
-        var processName = document.getElementById("processName").value;
-
-        uri = "ws://127.0.0.1:31235/v1/stream/traces?rate=5"
-        if (processName) uri += "&processName=" + encodeURI(processName)
-
-         traces = []
-         socket = new WebSocket(uri);
-        console.log("Attempting Connection...");
-
-        socket.onopen = () => {
-            console.log("Successfully Connected");
-        };
-        
-        socket.onclose = event => {
-            console.log("Socket Closed Connection: ", event);
-        };
-
-        socket.onerror = error => {
-            console.log("Socket Error: ", error);
-        };
-
-        socket.onmessage = msg => {
-            //console.log("Message: ", msg)
-
-            if (msg.data.trim() != "{}") {
-              traces.push(JSON.parse(msg.data).spans)
-              if (traces.length > maxTraces) traces.shift()
-              
-              worked = makeTree(traces)
-
-              if(!worked) {
-                traces.pop()
-              }
-            }
-        }
-       }
-       
 
         const maxSpans = 15
         let spans = []
-        let spanSocket
+        let socket
 
-       function stopSpanSocket() {
-        d3.select("#stopSpanSocket").style("display", "none");
-        d3.select("#startSpanSocket").style("display", "inline");
-        if (spanSocket) spanSocket.close()
+        traceQuery = false
+
+       function stopSocket() {
+        d3.select("#stopSocket").style("display", "none");
+        d3.select("#startSocket").style("display", "inline");
+
+        if (socket) socket.close()
        }
 
-        function startSpanSocket() {
-          stopSpanSocket()
-          d3.select("#stopSpanSocket").style("display", "inline");
-          d3.select("#startSpanSocket").style("display", "none");
+        function startSocket() {
+          stopSocket()
+          d3.select("#stopSocket").style("display", "inline");
+          d3.select("#startSocket").style("display", "none");
 
-          var processName = document.getElementById("spanProcessName").value;
-          var operationName = document.getElementById("spanOperationName").value;
-          var minDuration = document.getElementById("spanMinDuration").value;
+          var query = document.getElementById("query").value;
+          traceQuery = query.startsWith("traces")
+
+          if (traceQuery) {
+            d3.select("#chart").style("display", "inline");
+            d3.select("#table").style("display", "none");
+          } else {
+            d3.select("#table").style("display", "inline");
+            d3.select("#chart").style("display", "none");
+          }
 
           spans = []         
           displaySpans(spans)
 
-          uri = "ws://127.0.0.1:31235/v1/stream/spans?rate=10"
+          if(flamegraph) flamegraph.clear();
 
-          if (processName) uri += "&processName=" + encodeURI(processName)
-          if (operationName) uri += "&operationName=" + encodeURI(operationName)
-          if (minDuration) uri += "&minDuration=" + encodeURI(minDuration)
+          uri = "ws://127.0.0.1:31235/v1/stream?rate=10&q=" + encodeURI(query)
 
-          spanSocket = new WebSocket(uri);
-          spanSocket.onopen = () => {
+          socket = new WebSocket(uri);
+          socket.onopen = () => {
               console.log("Successfully Connected Spans");
           };
           
-          spanSocket.onclose = event => {
+          socket.onclose = event => {
               console.log("Socket Closed Span Connection: ", event);
           };
 
-          spanSocket.onerror = error => {
+          socket.onerror = error => {
               console.log("Span Socket Error: ", error);
           };
 
-          spanSocket.onmessage = msg => {
-              //console.log("Message: ", msg)
+          socket.onmessage = msg => {
+            //console.log("Message: ", msg)
 
-              if (msg.data.trim() != "{}") {
+            if (msg.data.trim() != "{}") {
+              if (traceQuery) {
+                traces.push(JSON.parse(msg.data).spans)
+                  if (traces.length > maxTraces) traces.shift()
+                  
+                  worked = makeTree(traces)
+
+                  if(!worked) {
+                    traces.pop()
+                  }
+              } else {
                 spans.push(...JSON.parse(msg.data).spans)
                 while (spans.length > maxSpans) spans.shift()
                 
                 displaySpans(spans)
               }
+            }
           }
         }
     </script>
@@ -210,8 +151,8 @@
 
         rootSpan = {
           spanID : "root",
-          processName : "root",
-          operationName : "root",
+          process : { name: "root" },
+          name : "root",
           parentSpanID : "",
           duration: 0,
         }
@@ -231,7 +172,7 @@
 
         var root = d3.hierarchy(data)
              .sum(d => d.value)
-        root.each(d => d.name = d.data.data.processName + "-" + d.data.data.operationName)
+        root.each(d => d.name = d.data.data.process.name + "-" + d.data.data.name)
 
         if (flamegraph) {
           flamegraph.update(root)
@@ -247,12 +188,11 @@
                            .minFrameSize(5)
                            .sort(true)
                            .title("")
-                           .onClick(onClick)
                            .differential(false)
                            .selfValue(false)
 
         flamegraph.setColorMapper(function(d, originalColor) {
-          return d.highlight ? "#E600E6" : color(d.data.data.data.processName);
+          return d.highlight ? "#E600E6" : color(d.data.data.data.process.name);
         });
 
         flamegraph.label(d => d.data.name);
@@ -267,11 +207,6 @@
             .datum(root)
             .call(flamegraph);
 
-        document.getElementById("form").addEventListener("submit", function(event){
-          event.preventDefault();
-          search();
-        });
-
         return true
       }
 
@@ -283,7 +218,7 @@
         agg = new Map()
 
         node.children.forEach( c => {
-            name = c.data.processName + "-" + c.data.operationName
+            name = c.data.process.name + "-" + c.data.name
 
             if (agg.has(name)) {
               merge(agg.get(name), c)
@@ -308,22 +243,6 @@
 
         n1.value++
       }
-
-      function onClick(d) {
-        
-      }
-
-      function search() {
-        var term = document.getElementById("term").value;
-        flamegraph.search(term);
-      }
-      function clear() {
-        document.getElementById('term').value = '';
-        flamegraph.clear();
-      }
-      function resetZoom() {
-        flamegraph.resetZoom();
-      }
     </script>
     <script>
       function displaySpans(spans) {
@@ -335,8 +254,8 @@
           id = base64toHEX(s.traceID)
           
           row.append("td").append("a").text(id).html(`<a href="https://admin-ops-tools1.grafana.net/jaeger/trace/${id}">${id}</a>`)
-          row.append("td").text(s.processName)
-          row.append("td").text(s.operationName)
+          row.append("td").text(s.process.name)
+          row.append("td").text(s.name)
           row.append("td").text(new Date(s.startTime * 1000).toLocaleString())
           row.append("td").text(s.duration)
         })

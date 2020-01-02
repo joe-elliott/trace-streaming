@@ -10,6 +10,8 @@ var tokens = map[string]int{
 	".":        DOT,
 	"{":        OPEN_BRACE,
 	"}":        CLOSE_BRACE,
+	"[":        OPEN_BRACKET,
+	"]":        CLOSE_BRACKET,
 	"=":        EQ,
 	"!=":       NEQ,
 	"=~":       RE,
@@ -30,8 +32,7 @@ var tokens = map[string]int{
 	"process":  FIELD_PROCESS,
 	"parent":   FIELD_PARENT,
 	"parent*":  FIELD_DESCENDANT,
-	"span":     FIELD_SPAN,
-	"rootSpan": FIELD_ROOT_SPAN,
+	"isRoot":   FIELD_IS_ROOT,
 }
 
 type lexer struct {

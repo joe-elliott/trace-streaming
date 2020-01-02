@@ -5,10 +5,12 @@ package traceql
 %}
 
 %union{
-  Selector  []ValueMatcher
-  Matchers  []ValueMatcher
-  Matcher   ValueMatcher
-  Field     complexField
+  Selector  []matcher
+  Matchers  []matcher
+  Matcher   matcher
+  TempField field
+  LHSField  field
+  RHSField  field
   Operator  int
 
   str       string
@@ -18,89 +20,76 @@ package traceql
 
 %start expr
 
-%type <Selector>              spanSelector
-%type <Matchers>              spanMatchers
-%type <Matcher>               spanMatcher
-%type <Selector>              traceSelector
-%type <Matchers>              traceMatchers
-%type <Matcher>               traceMatcher
+%type <Selector>              selector
+%type <Matchers>              matchers
+%type <Matcher>               matcher
 
-%type <Field>                 traceField
-%type <Field>                 spanField
-%type <Field>                 processField
-%type <Field>                 statusField
+%type <LHSField>              rhsField
+%type <RHSField>              lhsField
+%type <TempField>             field
+%type <TempField>             processField
+%type <TempField>             statusField
 
 %type <Operator>              operator
 
 %token <str>      IDENTIFIER STRING
 %token <integer>  INTEGER
 %token <float>    FLOAT
-%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE EQ NEQ RE NRE GT GTE LT LTE
+%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS STREAM_TYPE_TRACES
-                  FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_SPAN FIELD_ROOT_SPAN
+                  FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_IS_ROOT
 
 %%
 
 expr:
-      STREAM_TYPE_SPANS  spanSelector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
-    | STREAM_TYPE_TRACES traceSelector     { yylex.(*lexer).expr = newExpr(STREAM_TYPE_TRACES, $2) }
+      STREAM_TYPE_SPANS  selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
+    | STREAM_TYPE_TRACES selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_TRACES, $2) }
     ;
 
-spanSelector:
-      OPEN_BRACE CLOSE_BRACE               { }
-    | OPEN_BRACE spanMatchers CLOSE_BRACE  { $$ = $2 }
+selector:
+      OPEN_BRACE CLOSE_BRACE           { }
+    | OPEN_BRACE matchers CLOSE_BRACE  { $$ = $2 }
     ;
 
-spanMatchers:
-      spanMatcher                          { $$ = []ValueMatcher{ $1 } }
-    | spanMatchers COMMA spanMatcher       { $$ = append($1, $3)       }
+matchers:
+      matcher                          { $$ = []matcher{ $1 } }
+    | matchers COMMA matcher           { $$ = append($1, $3)       }
     ;
 
-spanMatcher:
-      spanField operator STRING            { $$ = newStringMatcher($3, $2, $1) }
-    | spanField operator INTEGER           { $$ = newIntMatcher($3, $2,  $1) }
-    | spanField operator FLOAT             { $$ = newFloatMatcher($3, $2, $1) }
+matcher:
+      lhsField operator rhsField          { $$ = newMatcher($1, $2, $3)  }
     ;
 
-traceSelector:
-      OPEN_BRACE CLOSE_BRACE               { }
-    | OPEN_BRACE traceMatchers CLOSE_BRACE { $$ = $2 }
+lhsField:
+      field                               { $$ = $1 }
     ;
 
-traceMatchers:
-      traceMatcher                         { $$ = []ValueMatcher{ $1 } }
-    | traceMatchers COMMA traceMatcher     { $$ = append($1, $3)       }
+rhsField:
+      field                               { $$ = $1 }
     ;
 
-traceMatcher:
-      traceField operator STRING           { $$ = newStringMatcher($3, $2, $1) }
-    | traceField operator INTEGER          { $$ = newIntMatcher($3, $2,  $1) }
-    | traceField operator FLOAT            { $$ = newFloatMatcher($3, $2, $1) }
-    ;
-
-traceField:
-      FIELD_SPAN DOT spanField             { $$ = wrapComplexField(FIELD_SPAN, $3)      }
-    | FIELD_ROOT_SPAN DOT spanField        { $$ = wrapComplexField(FIELD_ROOT_SPAN, $3) }
-    ;
-
-spanField:
-      FIELD_DURATION                      { $$ = newComplexField(FIELD_DURATION, "")    }
-    | FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")        }
-    | FIELD_DESCENDANT DOT spanField      { $$ = wrapComplexField(FIELD_DESCENDANT, $3) }  
-    | FIELD_PARENT DOT spanField          { $$ = wrapComplexField(FIELD_PARENT, $3)     }
-    | FIELD_PROCESS DOT processField      { $$ = wrapComplexField(FIELD_PROCESS, $3)    }
-    | FIELD_STATUS DOT statusField        { $$ = wrapComplexField(FIELD_STATUS, $3)     }
-    | FIELD_ATTS DOT IDENTIFIER           { $$ = newComplexField(FIELD_ATTS, $3)        }
-    | FIELD_EVENTS DOT IDENTIFIER         { $$ = newComplexField(FIELD_EVENTS, $3)      }
+field:
+      STRING                              { $$ = newStringField($1)                     }
+    | INTEGER                             { $$ = newIntField($1)                        }
+    | FLOAT                               { $$ = newFloatField($1)                      }
+    | FIELD_DURATION                      { $$ = newDynamicField(FIELD_DURATION, "")    }
+    | FIELD_IS_ROOT                       { $$ = newDynamicField(FIELD_IS_ROOT, "")     }
+    | FIELD_NAME                          { $$ = newDynamicField(FIELD_NAME, "")        }
+    | FIELD_DESCENDANT DOT field          { $$ = wrapRelationshipField(FIELD_DESCENDANT, $3) }  
+    | FIELD_PARENT DOT field              { $$ = wrapRelationshipField(FIELD_PARENT, $3)     }
+    | FIELD_PROCESS DOT processField      { $$ = wrapDynamicField(FIELD_PROCESS, $3)    }
+    | FIELD_STATUS DOT statusField        { $$ = wrapDynamicField(FIELD_STATUS, $3)     }
+    | FIELD_ATTS OPEN_BRACKET STRING CLOSE_BRACKET   { $$ = newDynamicField(FIELD_ATTS, $3)        }
+    | FIELD_EVENTS OPEN_BRACKET STRING CLOSE_BRACKET { $$ = newDynamicField(FIELD_EVENTS, $3)      }
     ;
 
 processField:
-      FIELD_NAME                          { $$ = newComplexField(FIELD_NAME, "")       }
+      FIELD_NAME                          { $$ = newDynamicField(FIELD_NAME, "")  }
     ;
 
 statusField:
-      FIELD_CODE                          { $$ = newComplexField(FIELD_CODE, "")  }
-    | FIELD_MSG                           { $$ = newComplexField(FIELD_MSG, "")   }
+      FIELD_CODE                          { $$ = newDynamicField(FIELD_CODE, "")  }
+    | FIELD_MSG                           { $$ = newDynamicField(FIELD_MSG, "")   }
     ;
 
 operator:

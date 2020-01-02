@@ -8,71 +8,117 @@ import (
 
 func TestParse(t *testing.T) {
 	for _, tc := range []struct {
-		in         string
-		stream     int
-		fieldIds   [][]int
-		fieldNames []string
-		err        error
+		in            string
+		stream        int
+		lhsFieldIds   []fieldID
+		lhsFieldNames []string
+		rhsFieldIds   []fieldID
+		rhsFieldNames []string
+		err           error
 	}{
 		{
-			in:         `spans{}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{},
-			fieldNames: []string{},
+			in:            `spans{}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{},
+			lhsFieldNames: []string{},
+			rhsFieldIds:   []fieldID{},
+			rhsFieldNames: []string{},
 		},
 		{
-			in:         `spans{duration=3, name="asdf"}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
-			fieldNames: []string{"", ""},
+			in:            `spans{atts["test"]=3, atts["http.url"]="asdf"}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_ATTS}, []int{FIELD_ATTS}},
+			lhsFieldNames: []string{"test", "http.url"},
+			rhsFieldIds:   []fieldID{[]int{}, []int{}},
+			rhsFieldNames: []string{"", ""},
 		},
 		{
-			in:         `spans{duration=3, atts.test="blerg"}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_ATTS}},
-			fieldNames: []string{"", "test"},
+			in:            `spans{duration=3, name="asdf"}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_NAME}},
+			lhsFieldNames: []string{"", ""},
+			rhsFieldIds:   []fieldID{[]int{}, []int{}},
+			rhsFieldNames: []string{"", ""},
 		},
 		{
-			in:         `spans{duration=3, atts.test="blerg", status.message=~".*blerg", status.code=400}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DURATION}, []int{FIELD_ATTS}, []int{FIELD_STATUS, FIELD_MSG}, []int{FIELD_STATUS, FIELD_CODE}},
-			fieldNames: []string{"", "test", "", ""},
+			in:            `spans{duration=3, atts["test"]="blerg"}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}},
+			lhsFieldNames: []string{"", "test"},
+			rhsFieldIds:   []fieldID{[]int{}, []int{}},
+			rhsFieldNames: []string{"", ""},
 		},
 		{
-			in:         `spans{parent*.duration=3}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_DESCENDANT, FIELD_DURATION}},
-			fieldNames: []string{""},
+			in:            `spans{duration=3, atts["test"]="blerg", status.message=~".*blerg", status.code=400}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_ATTS}, []int{FIELD_STATUS, FIELD_MSG}, []int{FIELD_STATUS, FIELD_CODE}},
+			lhsFieldNames: []string{"", "test", "", ""},
+			rhsFieldIds:   []fieldID{[]int{}, []int{}, []int{}, []int{}},
+			rhsFieldNames: []string{"", "", "", ""},
 		},
 		{
-			in:         `spans{parent.parent.duration=3}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_DURATION}},
-			fieldNames: []string{""},
+			in:            `spans{duration=atts["test"], status.message=~".*blerg", 400=400, 300=status.code}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}, []int{FIELD_STATUS, FIELD_MSG}, []int{}, []int{}},
+			lhsFieldNames: []string{"", "", "", ""},
+			rhsFieldIds:   []fieldID{[]int{FIELD_ATTS}, []int{}, []int{}, []int{FIELD_STATUS, FIELD_CODE}},
+			rhsFieldNames: []string{"test", "", "", ""},
 		},
 		{
-			in:         `spans{parent.parent.atts.test=3}`,
-			stream:     STREAM_TYPE_SPANS,
-			fieldIds:   [][]int{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
-			fieldNames: []string{"test"},
+			in:            `spans{parent*.duration=3}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DESCENDANT, FIELD_DURATION}},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
 		},
 		{
-			in:         `traces{}`,
-			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{},
-			fieldNames: []string{},
+			in:            `spans{parent.parent.duration=3}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_DURATION}},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
 		},
 		{
-			in:         `traces{span.duration = 3}`,
-			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{[]int{FIELD_SPAN, FIELD_DURATION}},
-			fieldNames: []string{""},
+			in:            `spans{parent.parent.atts["test"]=3}`,
+			stream:        STREAM_TYPE_SPANS,
+			lhsFieldIds:   []fieldID{[]int{FIELD_PARENT, FIELD_PARENT, FIELD_ATTS}},
+			lhsFieldNames: []string{"test"},
+			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
 		},
 		{
-			in:         `traces{rootSpan.parent.duration = 3}`,
-			stream:     STREAM_TYPE_TRACES,
-			fieldIds:   [][]int{[]int{FIELD_ROOT_SPAN, FIELD_PARENT, FIELD_DURATION}},
-			fieldNames: []string{""},
+			in:            `traces{}`,
+			stream:        STREAM_TYPE_TRACES,
+			lhsFieldIds:   []fieldID{},
+			lhsFieldNames: []string{},
+			rhsFieldIds:   []fieldID{},
+			rhsFieldNames: []string{},
+		},
+		{
+			in:            `traces{duration = 3}`,
+			stream:        STREAM_TYPE_TRACES,
+			lhsFieldIds:   []fieldID{[]int{FIELD_DURATION}},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
+		},
+		{
+			in:            `traces{isRoot = 1}`,
+			stream:        STREAM_TYPE_TRACES,
+			lhsFieldIds:   []fieldID{[]int{FIELD_IS_ROOT}},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{}},
+			rhsFieldNames: []string{""},
+		},
+		{
+			in:            `traces{1 = isRoot}`,
+			stream:        STREAM_TYPE_TRACES,
+			lhsFieldIds:   []fieldID{},
+			lhsFieldNames: []string{""},
+			rhsFieldIds:   []fieldID{[]int{FIELD_IS_ROOT}},
+			rhsFieldNames: []string{""},
 		},
 		{
 			in: `spans{foo="bar"}`,
@@ -116,25 +162,20 @@ func TestParse(t *testing.T) {
 			assert.Equal(t, tc.stream, expr.stream)
 
 			for i, o := range expr.matchers {
-				var fieldID []int
-				var fieldName string
+				fRHS := o.rhs
+				fLHS := o.lhs
 
-				switch v := o.(type) {
-				case intMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				case floatMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				case stringMatcher:
-					fieldID = v.field.fieldID
-					fieldName = v.field.fieldName
-				default:
-					assert.Failf(t, "", "Unkown type %T", v)
+				dLHS, ok := fLHS.(dynamicField)
+				if ok {
+					assert.Equalf(t, tc.lhsFieldIds[i], append(dLHS.relID, dLHS.id...), "lhs actual %v", o)
+					assert.Equalf(t, tc.lhsFieldNames[i], dLHS.name, "lhs actual %v", o)
 				}
 
-				assert.Equalf(t, tc.fieldIds[i], fieldID, "actual %v", o)
-				assert.Equalf(t, tc.fieldNames[i], fieldName, "actual %v", o)
+				dRHS, ok := fRHS.(dynamicField)
+				if ok {
+					assert.Equalf(t, tc.rhsFieldIds[i], append(dRHS.relID, dRHS.id...), "rhs actual %v", o)
+					assert.Equalf(t, tc.rhsFieldNames[i], dRHS.name, "rhs actual %v", o)
+				}
 			}
 		})
 	}
