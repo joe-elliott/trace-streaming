@@ -2,11 +2,36 @@
 
 A fledgeling project built on top of the [otel-collector](https://github.com/open-telemetry/opentelemetry-collector) to provide stream processing for traces.
 
+## Awful Demo Site!
+
+This demo site is awful, but it works just enough to test the functionality and get screenshots.
+
+### Span Queries
+
+![span queries](./span-querying.png)
+
+### Trace Queries
+
+Trace queries are currently visualized as a very poorly rendered flamegraph.
+
+![trace queries](./trace-querying.png)
+
 ## Queries
 
 The trace streaming project supports a query language roughly inspired by [prometheus](https://prometheus.io/docs/prometheus/latest/querying/basics/).  The basic format is:
 
 `<type>{<condition>, <condition>, ...}`
+
+### Examples
+
+`spans{duration > 100}`  
+Retrieves spans whose duration exceeds 100 ms.
+
+`spans{process.name != parent.process.name}`  
+Retrieves spans that cross process boundaries.
+
+`traces{parent*.process.name = 'cortex-ingester', process.name = 'cortex-querier'}`  
+Retrieves traces that follow a specific path through your services.
 
 ### Types
 
@@ -56,39 +81,14 @@ isRoot
 **atts**
 Attributes or tags are a key/value pairs stored along with the trace.
 
-**parent**
+**parent**  
 Parent refers to the parent of the currently evaluating span.
 
-**parent\***
+**parent\***  
 Parent* refers to all parents of the currently evaluated span.
 
-**isRoot**
+**isRoot**  
 isRoot is an integer with the value 1 if this is a root span and 0 if not.
-
-### Examples
-
-`spans{duration > 100}`
-Retrieves spans whose duration exceeds 100 ms.
-
-`spans{process.name != parent.process.name}`
-Retrieves spans that cross process boundaries.
-
-`traces{parent*.process.name = 'cortex-ingester', process.name = 'cortex-querier'}`
-Retrieves traces that follow a specific path through your services.
-
-## Awful Demo Site!
-
-This demo site is awful, but it works just enough to test the functionality and get screenshots.
-
-### Span Queries
-
-![span queries](./span-querying.png)
-
-### Trace Queries
-
-Trace queries are currently visualized as a very poorly rendered flamegraph.
-
-![trace queries](./trace-querying.png)
 
 ## todo
 
