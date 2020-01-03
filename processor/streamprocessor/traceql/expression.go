@@ -25,6 +25,11 @@ func newExpr(stream int, m []matcher) *Expr {
 	}
 }
 
+func newMetricsExpr(agg int, expr *Expr, f field) *Expr {
+	// todo: something
+	return expr
+}
+
 func (e *Expr) MatchesSpan(s *streampb.Span) bool {
 	for _, m := range e.matchers {
 		if !m.compare(s, s) {
