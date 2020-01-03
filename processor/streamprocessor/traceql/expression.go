@@ -88,7 +88,15 @@ func (e *Expr) Aggregate(s *streampb.Span, reset bool) []float64 {
 		return []float64{0.0}
 	}
 
-	return e.aggFunc(s, reset)
+	if reset {
+		return e.aggFunc(nil, true)
+	}
+
+	if s != nil && e.MatchesSpan(s) {
+		return e.aggFunc(s, false)
+	}
+
+	return nil
 }
 
 func (e *Expr) QueryType() QueryType {

@@ -136,7 +136,7 @@ var trace = []*streampb.Span{
 	// 1
 	&streampb.Span{
 		Name:     "childSpan",
-		Duration: 100,
+		Duration: 101,
 		Events: map[string]*streampb.KeyValuePair{
 			"testString": &streampb.KeyValuePair{
 				Type:        streampb.KeyValuePair_STRING,
@@ -162,7 +162,7 @@ var trace = []*streampb.Span{
 	// 2
 	&streampb.Span{
 		Name:     "child2",
-		Duration: 100,
+		Duration: 110,
 		Events: map[string]*streampb.KeyValuePair{
 			"testString": &streampb.KeyValuePair{
 				Type:        streampb.KeyValuePair_STRING,
@@ -188,7 +188,7 @@ var trace = []*streampb.Span{
 	// 3
 	&streampb.Span{
 		Name:         "noparent",
-		Duration:     100,
+		Duration:     99,
 		Events:       map[string]*streampb.KeyValuePair{},
 		Attributes:   map[string]*streampb.KeyValuePair{},
 		ParentIndex:  1000,
@@ -275,7 +275,7 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{0},
 		},
 		{
-			in:           `spans{atts["testInt"] = 1}`,
+			in:           `count(spans{atts["testInt"] = 1})`,
 			matchesSpans: []int{},
 		},
 		{
@@ -287,7 +287,7 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{0, 1, 2},
 		},
 		{
-			in:           `spans{events["testFloat"] = 3.14}`,
+			in:           `avg(spans{events["testFloat"] = 3.14}.duration)`,
 			matchesSpans: []int{0},
 		},
 		{
@@ -303,7 +303,7 @@ func TestMatchesSpan(t *testing.T) {
 			matchesSpans: []int{},
 		},
 		{
-			in:           `spans{status.code != 12}`,
+			in:           `max(spans{status.code != 12}.status.code)`,
 			matchesSpans: []int{3, 4},
 		},
 		{
@@ -419,4 +419,62 @@ func contains(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+func TestMetrics(t *testing.T) {
+	for _, tc := range []struct {
+		in       string
+		expected []float64
+	}{
+		{
+			in:       `count(spans{})`,
+			expected: []float64{5},
+		},
+		{
+			in:       `count(spans{duration > 5})`,
+			expected: []float64{4},
+		},
+		{
+			in:       `sum(spans{duration > 5}.duration)`,
+			expected: []float64{410},
+		},
+		{
+			in:       `max(spans{duration > 5}.duration)`,
+			expected: []float64{110},
+		},
+		{
+			in:       `min(spans{duration > 5}.duration)`,
+			expected: []float64{99},
+		},
+		{
+			in:       `avg(spans{duration > 5}.duration)`,
+			expected: []float64{102.5},
+		},
+		{
+			in:       `histogram(spans{duration > 5}.duration, 95.0, 5.0, 3.0)`,
+			expected: []float64{0, 2, 1, 0, 0, 1},
+		},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			expr, err := ParseExpr(tc.in)
+
+			assert.Nil(t, err)
+			if expr == nil {
+				assert.FailNow(t, "expr is unexpectedly nil.")
+			}
+
+			for _, s := range trace {
+				expr.Aggregate(s, false)
+			}
+
+			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
+
+			// do it again to confirm reset work
+			for _, s := range trace {
+				expr.Aggregate(s, false)
+			}
+
+			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
+		})
+	}
 }

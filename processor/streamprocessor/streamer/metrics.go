@@ -45,7 +45,9 @@ func (s *Metrics) Do() error {
 	}()
 
 	for trace := range s.traces {
-		s.aggregateSpans(trace)
+		for _, span := range trace {
+			s.query.Aggregate(span, false)
+		}
 	}
 
 	return nil
@@ -61,12 +63,4 @@ func (s *Metrics) ProcessBatch(trace []*streampb.Span) {
 
 func (s *Metrics) Shutdown() {
 	close(s.traces)
-}
-
-func (s *Metrics) aggregateSpans(spans []*streampb.Span) {
-	for _, span := range spans {
-		if s.query.MatchesSpan(span) {
-			s.query.Aggregate(span, false)
-		}
-	}
 }
