@@ -7,54 +7,54 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRequiresTraceBatching(t *testing.T) {
+func TestQueryType(t *testing.T) {
 	for _, tc := range []struct {
 		in       string
-		expected bool
+		expected QueryType
 	}{
 		{
 			in:       `spans{}`,
-			expected: false,
+			expected: QueryTypeSpans,
 		},
 		{
 			in:       `spans{duration=3, name="asdf"}`,
-			expected: false,
+			expected: QueryTypeSpans,
 		},
 		{
 			in:       `spans{duration=3, atts["test"]="blerg"}`,
-			expected: false,
+			expected: QueryTypeSpans,
 		},
 		{
 			in:       `spans{duration=3, atts["test"]="blerg", status.message=~".*blerg", status.code=400}`,
-			expected: false,
+			expected: QueryTypeSpans,
 		},
 		{
 			in:       `spans{parent*.duration=3}`,
-			expected: true,
+			expected: QueryTypeBatchedSpans,
 		},
 		{
 			in:       `spans{parent.parent.duration=3}`,
-			expected: true,
+			expected: QueryTypeBatchedSpans,
 		},
 		{
 			in:       `spans{parent.atts["test"]=3}`,
-			expected: true,
+			expected: QueryTypeBatchedSpans,
 		},
 		{
 			in:       `spans{isRoot=3}`,
-			expected: false,
+			expected: QueryTypeSpans,
 		},
 		{
 			in:       `traces{}`,
-			expected: true,
+			expected: QueryTypeTraces,
 		},
 		{
 			in:       `traces{duration = 3}`,
-			expected: true,
+			expected: QueryTypeTraces,
 		},
 		{
 			in:       `traces{parent.duration = 3, isRoot = 1}`,
-			expected: true,
+			expected: QueryTypeTraces,
 		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestRequiresTraceBatching(t *testing.T) {
 				assert.FailNow(t, "expr is unexpectedly nil.")
 			}
 
-			assert.Equal(t, tc.expected, expr.RequiresTraceBatching())
+			assert.Equal(t, tc.expected, expr.QueryType())
 		})
 	}
 }
@@ -323,7 +323,8 @@ func TestMatchesSpan(t *testing.T) {
 				assert.FailNow(t, "expr is unexpectedly nil.")
 			}
 
-			traceBatching := expr.RequiresTraceBatching()
+			queryType := expr.QueryType()
+			traceBatching := queryType == QueryTypeBatchedSpans || queryType == QueryTypeTraces
 
 			for i, span := range trace {
 				if traceBatching {

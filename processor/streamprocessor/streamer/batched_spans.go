@@ -6,16 +6,16 @@ import (
 	"go.uber.org/ratelimit"
 )
 
-type Traces struct {
+type BatchedSpans struct {
 	query   traceql.Query
 	stream  ClientStream
 	traces  chan []*streampb.Span
 	limiter ratelimit.Limiter
 }
 
-func NewTraces(q traceql.Query, rate int, stream ClientStream) *Traces {
+func NewBatchedSpans(q traceql.Query, rate int, stream ClientStream) *BatchedSpans {
 
-	return &Traces{
+	return &BatchedSpans{
 		query:   q,
 		stream:  stream,
 		traces:  make(chan []*streampb.Span),
@@ -23,7 +23,7 @@ func NewTraces(q traceql.Query, rate int, stream ClientStream) *Traces {
 	}
 }
 
-func (s *Traces) Do() error {
+func (s *BatchedSpans) Do() error {
 	for trace := range s.traces {
 		trace = s.filterSpan(trace)
 
@@ -42,7 +42,7 @@ func (s *Traces) Do() error {
 	return nil
 }
 
-func (s *Traces) ProcessBatch(trace []*streampb.Span) {
+func (s *BatchedSpans) ProcessBatch(trace []*streampb.Span) {
 	select {
 	case s.traces <- trace:
 	default:
@@ -50,14 +50,18 @@ func (s *Traces) ProcessBatch(trace []*streampb.Span) {
 	}
 }
 
-func (s *Traces) Shutdown() {
+func (s *BatchedSpans) Shutdown() {
 	close(s.traces)
 }
 
-func (s *Traces) filterSpan(trace []*streampb.Span) []*streampb.Span {
-	if s.query.MatchesTrace(trace) {
-		return trace
+func (s *BatchedSpans) filterSpan(trace []*streampb.Span) []*streampb.Span {
+	filtered := make([]*streampb.Span, 0)
+
+	for _, span := range trace {
+		if s.query.MatchesSpanBatched(span, trace) {
+			filtered = append(filtered, span)
+		}
 	}
 
-	return nil
+	return filtered
 }

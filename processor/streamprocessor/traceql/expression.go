@@ -2,13 +2,21 @@ package traceql
 
 import "github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 
+type QueryType int
+
+const (
+	QueryTypeSpans QueryType = iota
+	QueryTypeBatchedSpans
+	QueryTypeTraces
+	QueryTypeMetrics
+)
+
 type Query interface {
 	MatchesSpan(*streampb.Span) bool
 	MatchesSpanBatched(*streampb.Span, []*streampb.Span) bool
 	MatchesTrace([]*streampb.Span) bool
 
-	RequiresTraceBatching() bool
-	WantsSpans() bool
+	QueryType() QueryType
 }
 
 //
@@ -71,30 +79,26 @@ func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 	return false
 }
 
-// RequiresTraceBatching indicates if this expression expects/requires an entire trace at a time to be evaluated or if it
-//  can be done a span at a time
-func (e *Expr) RequiresTraceBatching() bool {
+func (e *Expr) QueryType() QueryType {
 	if e.stream == STREAM_TYPE_TRACES {
-		return true
+		return QueryTypeTraces
 	}
+
+	// jpe metrics?
 
 	// if any matchers have descendant or parent fields then we require trace batching
 	for _, m := range e.matchers {
 		for _, field := range []field{m.lhs, m.rhs} {
 			for _, f := range field.getRelationshipID() {
 				if f == FIELD_DESCENDANT || f == FIELD_PARENT {
-					return true
+					return QueryTypeBatchedSpans
 				}
 			}
 
 		}
 	}
 
-	return false
-}
-
-func (e *Expr) WantsSpans() bool {
-	return e.stream == STREAM_TYPE_SPANS
+	return QueryTypeSpans
 }
 
 func matchesTraceField(m matcher, s *streampb.Span, t []*streampb.Span) bool {

@@ -76,10 +76,17 @@ func (s *websocketServer) stream(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if q.RequiresTraceBatching() {
+	switch q.QueryType() {
+	case traceql.QueryTypeBatchedSpans:
+		tailer := streamer.NewBatchedSpans(q, int(req.RequestedRate), socket)
+		s.s.AddTraceStreamer(tailer)
+	case traceql.QueryTypeTraces:
 		tailer := streamer.NewTraces(q, int(req.RequestedRate), socket)
 		s.s.AddTraceStreamer(tailer)
-	} else {
+	case traceql.QueryTypeMetrics:
+		tailer := streamer.NewMetrics(q, int(req.RequestedRate), socket)
+		s.s.AddSpanStreamer(tailer)
+	case traceql.QueryTypeSpans:
 		tailer := streamer.NewSpans(q, int(req.RequestedRate), socket)
 		s.s.AddSpanStreamer(tailer)
 	}
