@@ -14,6 +14,9 @@ package traceql
   LHSField  field
   RHSField  field
 
+  AggregateArgs []float64
+  AggregateArg  float64
+
   Operator  int
   AggregateFunc int
 
@@ -26,6 +29,8 @@ package traceql
 
 %type <TempExpr>              spanExpr
 %type <TempExpr>              metricsExpr
+
+%type <AggregateArgs>         aggregateArgs
 
 %type <Selector>              selector
 %type <Matchers>              matchers
@@ -43,7 +48,8 @@ package traceql
 %token <str>      IDENTIFIER STRING
 %token <integer>  INTEGER
 %token <float>    FLOAT
-%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET OPEN_PARENS CLOSE_PARENS EQ NEQ RE NRE GT GTE LT LTE
+%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET OPEN_PARENS CLOSE_PARENS
+                  EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS STREAM_TYPE_TRACES
                   AGG_COUNT AGG_MAX AGG_MIN AGG_SUM AGG_AVG AGG_HIST
                   FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_IS_ROOT
@@ -57,8 +63,14 @@ expr:
     ;
 
 metricsExpr:
-      AGG_COUNT OPEN_PARENS spanExpr CLOSE_PARENS                { yylex.(*lexer).expr = newMetricsExpr(AGG_COUNT, $3, nil) }
-    | aggregateFunc OPEN_PARENS spanExpr DOT field CLOSE_PARENS  { yylex.(*lexer).expr = newMetricsExpr($1, $3, $5)         }
+      AGG_COUNT OPEN_PARENS spanExpr CLOSE_PARENS                              { yylex.(*lexer).expr = newMetricsExpr(AGG_COUNT, $3, nil, nil) }
+    | AGG_HIST OPEN_PARENS spanExpr DOT field COMMA aggregateArgs CLOSE_PARENS { yylex.(*lexer).expr = newMetricsExpr(AGG_HIST, $3, $5, $7)    }
+    | aggregateFunc OPEN_PARENS spanExpr DOT field CLOSE_PARENS                { yylex.(*lexer).expr = newMetricsExpr($1, $3, $5, nil)         }
+    ;
+
+aggregateArgs:
+      FLOAT                          { $$ = []float64{ $1 } }
+    | aggregateArgs COMMA FLOAT      { $$ = append($1, $3)  }
     ;
 
 aggregateFunc:
@@ -66,7 +78,6 @@ aggregateFunc:
     | AGG_MIN                         { $$ = AGG_MIN  }
     | AGG_SUM                         { $$ = AGG_SUM  }
     | AGG_AVG                         { $$ = AGG_AVG  }
-    | AGG_HIST                        { $$ = AGG_HIST }
     ;
 
 spanExpr:

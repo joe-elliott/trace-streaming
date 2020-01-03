@@ -15,6 +15,7 @@ type Query interface {
 	MatchesSpan(*streampb.Span) bool
 	MatchesSpanBatched(*streampb.Span, []*streampb.Span) bool
 	MatchesTrace([]*streampb.Span) bool
+	Aggregate(s *streampb.Span, reset bool) []float64
 
 	QueryType() QueryType
 }
@@ -23,6 +24,8 @@ type Query interface {
 type Expr struct {
 	stream   int
 	matchers []matcher
+
+	aggFunc aggregationFunc
 }
 
 func newExpr(stream int, m []matcher) *Expr {
@@ -33,8 +36,9 @@ func newExpr(stream int, m []matcher) *Expr {
 	}
 }
 
-func newMetricsExpr(agg int, expr *Expr, f field) *Expr {
-	// todo: something
+func newMetricsExpr(agg int, expr *Expr, f field, args []float64) *Expr {
+	expr.aggFunc = generateAggregationFunc(agg, f, args)
+
 	return expr
 }
 
@@ -79,12 +83,22 @@ func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 	return false
 }
 
+func (e *Expr) Aggregate(s *streampb.Span, reset bool) []float64 {
+	if e.aggFunc == nil {
+		return []float64{0.0}
+	}
+
+	return e.aggFunc(s, reset)
+}
+
 func (e *Expr) QueryType() QueryType {
 	if e.stream == STREAM_TYPE_TRACES {
 		return QueryTypeTraces
 	}
 
-	// jpe metrics?
+	if e.aggFunc != nil {
+		return QueryTypeMetrics
+	}
 
 	// if any matchers have descendant or parent fields then we require trace batching
 	for _, m := range e.matchers {

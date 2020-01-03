@@ -33,7 +33,7 @@ func (n intField) getIntValue(span *streampb.Span) int {
 }
 
 func (n intField) getFloatValue(span *streampb.Span) float64 {
-	return 0.0
+	return float64(n)
 }
 
 func (n intField) getStringValue(span *streampb.Span) string {
@@ -195,15 +195,24 @@ func (f dynamicField) getFloatValue(s *streampb.Span) float64 {
 	rootID := f.id[0]
 
 	switch rootID {
+	case FIELD_DURATION:
+		return float64(s.Duration)
+
 	case FIELD_ATTS:
 		if a, ok := s.Attributes[f.name]; ok {
-			if a.Type == streampb.KeyValuePair_DOUBLE {
+			switch a.Type {
+			case streampb.KeyValuePair_INT:
+				return float64(a.IntValue)
+			case streampb.KeyValuePair_DOUBLE:
 				return a.DoubleValue
 			}
 		}
 	case FIELD_EVENTS:
 		if e, ok := s.Events[f.name]; ok {
-			if e.Type == streampb.KeyValuePair_DOUBLE {
+			switch e.Type {
+			case streampb.KeyValuePair_INT:
+				return float64(e.IntValue)
+			case streampb.KeyValuePair_DOUBLE:
 				return e.DoubleValue
 			}
 		}
