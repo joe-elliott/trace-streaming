@@ -67,9 +67,10 @@ func TestFields(t *testing.T) {
 		expectedRelID  fieldID
 	}{
 		{
-			in:           intField(3),
-			expectedType: fieldTypeInt,
-			expectedInt:  3,
+			in:            intField(3),
+			expectedType:  fieldTypeInt,
+			expectedInt:   3,
+			expectedFloat: 3,
 		},
 		{
 			in:            floatField(3),
@@ -87,9 +88,10 @@ func TestFields(t *testing.T) {
 			expectedString: "rootSpan",
 		},
 		{
-			in:           newDynamicField(FIELD_DURATION, ""),
-			expectedType: fieldTypeInt,
-			expectedInt:  100,
+			in:            newDynamicField(FIELD_DURATION, ""),
+			expectedType:  fieldTypeInt,
+			expectedInt:   100,
+			expectedFloat: 100,
 		},
 		{
 			in:             newDynamicField(FIELD_EVENTS, "testString"),

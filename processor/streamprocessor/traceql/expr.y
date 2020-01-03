@@ -5,13 +5,20 @@ package traceql
 %}
 
 %union{
+  TempExpr  *Expr
+
   Selector  []matcher
   Matchers  []matcher
   Matcher   matcher
   TempField field
   LHSField  field
   RHSField  field
+
+  AggregateArgs []float64
+  AggregateArg  float64
+
   Operator  int
+  AggregateFunc int
 
   str       string
   integer   int
@@ -19,6 +26,11 @@ package traceql
 }
 
 %start expr
+
+%type <TempExpr>              spanExpr
+%type <TempExpr>              metricsExpr
+
+%type <AggregateArgs>         aggregateArgs
 
 %type <Selector>              selector
 %type <Matchers>              matchers
@@ -31,19 +43,45 @@ package traceql
 %type <TempField>             statusField
 
 %type <Operator>              operator
+%type <AggregateFunc>         aggregateFunc
 
 %token <str>      IDENTIFIER STRING
 %token <integer>  INTEGER
 %token <float>    FLOAT
-%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET EQ NEQ RE NRE GT GTE LT LTE
+%token <val>      COMMA DOT OPEN_BRACE CLOSE_BRACE OPEN_BRACKET CLOSE_BRACKET OPEN_PARENS CLOSE_PARENS
+                  EQ NEQ RE NRE GT GTE LT LTE
                   STREAM_TYPE_SPANS STREAM_TYPE_TRACES
+                  AGG_COUNT AGG_MAX AGG_MIN AGG_SUM AGG_AVG AGG_HIST
                   FIELD_DURATION FIELD_NAME FIELD_ATTS FIELD_EVENTS FIELD_STATUS FIELD_CODE FIELD_MSG FIELD_PROCESS FIELD_PARENT FIELD_DESCENDANT FIELD_IS_ROOT
 
 %%
 
 expr:
-      STREAM_TYPE_SPANS  selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
+      spanExpr                         { yylex.(*lexer).expr = $1 }
+    | metricsExpr                      { yylex.(*lexer).expr = $1 }
     | STREAM_TYPE_TRACES selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_TRACES, $2) }
+    ;
+
+metricsExpr:
+      AGG_COUNT OPEN_PARENS spanExpr CLOSE_PARENS                              { $$ = newMetricsExpr(AGG_COUNT, $3, nil, nil) }
+    | AGG_HIST OPEN_PARENS spanExpr DOT field COMMA aggregateArgs CLOSE_PARENS { $$ = newMetricsExpr(AGG_HIST, $3, $5, $7)    }
+    | aggregateFunc OPEN_PARENS spanExpr DOT field CLOSE_PARENS                { $$ = newMetricsExpr($1, $3, $5, nil)         }
+    ;
+
+spanExpr:
+      STREAM_TYPE_SPANS  selector      { $$ = newExpr(STREAM_TYPE_SPANS, $2) }
+    ;
+
+aggregateArgs:
+      FLOAT                          { $$ = []float64{ $1 } }
+    | aggregateArgs COMMA FLOAT      { $$ = append($1, $3)  }
+    ;
+
+aggregateFunc:
+      AGG_MAX                         { $$ = AGG_MAX  }
+    | AGG_MIN                         { $$ = AGG_MIN  }
+    | AGG_SUM                         { $$ = AGG_SUM  }
+    | AGG_AVG                         { $$ = AGG_AVG  }
     ;
 
 selector:

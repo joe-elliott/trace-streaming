@@ -9,6 +9,13 @@
     <link rel="stylesheet" type="text/css" href="flamegraph.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
+      canvas{
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+    </style>
+    <style>
         /* Space out content a bit */
         body {
           padding-top: 20px;
@@ -46,6 +53,9 @@
             </span>
           </div>
         </div>
+        <div id="graph" style="display: none; width: 100%">
+          <canvas id="canvas"></canvas>
+        </div>
         <div id="chart" style="display: none"></div>
         <div id="table" style="display: none">
           <table class="table">
@@ -67,6 +77,7 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js></script>
     <script type="text/javascript" src="flamegraph.js"></script>
+    <script type="text/javascript" src="chart.min.js"></script>
     <script>       
        const maxTraces = 100
        let traces = []
@@ -75,7 +86,7 @@
         let spans = []
         let socket
 
-        traceQuery = false
+       let queryType
 
        function stopSocket() {
         d3.select("#stopSocket").style("display", "none");
@@ -90,14 +101,24 @@
           d3.select("#startSocket").style("display", "none");
 
           var query = document.getElementById("query").value;
-          traceQuery = query.startsWith("traces")
 
-          if (traceQuery) {
+          rate = 10
+          if (query.startsWith("traces")) {
+            queryType = "traces"
             d3.select("#chart").style("display", "inline");
             d3.select("#table").style("display", "none");
-          } else {
+            d3.select("#graph").style("display", "none");
+          } else if (query.startsWith("spans")) {
+            queryType = "spans"
             d3.select("#table").style("display", "inline");
             d3.select("#chart").style("display", "none");
+            d3.select("#graph").style("display", "none");
+          } else {
+            rate = 3
+            queryType = "metrics"
+            d3.select("#table").style("display", "none");
+            d3.select("#chart").style("display", "none");
+            d3.select("#graph").style("display", "block");
           }
 
           spans = []         
@@ -105,7 +126,13 @@
 
           if(flamegraph) flamegraph.clear();
 
-          uri = "ws://127.0.0.1:31235/v1/stream?rate=10&q=" + encodeURI(query)
+          // reset linegraph
+          if(linegraph) {
+            linegraph.destroy();
+            linegraph = null;
+          }
+
+          uri = "ws://127.0.0.1:31235/v1/stream?rate=" + rate + "&q=" + encodeURI(query)
 
           socket = new WebSocket(uri);
           socket.onopen = () => {
@@ -124,7 +151,7 @@
             //console.log("Message: ", msg)
 
             if (msg.data.trim() != "{}") {
-              if (traceQuery) {
+              if (queryType == "traces") {
                 traces.push(JSON.parse(msg.data).spans)
                   if (traces.length > maxTraces) traces.shift()
                   
@@ -133,11 +160,13 @@
                   if(!worked) {
                     traces.pop()
                   }
-              } else {
+              } else if (queryType == "spans") {
                 spans.push(...JSON.parse(msg.data).spans)
                 while (spans.length > maxSpans) spans.shift()
                 
                 displaySpans(spans)
+              } else if (queryType == "metrics") {
+                doLinegraph(JSON.parse(msg.data).metrics)
               }
             }
           }
@@ -242,6 +271,54 @@
         n1.children = all
 
         n1.value++
+      }
+    </script>
+    <script>
+      var linegraph
+      var graphCfg = {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [],
+            },
+            options: {
+              scales: {
+                xAxes: [{
+                  display: false
+                }]
+              },
+              legend: {
+                display: false,
+              },
+            }
+          }
+
+      function doLinegraph(data) {
+        if(!linegraph) {
+          graphCfg.data.labels = [];
+          graphCfg.data.datasets = [];
+          
+          var ctx = document.getElementById('canvas').getContext('2d')
+          linegraph = new Chart(ctx, graphCfg)
+        }
+
+        graphCfg.data.labels.push(data.t)
+
+        data.v.forEach( function(val, i) {
+          if (i < graphCfg.data.datasets.length) {
+            graphCfg.data.datasets[i].data.push(val)
+          } else {
+            graphCfg.data.datasets.push({
+              label: "series " + i,
+              data: [val],
+              fill: false,
+              backgroundColor: "0xaabbcc",
+              borderColor: "0xaabbcc",
+            })
+          }
+        })
+
+        linegraph.update()
       }
     </script>
     <script>

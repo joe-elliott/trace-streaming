@@ -2,19 +2,30 @@ package traceql
 
 import "github.com/joe-elliott/trace-streaming/processor/streamprocessor/streampb"
 
+type QueryType int
+
+const (
+	QueryTypeSpans QueryType = iota
+	QueryTypeBatchedSpans
+	QueryTypeTraces
+	QueryTypeMetrics
+)
+
 type Query interface {
 	MatchesSpan(*streampb.Span) bool
 	MatchesSpanBatched(*streampb.Span, []*streampb.Span) bool
 	MatchesTrace([]*streampb.Span) bool
+	Aggregate(s *streampb.Span, reset bool) []float64
 
-	RequiresTraceBatching() bool
-	WantsSpans() bool
+	QueryType() QueryType
 }
 
 //
 type Expr struct {
 	stream   int
 	matchers []matcher
+
+	aggFunc aggregationFunc
 }
 
 func newExpr(stream int, m []matcher) *Expr {
@@ -23,6 +34,12 @@ func newExpr(stream int, m []matcher) *Expr {
 		stream:   stream,
 		matchers: m,
 	}
+}
+
+func newMetricsExpr(agg int, expr *Expr, f field, args []float64) *Expr {
+	expr.aggFunc = generateAggregationFunc(agg, f, args)
+
+	return expr
 }
 
 func (e *Expr) MatchesSpan(s *streampb.Span) bool {
@@ -66,11 +83,29 @@ func (e *Expr) MatchesTrace(t []*streampb.Span) bool {
 	return false
 }
 
-// RequiresTraceBatching indicates if this expression expects/requires an entire trace at a time to be evaluated or if it
-//  can be done a span at a time
-func (e *Expr) RequiresTraceBatching() bool {
+func (e *Expr) Aggregate(s *streampb.Span, reset bool) []float64 {
+	if e.aggFunc == nil {
+		return []float64{0.0}
+	}
+
+	if reset {
+		return e.aggFunc(nil, true)
+	}
+
+	if s != nil && e.MatchesSpan(s) {
+		return e.aggFunc(s, false)
+	}
+
+	return nil
+}
+
+func (e *Expr) QueryType() QueryType {
 	if e.stream == STREAM_TYPE_TRACES {
-		return true
+		return QueryTypeTraces
+	}
+
+	if e.aggFunc != nil {
+		return QueryTypeMetrics
 	}
 
 	// if any matchers have descendant or parent fields then we require trace batching
@@ -78,18 +113,14 @@ func (e *Expr) RequiresTraceBatching() bool {
 		for _, field := range []field{m.lhs, m.rhs} {
 			for _, f := range field.getRelationshipID() {
 				if f == FIELD_DESCENDANT || f == FIELD_PARENT {
-					return true
+					return QueryTypeBatchedSpans
 				}
 			}
 
 		}
 	}
 
-	return false
-}
-
-func (e *Expr) WantsSpans() bool {
-	return e.stream == STREAM_TYPE_SPANS
+	return QueryTypeSpans
 }
 
 func matchesTraceField(m matcher, s *streampb.Span, t []*streampb.Span) bool {

@@ -16,6 +16,10 @@ Trace queries are currently visualized as a very poorly rendered flamegraph.
 
 ![trace queries](./trace-querying.png)
 
+### Metric Queries
+
+![metric queries](./metric-querying.png)
+
 ## Queries
 
 The trace streaming project supports a query language roughly inspired by [prometheus](https://prometheus.io/docs/prometheus/latest/querying/basics/).  The basic format is:
@@ -32,6 +36,12 @@ Retrieves spans that cross process boundaries.
 
 `traces{parent*.process.name = 'cortex-ingester', process.name = 'cortex-querier'}`  
 Retrieves traces that follow a specific path through your services.
+
+`avg(spans{name = 'memcache.GET'}.duration)`
+Retrieves average durations for any span with the name `memcache.GET`.
+
+`histogram(spans{name = 'memcache.GET'}.atts["blerg"]), 0.0, 10.0, 10.0)`
+Retrieves average durations for any span with the name `memcache.GET`.
 
 ### Types
 
@@ -89,6 +99,21 @@ Parent* refers to all parents of the currently evaluated span.
 
 **isRoot**  
 isRoot is an integer with the value 1 if this is a root span and 0 if not.
+
+### Metrics
+
+Metric functions can only be applied to queries of type span.  The value to perform the aggregation on is specified by using a `.<span field>` syntax.  Available functions:
+
+```
+avg(<span query>.<span field>)
+max(<span query>.<span field>)
+min(<span query>.<span field>)
+sum(<span query>.<span field>)
+count(<span query>)
+histogram(<span query>, <start value>, <num buckets>, <bucket width>)
+```
+
+Average, min, max, and sum are calculated from the last reported value.  Count and histogram are ascending counters starting from the initiation of the query.
 
 ## todo
 

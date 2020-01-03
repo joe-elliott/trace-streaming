@@ -35,6 +35,9 @@ func TestLex(t *testing.T) {
 		{` traces{ process.name <= 13 } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_PROCESS, DOT, FIELD_NAME, LTE, INTEGER, CLOSE_BRACE}},
 		{` traces{ isRoot = 1 } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_IS_ROOT, EQ, INTEGER, CLOSE_BRACE}},
 		{` traces{ parent*.duration =~ events.blerg } `, []int{STREAM_TYPE_TRACES, OPEN_BRACE, FIELD_DESCENDANT, DOT, FIELD_DURATION, RE, FIELD_EVENTS, DOT, IDENTIFIER, CLOSE_BRACE}},
+		{`count(spans{ parent*.duration =~ events.blerg })`, []int{AGG_COUNT, OPEN_PARENS, STREAM_TYPE_SPANS, OPEN_BRACE, FIELD_DESCENDANT, DOT, FIELD_DURATION, RE, FIELD_EVENTS, DOT, IDENTIFIER, CLOSE_BRACE, CLOSE_PARENS}},
+		{`max(spans{})`, []int{AGG_MAX, OPEN_PARENS, STREAM_TYPE_SPANS, OPEN_BRACE, CLOSE_BRACE, CLOSE_PARENS}},
+		{`avg(spans{})`, []int{AGG_AVG, OPEN_PARENS, STREAM_TYPE_SPANS, OPEN_BRACE, CLOSE_BRACE, CLOSE_PARENS}},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			actual := []int{}

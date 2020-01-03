@@ -131,7 +131,7 @@ func TestParse(t *testing.T) {
 		{
 			in: `blerg{foo="bar"}`,
 			err: ParseError{
-				msg:  "syntax error: unexpected IDENTIFIER, expecting STREAM_TYPE_SPANS or STREAM_TYPE_TRACES",
+				msg:  "syntax error: unexpected IDENTIFIER",
 				line: 1,
 				col:  1,
 			},

@@ -33,6 +33,7 @@ func (s *Traces) Do() error {
 
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
+			Type:    streampb.SpanResponse_TRACE,
 			Spans:   trace,
 		})
 
@@ -55,18 +56,6 @@ func (s *Traces) Shutdown() {
 }
 
 func (s *Traces) filterSpan(trace []*streampb.Span) []*streampb.Span {
-	if s.query.WantsSpans() {
-		filtered := make([]*streampb.Span, 0)
-
-		for _, span := range trace {
-			if s.query.MatchesSpanBatched(span, trace) {
-				filtered = append(filtered, span)
-			}
-		}
-
-		return filtered
-	}
-
 	if s.query.MatchesTrace(trace) {
 		return trace
 	}

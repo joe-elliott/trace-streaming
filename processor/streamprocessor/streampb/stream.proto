@@ -15,8 +15,17 @@ message StreamRequest {
 }
 
 message SpanResponse {  
+    enum ResponseType {
+      SPANS    = 0;
+      METRICS  = 1;
+      TRACE    = 2;
+    };
+
     int32 dropped = 1;
-    repeated Span spans = 2;
+
+    ResponseType type = 2;
+    repeated Span spans = 3;
+    Metric metrics = 4;
 }
 
 message Span {
@@ -34,6 +43,11 @@ message Span {
   Process process = 11;
 
   int32 parentIndex = 12;
+}
+
+message Metric {
+  int64 t = 1;
+  repeated double v = 2;
 }
 
 message Process {
