@@ -28,9 +28,9 @@ func (s *Metrics) Do() error {
 	go func() {
 		// todo: shutdown cleanly
 		for {
+			// todo: totally a race condition here
 			metrics := s.query.Aggregate(nil, true)
 
-			// jpe send metrics
 			s.stream.Send(&streampb.SpanResponse{
 				Dropped: 0,
 				Type:    streampb.SpanResponse_METRICS,

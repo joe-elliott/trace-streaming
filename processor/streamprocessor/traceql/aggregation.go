@@ -40,9 +40,8 @@ func generateAggregationFunc(agg int, f field, args []float64) aggregationFunc {
 		count := 0.0
 		return func(s *streampb.Span, reset bool) []float64 {
 			if reset {
-				ret := []float64{count}
-				count = 0.0
-				return ret
+				// no reset.  count is a counter
+				return []float64{count}
 			}
 
 			count++
@@ -65,7 +64,14 @@ func generateAggregationFunc(agg int, f field, args []float64) aggregationFunc {
 		sum := 0.0
 		return func(s *streampb.Span, reset bool) []float64 {
 			if reset {
-				ret := []float64{sum / count}
+				var ret []float64
+
+				if count == 0.0 {
+					ret = []float64{0.0}
+				} else {
+					ret = []float64{sum / count}
+				}
+
 				count = 0.0
 				sum = 0.0
 				return ret
@@ -89,9 +95,8 @@ func generateAggregationFunc(agg int, f field, args []float64) aggregationFunc {
 
 		return func(s *streampb.Span, reset bool) []float64 {
 			if reset {
-				ret := buckets
-				buckets = make([]float64, bucketCount+1)
-				return ret
+				// no reset.  buckets are counters
+				return buckets
 			}
 
 			val := f.getFloatValue(s)
