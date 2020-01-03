@@ -56,6 +56,18 @@ func TestQueryType(t *testing.T) {
 			in:       `traces{parent.duration = 3, isRoot = 1}`,
 			expected: QueryTypeTraces,
 		},
+		{
+			in:       `count(spans{})`,
+			expected: QueryTypeMetrics,
+		},
+		{
+			in:       `avg(spans{}.duration)`,
+			expected: QueryTypeMetrics,
+		},
+		{
+			in:       `histogram(spans{}.duration, 1.0, 2.0, 3.0)`,
+			expected: QueryTypeMetrics,
+		},
 	} {
 		t.Run(tc.in, func(t *testing.T) {
 			expr, err := ParseExpr(tc.in)

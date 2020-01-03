@@ -157,16 +157,16 @@ var yyPgo = [...]int{
 }
 var yyR1 = [...]int{
 
-	0, 1, 1, 1, 3, 3, 3, 4, 4, 14,
-	14, 14, 14, 2, 5, 5, 6, 6, 7, 9,
+	0, 1, 1, 1, 3, 3, 3, 2, 4, 4,
+	14, 14, 14, 14, 5, 5, 6, 6, 7, 9,
 	8, 10, 10, 10, 10, 10, 10, 10, 10, 10,
 	10, 10, 10, 11, 12, 12, 13, 13, 13, 13,
 	13, 13, 13, 13,
 }
 var yyR2 = [...]int{
 
-	0, 1, 1, 2, 4, 8, 6, 1, 3, 1,
-	1, 1, 1, 2, 2, 3, 1, 3, 3, 1,
+	0, 1, 1, 2, 4, 8, 6, 2, 1, 3,
+	1, 1, 1, 1, 2, 3, 1, 3, 3, 1,
 	1, 1, 1, 1, 1, 1, 1, 3, 3, 3,
 	3, 4, 4, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1,
@@ -185,15 +185,15 @@ var yyChk = [...]int{
 }
 var yyDef = [...]int{
 
-	0, -2, 1, 2, 0, 0, 0, 0, 0, 9,
-	10, 11, 12, 3, 0, 13, 0, 0, 0, 14,
+	0, -2, 1, 2, 0, 0, 0, 0, 0, 10,
+	11, 12, 13, 3, 0, 7, 0, 0, 0, 14,
 	0, 16, 0, 19, 21, 22, 23, 24, 25, 26,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 15,
 	0, 0, 36, 37, 38, 39, 40, 41, 42, 43,
 	0, 0, 0, 0, 0, 0, 4, 0, 0, 17,
 	18, 20, 27, 28, 29, 33, 30, 34, 35, 0,
-	0, 0, 0, 31, 32, 0, 6, 0, 7, 5,
-	0, 8,
+	0, 0, 0, 31, 32, 0, 6, 0, 8, 5,
+	0, 9,
 }
 var yyTok1 = [...]int{
 
@@ -549,10 +549,12 @@ yydefault:
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*lexer).expr = yyDollar[1].TempExpr
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*lexer).expr = yyDollar[1].TempExpr
 		}
 	case 3:
 		yyDollar = yyS[yypt-2 : yypt+1]
@@ -562,52 +564,52 @@ yydefault:
 	case 4:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yylex.(*lexer).expr = newMetricsExpr(AGG_COUNT, yyDollar[3].TempExpr, nil, nil)
+			yyVAL.TempExpr = newMetricsExpr(AGG_COUNT, yyDollar[3].TempExpr, nil, nil)
 		}
 	case 5:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			yylex.(*lexer).expr = newMetricsExpr(AGG_HIST, yyDollar[3].TempExpr, yyDollar[5].TempField, yyDollar[7].AggregateArgs)
+			yyVAL.TempExpr = newMetricsExpr(AGG_HIST, yyDollar[3].TempExpr, yyDollar[5].TempField, yyDollar[7].AggregateArgs)
 		}
 	case 6:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yylex.(*lexer).expr = newMetricsExpr(yyDollar[1].AggregateFunc, yyDollar[3].TempExpr, yyDollar[5].TempField, nil)
+			yyVAL.TempExpr = newMetricsExpr(yyDollar[1].AggregateFunc, yyDollar[3].TempExpr, yyDollar[5].TempField, nil)
 		}
 	case 7:
+		yyDollar = yyS[yypt-2 : yypt+1]
+		{
+			yyVAL.TempExpr = newExpr(STREAM_TYPE_SPANS, yyDollar[2].Selector)
+		}
+	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.AggregateArgs = []float64{yyDollar[1].float}
 		}
-	case 8:
+	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
 			yyVAL.AggregateArgs = append(yyDollar[1].AggregateArgs, yyDollar[3].float)
 		}
-	case 9:
+	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.AggregateFunc = AGG_MAX
 		}
-	case 10:
+	case 11:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.AggregateFunc = AGG_MIN
 		}
-	case 11:
+	case 12:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.AggregateFunc = AGG_SUM
 		}
-	case 12:
+	case 13:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			yyVAL.AggregateFunc = AGG_AVG
-		}
-	case 13:
-		yyDollar = yyS[yypt-2 : yypt+1]
-		{
-			yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, yyDollar[2].Selector)
 		}
 	case 14:
 		yyDollar = yyS[yypt-2 : yypt+1]

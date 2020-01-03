@@ -33,6 +33,7 @@ func (s *Traces) Do() error {
 
 		s.stream.Send(&streampb.SpanResponse{
 			Dropped: 0,
+			Type:    streampb.SpanResponse_TRACE,
 			Spans:   trace,
 		})
 

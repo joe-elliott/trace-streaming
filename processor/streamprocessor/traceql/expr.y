@@ -57,15 +57,19 @@ package traceql
 %%
 
 expr:
-      spanExpr                         { }
-    | metricsExpr                      { }
+      spanExpr                         { yylex.(*lexer).expr = $1 }
+    | metricsExpr                      { yylex.(*lexer).expr = $1 }
     | STREAM_TYPE_TRACES selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_TRACES, $2) }
     ;
 
 metricsExpr:
-      AGG_COUNT OPEN_PARENS spanExpr CLOSE_PARENS                              { yylex.(*lexer).expr = newMetricsExpr(AGG_COUNT, $3, nil, nil) }
-    | AGG_HIST OPEN_PARENS spanExpr DOT field COMMA aggregateArgs CLOSE_PARENS { yylex.(*lexer).expr = newMetricsExpr(AGG_HIST, $3, $5, $7)    }
-    | aggregateFunc OPEN_PARENS spanExpr DOT field CLOSE_PARENS                { yylex.(*lexer).expr = newMetricsExpr($1, $3, $5, nil)         }
+      AGG_COUNT OPEN_PARENS spanExpr CLOSE_PARENS                              { $$ = newMetricsExpr(AGG_COUNT, $3, nil, nil) }
+    | AGG_HIST OPEN_PARENS spanExpr DOT field COMMA aggregateArgs CLOSE_PARENS { $$ = newMetricsExpr(AGG_HIST, $3, $5, $7)    }
+    | aggregateFunc OPEN_PARENS spanExpr DOT field CLOSE_PARENS                { $$ = newMetricsExpr($1, $3, $5, nil)         }
+    ;
+
+spanExpr:
+      STREAM_TYPE_SPANS  selector      { $$ = newExpr(STREAM_TYPE_SPANS, $2) }
     ;
 
 aggregateArgs:
@@ -78,10 +82,6 @@ aggregateFunc:
     | AGG_MIN                         { $$ = AGG_MIN  }
     | AGG_SUM                         { $$ = AGG_SUM  }
     | AGG_AVG                         { $$ = AGG_AVG  }
-    ;
-
-spanExpr:
-      STREAM_TYPE_SPANS  selector      { yylex.(*lexer).expr = newExpr(STREAM_TYPE_SPANS, $2) }
     ;
 
 selector:
