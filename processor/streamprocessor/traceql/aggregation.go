@@ -87,6 +87,7 @@ func generateAggregationFunc(agg int, f field, args []float64) aggregationFunc {
 			return nil
 		}
 
+		// todo: review this.  i'm pretty sure it's wrong
 		start := args[0]
 		bucketCount := int(args[1])
 		diff := args[2]
