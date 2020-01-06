@@ -59,7 +59,7 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 }
 
 func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata.TraceData) error {
-	blergSpans := make([]*streampb.Span, len(td.Spans))
+	streamSpans := make([]*streampb.Span, len(td.Spans))
 	i := 0
 
 	for _, span := range td.Spans {
@@ -67,18 +67,18 @@ func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata
 			continue
 		}
 
-		blergSpan := spanToSpan(span, td.Node)
-		blergSpans[i] = blergSpan
+		streamSpan := spanToSpan(span, td.Node)
+		streamSpans[i] = streamSpan
 		i++
 	}
 
 	if i > 0 {
-		blergSpans = blergSpans[:i]
+		streamSpans = streamSpans[:i]
 		for _, s := range sp.spanStreamers {
-			s.ProcessBatch(blergSpans)
+			s.ProcessBatch(streamSpans)
 		}
 
-		sp.traceBatcher.addBatch(blergSpans)
+		sp.traceBatcher.addBatch(streamSpans)
 	}
 
 	return sp.nextConsumer.ConsumeTraceData(ctx, td)

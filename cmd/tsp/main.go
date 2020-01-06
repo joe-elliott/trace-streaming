@@ -21,10 +21,10 @@ func main() {
 	handleErr(err)
 
 	info := service.ApplicationStartInfo{
-		ExeName:  "blerg",
-		LongName: "blerg",
-		Version:  "blerg",
-		GitHash:  "blerg",
+		ExeName:  "tsp",
+		LongName: "trace stream processing",
+		Version:  "x.x.x.x",
+		GitHash:  "",
 	}
 
 	customProcessors, err := processor.Build(

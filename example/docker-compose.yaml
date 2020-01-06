@@ -1,7 +1,7 @@
 version: '3.3'
 services:
-  blerg:
-    image: blerg:latest
+  tsp:
+    image: tsp:latest
     command: ["--config","/etc/config/config.yaml"]
     ports:
       - "31234:31234"
@@ -14,6 +14,6 @@ services:
       - "8080:8080"
     command: ["all"]
     environment:
-      - JAEGER_ENDPOINT=http://blerg:14268/api/traces
+      - JAEGER_ENDPOINT=http://tsp:14268/api/traces
     depends_on:
-      - blerg
+      - tsp
