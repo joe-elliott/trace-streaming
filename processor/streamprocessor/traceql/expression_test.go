@@ -468,8 +468,46 @@ func TestMetrics(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
+		})
+	}
+}
 
-			// do it again to confirm reset work
+func TestReset(t *testing.T) {
+	for _, tc := range []struct {
+		in       string
+		expected []float64
+	}{
+		{
+			in:       `sum(spans{duration > 5}.duration)`,
+			expected: []float64{410},
+		},
+		{
+			in:       `max(spans{duration > 5}.duration)`,
+			expected: []float64{110},
+		},
+		{
+			in:       `min(spans{duration > 5}.duration)`,
+			expected: []float64{99},
+		},
+		{
+			in:       `avg(spans{duration > 5}.duration)`,
+			expected: []float64{102.5},
+		},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			expr, err := ParseExpr(tc.in)
+
+			assert.Nil(t, err)
+			if expr == nil {
+				assert.FailNow(t, "expr is unexpectedly nil.")
+			}
+
+			for _, s := range trace {
+				expr.Aggregate(s, false)
+			}
+
+			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
+
 			for _, s := range trace {
 				expr.Aggregate(s, false)
 			}
@@ -477,4 +515,55 @@ func TestMetrics(t *testing.T) {
 			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
 		})
 	}
+}
+
+func TestResetOnCounters(t *testing.T) {
+	for _, tc := range []struct {
+		in       string
+		expected []float64
+	}{
+		{
+			in:       `count(spans{})`,
+			expected: []float64{5},
+		},
+		{
+			in:       `count(spans{duration > 5})`,
+			expected: []float64{4},
+		},
+		{
+			in:       `histogram(spans{duration > 5}.duration, 95.0, 5.0, 3.0)`,
+			expected: []float64{0, 2, 1, 0, 0, 1},
+		},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			expr, err := ParseExpr(tc.in)
+
+			assert.Nil(t, err)
+			if expr == nil {
+				assert.FailNow(t, "expr is unexpectedly nil.")
+			}
+
+			for _, s := range trace {
+				expr.Aggregate(s, false)
+			}
+
+			assert.Equal(t, tc.expected, expr.Aggregate(nil, true))
+
+			for _, s := range trace {
+				expr.Aggregate(s, false)
+			}
+
+			assert.Equal(t, doubleSlice(tc.expected), expr.Aggregate(nil, true))
+		})
+	}
+}
+
+func doubleSlice(in []float64) []float64 {
+	out := make([]float64, 0)
+
+	for _, f := range in {
+		out = append(out, 2*f)
+	}
+
+	return out
 }

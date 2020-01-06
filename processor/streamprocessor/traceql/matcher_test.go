@@ -7,19 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type intTest struct {
-	compare  int
-	expected bool
-}
-type floatTest struct {
-	compare  float64
-	expected bool
-}
-type stringTest struct {
-	compare  string
-	expected bool
-}
-
 func TestMatcher(t *testing.T) {
 	span := &streampb.Span{
 		Name:     "rootSpan",
