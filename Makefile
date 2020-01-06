@@ -1,6 +1,6 @@
-.PHONY: blerg
-blerg:
-	GO111MODULE=on CGO_ENABLED=0 go build -o ./bin/$(GOOS)/blerg $(BUILD_INFO) ./cmd/blerg
+.PHONY: tsp
+tsp:
+	GO111MODULE=on CGO_ENABLED=0 go build -o ./bin/$(GOOS)/tsp $(BUILD_INFO) ./cmd/tsp
 
 .PHONY: docker-component # Not intended to be used directly
 docker-component: check-component
@@ -9,9 +9,9 @@ docker-component: check-component
 	docker build -t $(COMPONENT) ./cmd/$(COMPONENT)/
 	rm ./cmd/$(COMPONENT)/$(COMPONENT)
 
-.PHONY: docker-blerg
-docker-blerg:
-	COMPONENT=blerg $(MAKE) docker-component
+.PHONY: docker-tsp
+docker-tsp:
+	COMPONENT=tsp $(MAKE) docker-component
 
 .PHONY: check-component
 check-component:

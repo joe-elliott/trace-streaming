@@ -1,4 +1,4 @@
-- make docker-blerg
+- make docker-tsp
 - docker-compose up
 - go run ./cmd/client
 - http://localhost:8080
