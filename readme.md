@@ -37,11 +37,11 @@ Retrieves spans that cross process boundaries.
 `traces{parent*.process.name = 'cortex-ingester', process.name = 'cortex-querier'}`  
 Retrieves traces that follow a specific path through your services.
 
-`avg(spans{name = 'memcache.GET'}.duration)`
+`avg(spans{name = 'memcache.GET'}.duration)`  
 Retrieves average durations for any span with the name `memcache.GET`.
 
-`histogram(spans{name = 'memcache.GET'}.atts["blerg"]), 0.0, 10.0, 10.0)`
-Retrieves average durations for any span with the name `memcache.GET`.
+`histogram(spans{name = 'memcache.GET'}.atts["blerg"]), 0.0, 10.0, 10.0)`  
+Retrieves a histogram starting at 0 and containing 10 buckets for the duration of any span with the name `memcache.GET`.
 
 ### Types
 
