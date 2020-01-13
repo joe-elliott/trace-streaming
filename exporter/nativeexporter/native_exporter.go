@@ -16,11 +16,13 @@ package nativeexporter
 
 import (
 	"context"
+	"io/ioutil"
 	"time"
 
 	"go.uber.org/zap"
 
 	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/backends"
+	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/backends/local"
 	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/batch"
 
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
@@ -41,8 +43,14 @@ type nativeExporter struct {
 // NewTraceExporter creates an exporter.TraceExporter that just drops the
 // received data and logs debugging messages.
 func NewTraceExporter(config configmodels.Exporter, logger *zap.Logger) (exporter.TraceExporter, error) {
+	dir, err := ioutil.TempDir("", "tsp-test")
+	if err != nil {
+		return nil, err
+	}
+
 	e := &nativeExporter{
 		batcher: batch.NewBatcher(),
+		backend: local.NewBackend(dir),
 		logger:  logger,
 	}
 
