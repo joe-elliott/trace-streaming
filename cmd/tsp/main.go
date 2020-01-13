@@ -4,9 +4,11 @@ import (
 	"log"
 
 	"github.com/open-telemetry/opentelemetry-collector/defaults"
+	"github.com/open-telemetry/opentelemetry-collector/exporter"
 	"github.com/open-telemetry/opentelemetry-collector/processor"
 	"github.com/open-telemetry/opentelemetry-collector/service"
 
+	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter"
 	"github.com/joe-elliott/trace-streaming/processor/streamprocessor"
 )
 
@@ -27,6 +29,7 @@ func main() {
 		GitHash:  "",
 	}
 
+	// processors
 	customProcessors, err := processor.Build(
 		&streamprocessor.Factory{},
 	)
@@ -36,6 +39,17 @@ func main() {
 		factories.Processors[k] = v
 	}
 
+	// exporters
+	customExporters, err := exporter.Build(
+		&nativeexporter.Factory{},
+	)
+	handleErr(err)
+
+	for k, v := range customExporters {
+		factories.Exporters[k] = v
+	}
+
+	// start
 	svc, err := service.New(factories, info)
 	handleErr(err)
 
