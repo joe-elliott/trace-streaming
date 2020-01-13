@@ -20,6 +20,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/backends"
 	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/batch"
 
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
@@ -30,6 +31,9 @@ import (
 
 type nativeExporter struct {
 	batcher batch.Batcher
+	backend backends.Writer
+
+	batches []batch.Batch
 
 	logger *zap.Logger
 }
@@ -63,13 +67,53 @@ func (e *nativeExporter) cutTraces() {
 	ticker := time.NewTicker(1 * time.Hour)
 
 	for {
-		_, err := e.batcher.Cut() // todo: write this somewhere
+		batch, err := e.batcher.Cut()
 
 		if err != nil {
 			e.logger.Error("Error cutting batch.", zap.Error(err))
 		}
 
+		e.batches = append(e.batches, batch)
+
 		<-ticker.C
 	}
+}
 
+func (e *nativeExporter) flushBatches() {
+	ticker := time.NewTicker(5 * time.Second)
+
+	for {
+		<-ticker.C
+
+		// todo : shared structure needs locking?  this seems generally like a poor way to do this.  find a better way
+		if len(e.batches) == 0 {
+			continue
+		}
+
+		b := e.batches[0]
+
+		idxBytes, err := b.Index()
+		if err != nil {
+			e.logger.Error("Error getting index.", zap.Error(err))
+			continue
+		}
+
+		traceBytes, err := b.Traces()
+		if err != nil {
+			e.logger.Error("Error getting traces.", zap.Error(err))
+			continue
+		}
+
+		filterBytes, err := b.BloomFilter()
+		if err != nil {
+			e.logger.Error("Error getting filter.", zap.Error(err))
+			continue
+		}
+
+		err = e.backend.Write(idxBytes, traceBytes, filterBytes)
+		if err != nil {
+			e.logger.Error("Error flushing.", zap.Error(err))
+			continue
+		}
+	}
 }
