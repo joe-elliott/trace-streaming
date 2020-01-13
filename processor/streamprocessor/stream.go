@@ -5,6 +5,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/open-telemetry/opentelemetry-collector/component"
 	"github.com/open-telemetry/opentelemetry-collector/consumer"
 	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
 	"github.com/open-telemetry/opentelemetry-collector/oterr"
@@ -45,16 +46,6 @@ func NewTraceProcessor(nextConsumer consumer.TraceConsumer, config Config) (proc
 	sp.servers = append(sp.servers, server.NewGRPC(sp, config.GRPC))
 	sp.servers = append(sp.servers, server.NewWebsocket(sp, config.Websocket))
 
-	for _, srv := range sp.servers {
-		err := srv.Do()
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	go sp.pollBatches(5 * time.Second)
-
 	return sp, nil
 }
 
@@ -81,6 +72,20 @@ func (sp *streamProcessor) ConsumeTraceData(ctx context.Context, td consumerdata
 
 func (sp *streamProcessor) GetCapabilities() processor.Capabilities {
 	return processor.Capabilities{MutatesConsumedData: false}
+}
+
+func (sp *streamProcessor) Start(host component.Host) error {
+	for _, srv := range sp.servers {
+		err := srv.Do()
+
+		if err != nil {
+			return err
+		}
+	}
+
+	go sp.pollBatches(5 * time.Second)
+
+	return nil
 }
 
 func (sp *streamProcessor) Shutdown() error {
