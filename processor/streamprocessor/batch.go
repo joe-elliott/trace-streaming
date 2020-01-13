@@ -75,6 +75,7 @@ func (b *batcher) completeBatches() [][]*streampb.Span {
 }
 
 // let's hope there's no collisions in the last 8 bytes!
+//  todo:  use full byte slice.  this only works b/c we generate 64 bit traceids in jaeger
 func traceID(b []byte) uint64 {
 	lastBytes := b[len(b)-8:]
 	return binary.BigEndian.Uint64(lastBytes)

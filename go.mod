@@ -12,6 +12,8 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20190924101040-52e0504f83ea
 	github.com/spf13/cast v1.3.0
 	github.com/stretchr/testify v1.4.0
+	github.com/willf/bitset v1.1.10 // indirect
+	github.com/willf/bloom v2.0.3+incompatible
 	go.uber.org/ratelimit v0.1.0
 	go.uber.org/zap v1.10.0
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553

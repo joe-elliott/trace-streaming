@@ -16,8 +16,11 @@ package nativeexporter
 
 import (
 	"context"
+	"time"
 
 	"go.uber.org/zap"
+
+	"github.com/joe-elliott/trace-streaming/exporter/nativeexporter/batch"
 
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
@@ -25,17 +28,48 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/exporter/exporterhelper"
 )
 
+type nativeExporter struct {
+	batcher batch.Batcher
+
+	logger *zap.Logger
+}
+
 // NewTraceExporter creates an exporter.TraceExporter that just drops the
 // received data and logs debugging messages.
 func NewTraceExporter(config configmodels.Exporter, logger *zap.Logger) (exporter.TraceExporter, error) {
+	e := &nativeExporter{
+		batcher: batch.NewBatcher(),
+		logger:  logger,
+	}
+
+	go e.cutTraces()
+
 	return exporterhelper.NewTraceExporter(
 		config,
-		func(ctx context.Context, td consumerdata.TraceData) (int, error) {
-
-			return 0, nil
-		},
+		e.consumeTrace,
 		exporterhelper.WithTracing(true),
 		exporterhelper.WithMetrics(true),
-		exporterhelper.WithShutdown(logger.Sync),
+		exporterhelper.WithShutdown(logger.Sync), // todo: flush on shutdown
 	)
+}
+
+func (e *nativeExporter) consumeTrace(ctx context.Context, td consumerdata.TraceData) (int, error) {
+	e.batcher.Store(td)
+
+	return 0, nil
+}
+
+func (e *nativeExporter) cutTraces() {
+	ticker := time.NewTicker(1 * time.Hour)
+
+	for {
+		_, err := e.batcher.Cut() // todo: write this somewhere
+
+		if err != nil {
+			e.logger.Error("Error cutting batch.", zap.Error(err))
+		}
+
+		<-ticker.C
+	}
+
 }
