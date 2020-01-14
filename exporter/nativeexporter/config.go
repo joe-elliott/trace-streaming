@@ -15,10 +15,13 @@
 package nativeexporter
 
 import (
+	"time"
+
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 )
 
 // Config defines configuration for logging exporter.
 type Config struct {
 	configmodels.ExporterSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct.
+	BlockDuration                 time.Duration            `mapstructure:"blockDuration"`
 }

@@ -15,6 +15,8 @@
 package nativeexporter
 
 import (
+	"time"
+
 	"go.uber.org/zap"
 
 	"github.com/open-telemetry/opentelemetry-collector/config/configerror"
@@ -43,6 +45,7 @@ func (f *Factory) CreateDefaultConfig() configmodels.Exporter {
 			TypeVal: typeStr,
 			NameVal: typeStr,
 		},
+		BlockDuration: 2 * time.Hour,
 	}
 }
 

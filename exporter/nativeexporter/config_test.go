@@ -17,6 +17,7 @@ package nativeexporter
 import (
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,16 +37,17 @@ func TestLoadConfig(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
-	e0 := cfg.Exporters["logging"]
+	e0 := cfg.Exporters["native"]
 	assert.Equal(t, e0, factory.CreateDefaultConfig())
 
-	e1 := cfg.Exporters["logging/2"]
+	e1 := cfg.Exporters["native/custom"]
 	assert.Equal(t, e1,
 		&Config{
 			ExporterSettings: configmodels.ExporterSettings{
-				NameVal: "logging/2",
-				TypeVal: "logging",
+				NameVal: "native/custom",
+				TypeVal: "native",
 			},
-			LogLevel: "debug",
+			BlockDuration: 5 * time.Minute,
 		})
+
 }

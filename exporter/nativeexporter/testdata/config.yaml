@@ -5,16 +5,13 @@ processors:
   exampleprocessor:
 
 exporters:
-  logging:
-  logging/2:
-    loglevel: debug
+  native:
+  native/custom:
+    blockDuration: 5m
 
 service:
   pipelines:
     traces:
       receivers: [examplereceiver]
       processors: [exampleprocessor]
-      exporters: [logging]
-    metrics:
-      receivers: [examplereceiver]
-      exporters: [logging,logging/2]
+      exporters: [native]

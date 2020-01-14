@@ -38,6 +38,7 @@ type nativeExporter struct {
 	batches []batch.Batch
 
 	logger *zap.Logger
+	cfg    *Config
 }
 
 // NewTraceExporter creates an exporter.TraceExporter that just drops the
@@ -52,6 +53,7 @@ func NewTraceExporter(config configmodels.Exporter, logger *zap.Logger) (exporte
 		batcher: batch.NewBatcher(),
 		backend: local.NewBackend(dir),
 		logger:  logger,
+		cfg:     config.(*Config),
 	}
 
 	go e.cutTraces()
@@ -72,7 +74,7 @@ func (e *nativeExporter) consumeTrace(ctx context.Context, td consumerdata.Trace
 }
 
 func (e *nativeExporter) cutTraces() {
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(e.cfg.BlockDuration)
 
 	for {
 		batch, err := e.batcher.Cut()

@@ -17,7 +17,6 @@ import (
 	"context"
 	"testing"
 
-	metricspb "github.com/census-instrumentation/opencensus-proto/gen-go/metrics/v1"
 	tracepb "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,7 +26,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
 )
 
-func TestLoggingTraceExporterNoErrors(t *testing.T) {
+func TestNativeTraceExporterNoErrors(t *testing.T) {
 	lte, err := NewTraceExporter(&configmodels.ExporterSettings{}, zap.NewNop())
 	require.NotNil(t, lte)
 	assert.NoError(t, err)
@@ -37,16 +36,4 @@ func TestLoggingTraceExporterNoErrors(t *testing.T) {
 	}
 	assert.NoError(t, lte.ConsumeTraceData(context.Background(), td))
 	assert.NoError(t, lte.Shutdown())
-}
-
-func TestLoggingMetricsExporterNoErrors(t *testing.T) {
-	lme, err := NewMetricsExporter(&configmodels.ExporterSettings{}, zap.NewNop())
-	require.NotNil(t, lme)
-	assert.NoError(t, err)
-
-	md := consumerdata.MetricsData{
-		Metrics: make([]*metricspb.Metric, 7),
-	}
-	assert.NoError(t, lme.ConsumeMetricsData(context.Background(), md))
-	assert.NoError(t, lme.Shutdown())
 }
