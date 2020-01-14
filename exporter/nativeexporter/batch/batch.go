@@ -39,22 +39,21 @@ func (b *batch) Index() ([]byte, error) {
 	// 128 (trace id) + 64 (start) + 32 (length) = 1612800000 bits ~= 200MB for 1000 traces/second cut every 2 hours
 
 	// todo:  consider compression (columnar diff).  index must clearly indicate if a trace id is in a set
-	bytes := make([]byte, 0, len(b.mappings)*28)
-	buff := bytes
+	bytes := make([]byte, len(b.mappings)*28)
 
-	for _, m := range b.mappings {
+	for i, m := range b.mappings {
+		buff := bytes[i*28 : (i+1)*28]
+
 		if len(m.id) != 16 {
 			return nil, fmt.Errorf("Trace Ids must be 128 bit")
 		}
 
 		// todo: does golang have memcpy?
-		for i, idByte := range m.id {
-			buff[i] = idByte
+		for j, idByte := range m.id {
+			buff[j] = idByte
 		}
-		binary.LittleEndian.PutUint64(buff, m.start)
-		binary.LittleEndian.PutUint32(buff, m.length)
-
-		buff = buff[28:]
+		binary.LittleEndian.PutUint64(buff[16:24], m.start)
+		binary.LittleEndian.PutUint32(buff[24:], m.length)
 	}
 
 	return bytes, nil

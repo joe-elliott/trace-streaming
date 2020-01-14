@@ -57,6 +57,7 @@ func NewTraceExporter(config configmodels.Exporter, logger *zap.Logger) (exporte
 	}
 
 	go e.cutTraces()
+	go e.flushBatches()
 
 	return exporterhelper.NewTraceExporter(
 		config,
@@ -77,6 +78,8 @@ func (e *nativeExporter) cutTraces() {
 	ticker := time.NewTicker(e.cfg.BlockDuration)
 
 	for {
+		e.logger.Info("Cutting a batch", zap.String("exporter", e.cfg.NameVal))
+
 		batch, err := e.batcher.Cut()
 
 		if err != nil {
@@ -99,6 +102,8 @@ func (e *nativeExporter) flushBatches() {
 		if len(e.batches) == 0 {
 			continue
 		}
+
+		e.logger.Info("Flushing batch", zap.String("exporter", e.cfg.NameVal))
 
 		b := e.batches[0]
 
@@ -125,5 +130,7 @@ func (e *nativeExporter) flushBatches() {
 			e.logger.Error("Error flushing.", zap.Error(err))
 			continue
 		}
+
+		e.batches = e.batches[1:]
 	}
 }

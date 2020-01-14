@@ -7,7 +7,7 @@ receivers:
         endpoint: "0.0.0.0:14268"
 exporters:
   native:
-    block_duration: 1m
+    block_duration: 5m
 processors:
   stream: {}
 extensions:
