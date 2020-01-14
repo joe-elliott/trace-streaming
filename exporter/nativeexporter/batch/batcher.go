@@ -53,7 +53,7 @@ func (b *batcher) Store(td consumerdata.TraceData) {
 
 func (b *batcher) Cut() (Batch, error) {
 	// iterate through and remove all "complete" traces
-	batch := &batch{}
+	batch := newBatch(uint(len(b.traces))) // todo: get real trace count?
 
 	b.lock.RLock()
 	defer b.lock.RUnlock()

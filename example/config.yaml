@@ -1,13 +1,13 @@
+# docker run -e JAEGER_COLLECTOR_URL=http://192.168.1.124:14268 omnition/synthetic-load-generator:1.0.25
 # go run ./cmd/server --config=./cmd/server/config.yaml
 receivers:
   jaeger:
     protocols:
       thrift-http:
         endpoint: "0.0.0.0:14268"
-      grpc:
-        endpoint: "0.0.0.0:14250"
 exporters:
-  logging: {}
+  native:
+    block_duration: 1m
 processors:
   stream: {}
 extensions:
@@ -19,5 +19,5 @@ service:
   pipelines:
     traces:
       receivers: [jaeger]
-      exporters: [logging]
+      exporters: [native]
       processors: [stream]
