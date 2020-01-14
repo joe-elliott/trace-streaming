@@ -23,5 +23,5 @@ import (
 // Config defines configuration for logging exporter.
 type Config struct {
 	configmodels.ExporterSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct.
-	BlockDuration                 time.Duration            `mapstructure:"blockDuration"`
+	BlockDuration                 time.Duration            `mapstructure:"block_duration"`
 }

@@ -7,7 +7,7 @@ processors:
 exporters:
   native:
   native/custom:
-    blockDuration: 5m
+    block_duration: 5m
 
 service:
   pipelines:
