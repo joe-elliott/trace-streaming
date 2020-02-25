@@ -17,3 +17,10 @@ services:
       - JAEGER_ENDPOINT=http://tsp:14268/api/traces
     depends_on:
       - tsp
+  synthetic-load-generator:
+    image: omnition/synthetic-load-generator:1.0.25
+    volumes:
+      - ./load-generator.json:/etc/load-generator.json
+    environment:
+      - TOPOLOGY_FILE=/etc/load-generator.json
+      - JAEGER_COLLECTOR_URL=http://tsp:14268
